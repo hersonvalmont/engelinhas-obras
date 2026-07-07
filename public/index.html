@@ -6087,21 +6087,21 @@ const FUNC_NRS = {
 
 // ── Registro de funcionários (estado em memória) ──────
 const FUNCIONARIOS_SEED = [
-  {matricula:'ENG-001', nome:'Juan Carlos Silva dos Santos', cpf:'123.456.789-01', funcao:'Engenheiro de Produção', obraId:'ld-lagoa-nova', admissao:'01/09/2024', regime:'CLT', docs:'Completo',
+  {matricula:'ENG-001', nome:'Juan Carlos Silva dos Santos', cpf:'123.456.789-01', funcao:'Engenheiro de Produção', obraId:'ld-lagoa-nova', admissao:'01/09/2024', regime:'CLT', docs:'Pendente',
     nrsExigidas:['NR-6','NR-10','NR-18','NR-23','NR-35','Primeiros Socorros'],
-    nrsStatus:{'NR-6':'ok','NR-10':'ok','NR-11':'na','NR-12':'na','NR-18':'ok','NR-23':'ok','NR-33':'na','NR-35':'ok','Trabalho em Altura':'ok','Direção Defensiva':'na','Primeiros Socorros':'ok'}},
+    nrsStatus:{}, nrsDetalhes:{}},
   {matricula:'MON-011', nome:'Wlisses Aparecido', cpf:'234.567.890-12', funcao:'Encarregado de Montagem', obraId:'ld-lagoa-nova', admissao:'15/09/2024', regime:'CLT', docs:'Pendente',
     nrsExigidas:['NR-6','NR-10','NR-11','NR-12','NR-18','NR-23','NR-35','Primeiros Socorros'],
-    nrsStatus:{'NR-6':'ok','NR-10':'vencida','NR-11':'ok','NR-12':'ok','NR-18':'ok','NR-23':'ok','NR-33':'na','NR-35':'ok','Trabalho em Altura':'ok','Direção Defensiva':'na','Primeiros Socorros':'vencendo'}},
+    nrsStatus:{}, nrsDetalhes:{}},
   {matricula:'TOP-003', nome:'Silvanio Monteiro', cpf:'345.678.901-23', funcao:'Encarregado de Topografia', obraId:'ld-lagoa-nova', admissao:'01/09/2024', regime:'CLT', docs:'Pendente',
     nrsExigidas:['NR-6','NR-18','NR-35'],
-    nrsStatus:{'NR-6':'ok','NR-10':'vencida','NR-11':'na','NR-12':'na','NR-18':'ok','NR-23':'na','NR-33':'na','NR-35':'vencendo','Trabalho em Altura':'ok','Direção Defensiva':'na','Primeiros Socorros':'ok'}},
-  {matricula:'ACE-004', nome:'Mauricio Ferreira', cpf:'456.789.012-34', funcao:'Encarregado de Acesso', obraId:'ld-lagoa-nova', admissao:'01/09/2024', regime:'CLT', docs:'Completo',
+    nrsStatus:{}, nrsDetalhes:{}},
+  {matricula:'ACE-004', nome:'Mauricio Ferreira', cpf:'456.789.012-34', funcao:'Encarregado de Acesso', obraId:'ld-lagoa-nova', admissao:'01/09/2024', regime:'CLT', docs:'Pendente',
     nrsExigidas:['NR-6','NR-18'],
-    nrsStatus:{'NR-6':'ok','NR-10':'ok','NR-11':'na','NR-12':'ok','NR-18':'ok','NR-23':'na','NR-33':'ok','NR-35':'vencendo','Trabalho em Altura':'vencendo','Direção Defensiva':'na','Primeiros Socorros':'ok'}},
-  {matricula:'TRA-005', nome:'Thiago Rocha', cpf:'567.890.123-45', funcao:'Motorista Munck', obraId:'ld-lagoa-nova', admissao:'10/09/2024', regime:'CLT', docs:'Completo',
+    nrsStatus:{}, nrsDetalhes:{}},
+  {matricula:'TRA-005', nome:'Thiago Rocha', cpf:'567.890.123-45', funcao:'Motorista Munck', obraId:'ld-lagoa-nova', admissao:'10/09/2024', regime:'CLT', docs:'Pendente',
     nrsExigidas:['NR-6','NR-11','NR-12','Direção Defensiva'],
-    nrsStatus:{'NR-6':'ok','NR-10':'na','NR-11':'ok','NR-12':'ok','NR-18':'na','NR-23':'na','NR-33':'na','NR-35':'na','Trabalho em Altura':'na','Direção Defensiva':'vencendo','Primeiros Socorros':'na'}},
+    nrsStatus:{}, nrsDetalhes:{}},
 ];
 
 // ── Persistência local (cache do navegador) ──────────
@@ -6113,7 +6113,29 @@ function rhCarregarFuncionarios(){
     const raw = localStorage.getItem(RH_STORAGE_KEY);
     if(raw){
       const parsed = JSON.parse(raw);
-      if(Array.isArray(parsed) && parsed.length>0) return parsed;
+      if(Array.isArray(parsed) && parsed.length>0){
+        // MIGRAÇÃO v2: se um funcionário tem nrsStatus com valores 'ok' mas não tem nrsDetalhes
+        // correspondentes, significa que o status foi gerado artificialmente pelo seed antigo.
+        // Nesse caso, limpar o nrsStatus para forçar recalculo pelos certificados reais.
+        let migrado = false;
+        parsed.forEach(f=>{
+          const det = f.nrsDetalhes || {};
+          const st  = f.nrsStatus  || {};
+          // Verificar se algum nr está marcado como 'ok' sem ter nrsDetalhes com dataVencimento
+          Object.keys(st).forEach(nr=>{
+            if(st[nr]==='ok' && (!det[nr] || !det[nr].dataVencimento)){
+              delete st[nr]; // remover status falso
+              migrado = true;
+            }
+          });
+          if(migrado) f.nrsStatus = st;
+        });
+        if(migrado){
+          // Salvar imediatamente a versão corrigida
+          try{ localStorage.setItem(RH_STORAGE_KEY, JSON.stringify(parsed)); }catch(e){}
+        }
+        return parsed;
+      }
     }
   }catch(e){ console.error('Falha ao carregar funcionários do cache:', e); }
   return JSON.parse(JSON.stringify(FUNCIONARIOS_SEED)); // cópia profunda do seed
@@ -6392,11 +6414,11 @@ function trSalvar(){
   const dataVencimento = document.getElementById('tr-data-vencimento').value;
   const instituicao = document.getElementById('tr-instituicao').value.trim();
 
-  if(!dataRealizacao){ alert('Informe a data de realização do treinamento.'); return; }
-  if(!dataVencimento){ alert('Informe ou calcule a data de vencimento.'); return; }
+  if(!dataRealizacao){ showToast('Informe a data de realização do treinamento.','error'); return; }
+  if(!dataVencimento){ showToast('Calcule ou informe a data de vencimento.','error'); return; }
 
   const f = FUNCIONARIOS.find(x=>x.matricula===matricula);
-  if(!f){ alert('Funcionário não encontrado.'); return; }
+  if(!f){ showToast('Funcionário não encontrado.','error'); return; }
 
   if(!f.nrsDetalhes) f.nrsDetalhes = {};
   const temAnexo = trArquivosTemp.length > 0;
@@ -6404,6 +6426,8 @@ function trSalvar(){
     tipo, cargaHoraria, dataRealizacao, validadeMeses, dataVencimento, instituicao,
     arquivosNomes: trArquivosTemp.map(a=>a.name),
   };
+
+  // Status calculado a partir dos detalhes reais — NÃO setar 'ok' manualmente
   if(!f.nrsStatus) f.nrsStatus = {};
   const novoStatus = trCalcularStatus(dataVencimento, temAnexo);
   f.nrsStatus[nrNome] = novoStatus;
@@ -6412,9 +6436,16 @@ function trSalvar(){
   rhRenderTreinamentos();
   closeModal('modal-treinamento');
 
-  let avisoExtra = '';
-  if(novoStatus==='sem_doc') avisoExtra = '\n\nAtenção: a data está em dia, mas nenhum certificado foi anexado. Status marcado como pendente de documento.';
-  alert('Treinamento "'+nrNome+'" registrado para '+f.nome+'. Vencimento: '+dataVencimento.split('-').reverse().join('/')+avisoExtra);
+  const vencFmt = dataVencimento.split('-').reverse().join('/');
+  if(novoStatus==='sem_doc'){
+    showToast('⚠️ Treinamento salvo — mas sem certificado anexado. Anexe o arquivo para validar.','warn');
+  } else if(novoStatus==='ok'){
+    showToast('✅ '+nrNome+' registrado para '+f.nome.split(' ')[0]+'. Validade: '+vencFmt,'success');
+  } else if(novoStatus==='vencendo'){
+    showToast('⚠️ '+nrNome+' salvo, mas vence em menos de 30 dias ('+vencFmt+').','warn');
+  } else if(novoStatus==='vencida'){
+    showToast('❌ '+nrNome+' registrado com data de vencimento vencida ('+vencFmt+').','error');
+  }
 }
 
 
@@ -6426,14 +6457,23 @@ function rhRenderTreinamentos(){
     tbody.innerHTML = `<tr><td colspan="${NRS_COLUNAS.length+1}" style="text-align:center;color:var(--text3);padding:24px">Nenhum funcionário ativo cadastrado.</td></tr>`;
   } else {
     tbody.innerHTML = funcAtivos.map(f=>{
-      const status = f.nrsStatus || {};
+      const detalhes = f.nrsDetalhes || {};
       const celulas = NRS_COLUNAS.map(nr=>{
         const exigida = (f.nrsExigidas||[]).includes(nr);
         if(!exigida) return '<td style="text-align:center;color:var(--text3)">—</td>';
-        // Se exigida mas sem status definido ou 'na' → pendente (sem_doc = X vermelho)
-        const s = status[nr];
-        const statusReal = (!s || s==='na') ? 'sem_doc' : s;
-        return `<td style="text-align:center;cursor:pointer" onclick="trVerOuRegistrar('${f.matricula}','${nr.replace(/'/g,"\\'")}')">${rhBadgeNR(statusReal)}</td>`;
+        // Status calculado ao vivo: olha os nrsDetalhes reais do funcionário
+        const det = detalhes[nr];
+        let statusReal;
+        if(!det || !det.dataVencimento){
+          statusReal = 'sem_doc'; // sem registro = X vermelho
+        } else {
+          const temAnexo = (det.arquivosNomes||[]).length > 0;
+          statusReal = trCalcularStatus(det.dataVencimento, temAnexo);
+        }
+        // Atualizar cache nrsStatus para manter consistência com KPIs
+        if(!f.nrsStatus) f.nrsStatus = {};
+        f.nrsStatus[nr] = statusReal;
+        return `<td style="text-align:center;cursor:pointer" title="${nr}: clique para registrar/editar" onclick="trVerOuRegistrar('${f.matricula}','${nr.replace(/'/g,"\\'")}')">${rhBadgeNR(statusReal)}</td>`;
       }).join('');
       const obraNome = RDO_OBRAS[f.obraId]?.nome || OBRAS_LISTA.find(o=>o.id===f.obraId)?.nome || f.obraId || '—';
       return `<tr>
@@ -6450,14 +6490,17 @@ function rhRenderTreinamentos(){
 function rhAtualizarKpisTreinamentos(){
   let ativas=0, emDia=0, vencendo=0, vencidas=0;
   FUNCIONARIOS.filter(f=>f.ativo!==false).forEach(f=>{
-    const status = f.nrsStatus || {};
+    const detalhes = f.nrsDetalhes || {};
     (f.nrsExigidas||[]).forEach(nr=>{
       ativas++;
-      const s = status[nr];
+      const det = detalhes[nr];
+      if(!det || !det.dataVencimento){ /* sem_doc — pendente, não conta emDia */ return; }
+      const temAnexo = (det.arquivosNomes||[]).length > 0;
+      const s = trCalcularStatus(det.dataVencimento, temAnexo);
       if(s==='ok') emDia++;
       else if(s==='vencendo') vencendo++;
       else if(s==='vencida') vencidas++;
-      // sem_doc / na / undefined → não contabiliza em "emDia"
+      // sem_doc (data ok mas sem anexo) → não conta como "em dia"
     });
   });
   const elA=document.getElementById('rh-tr-kpi-ativas'), elE=document.getElementById('rh-tr-kpi-emdia'),
@@ -6647,10 +6690,15 @@ function funcSalvar(){
     const idx = FUNCIONARIOS.findIndex(x=>x.matricula===funcEditandoMatricula);
     if(idx<0){ showToast('Funcionário não encontrado.','error'); return; }
     const f = FUNCIONARIOS[idx];
-    // Manter nrsStatus existente, adicionar novas NRs como 'ok' se não existirem
+    // Manter nrsStatus existente (calculado pelos certificados anexados em nrsDetalhes)
+    // NÃO inicializar novas NRs como 'ok' — status vem exclusivamente dos certificados reais
     const nrsStatus = f.nrsStatus || {};
-    nrsExigidas.forEach(nr=>{ if(!nrsStatus[nr]) nrsStatus[nr]='ok'; });
-    FUNCIONARIOS[idx] = { ...f, nome, cpf, funcao, obraId, regime, nrsExigidas, nrsStatus,
+    // Remover status de NRs que foram desmarcadas (não são mais exigidas)
+    Object.keys(nrsStatus).forEach(nr=>{ if(!nrsExigidas.includes(nr)) delete nrsStatus[nr]; });
+    const nrsDetalhes = f.nrsDetalhes || {};
+    // Remover detalhes de NRs desmarcadas
+    Object.keys(nrsDetalhes).forEach(nr=>{ if(!nrsExigidas.includes(nr)) delete nrsDetalhes[nr]; });
+    FUNCIONARIOS[idx] = { ...f, nome, cpf, funcao, obraId, regime, nrsExigidas, nrsStatus, nrsDetalhes,
       docs: (funcArquivosTemp.length>0||f.docs==='Completo') ? 'Completo' : 'Pendente' };
     rhSalvarFuncionarios();
     rhRenderFuncionarios();
@@ -6658,16 +6706,16 @@ function funcSalvar(){
     closeModal('modal-funcionario');
     showToast('Funcionário "'+nome+'" atualizado com sucesso.','success');
   } else {
-    // NOVO
+    // NOVO — status começa vazio, será preenchido ao registrar cada treinamento com certificado
     const nrsStatus = {};
-    NRS_COLUNAS.forEach(nr=>{ nrsStatus[nr] = nrsExigidas.includes(nr) ? 'ok' : 'na'; });
+    const nrsDetalhes = {};
     const hoje = new Date();
     const admissao = String(hoje.getDate()).padStart(2,'0')+'/'+String(hoje.getMonth()+1).padStart(2,'0')+'/'+hoje.getFullYear();
     const novoFuncionario = {
       matricula: rhGerarMatricula(funcao),
       nome, cpf, funcao, obraId, admissao, regime,
       docs: funcArquivosTemp.length>0 ? 'Completo' : 'Pendente',
-      nrsExigidas, nrsStatus, ativo: true,
+      nrsExigidas, nrsStatus, nrsDetalhes, ativo: true,
     };
     FUNCIONARIOS.push(novoFuncionario);
     rhSalvarFuncionarios();
