@@ -4464,10 +4464,22 @@ function doLogin(){
   const email   = document.getElementById('inp-email').value.trim().toLowerCase();
   const senha   = document.getElementById('inp-senha').value;
   const err     = document.getElementById('login-error');
-  const usuariosList = typeof USUARIOS_LISTA !== 'undefined' ? USUARIOS_LISTA : [{email:USUARIO.email,senha:USUARIO.senha,nome:USUARIO.nome,ativo:true}];
+
+  // Sempre reler do localStorage para pegar usuários criados em qualquer sessão
+  let usuariosList = [];
+  try{
+    const raw = localStorage.getItem('engelinhas_usuarios_v1');
+    if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)&&p.length>0) usuariosList=p; }
+  }catch(e){}
+  // Fallback: seed padrão caso o storage esteja vazio
+  if(usuariosList.length===0){
+    usuariosList = [{email:'guilherme@engelinhas.com.br',senha:'1234',nome:'Guilherme Diniz',perfil:'Admin',empresa:'Engelinhas',ativo:true}];
+  }
+  // Sincronizar array em memória para evitar dessincronização
+  if(typeof USUARIOS_LISTA !== 'undefined') USUARIOS_LISTA = usuariosList;
+
   const user = usuariosList.find(u=>u.email===email&&u.senha===senha&&u.ativo!==false);
   if(user){
-    // Salvar sessão e cache dos campos empresa+email para próximo acesso
     localStorage.setItem('engelinhas_session', JSON.stringify({email:user.email, nome:user.nome, ts:Date.now()}));
     localStorage.setItem('engelinhas_login_cache', JSON.stringify({empresa: empresa||user.empresa||'', email:user.email}));
     _aplicarLogin(user);
