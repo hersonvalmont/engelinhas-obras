@@ -3562,20 +3562,20 @@ tbody tr:hover td{background:var(--bg3)}
 
       <!-- PLANILHAS TÉCNICAS -->
       <div class="page" id="page-plan-civil-topografia">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Topografia</span></div><div class="page-title">Topografia</div><div class="page-sub">Levantamentos topográficos, plantas e cadernetas de campo</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
-        <div class="kpi-grid kpi-grid-3" id="kpi-ambiental-arqueologia">
-          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-arqueologia-total">0</div></div>
-          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-arqueologia-ok">0</div></div>
-          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-arqueologia-pend">0</div></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Topografia</span></div><div class="page-title">Topografia</div><div class="page-sub">Levantamentos topográficos, plantas e cadernetas de campo</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-civil-topografia','Nova Topografia')"><i data-lucide="plus"></i> Nova Planilha</button></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-plan-civil-topografia">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-plan-civil-topografia-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-plan-civil-topografia-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-plan-civil-topografia-pend">0</div></div>
         </div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Registros — Arqueologia</div>
-            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-arqueologia','Arqueologia')"><i data-lucide="plus"></i> Novo</button>
+            <div class="card-title">Registros — Topografia</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('plan-civil-topografia','Topografia')"><i data-lucide="plus"></i> Novo</button>
           </div>
           <div class="table-wrap"><table>
             <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
-            <tbody id="tbody-ambiental-arqueologia">
+            <tbody id="tbody-plan-civil-topografia">
               <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
             </tbody>
           </table></div>
@@ -3583,51 +3583,154 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <div class="page" id="page-plan-civil-sondagem">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Sondagem</span></div><div class="page-title">Sondagem</div><div class="page-sub">Laudos de sondagem SPT, boletins de ensaio e perfis de solo</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="drill" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Sondagem</span></div><div class="page-title">Sondagem</div><div class="page-sub">Laudos de sondagem SPT, boletins de ensaio e perfis de solo</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-civil-sondagem','Nova Sondagem')"><i data-lucide="plus"></i> Nova Planilha</button></div>
+        
+      <div class="kpi-grid kpi-grid-3" style="margin-top:8px">
+        <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-plan-civil-sondagem-total">0</div></div>
+        <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-plan-civil-sondagem-ok">0</div></div>
+        <div class="kpi amber"><div class="kpi-label">Em andamento</div><div class="kpi-value" id="kpi-plan-civil-sondagem-pend">0</div></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="card-header">
+          <div class="card-title">Registros — Sondagem</div>
+          <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('plan-civil-sondagem','Sondagem')"><i data-lucide="plus"></i> Novo</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+          <tbody id="tbody-plan-civil-sondagem">
+            <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
       </div>
 
       <div class="page" id="page-plan-civil-fundacao">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Fundação</span></div><div class="page-title">Fundação</div><div class="page-sub">Planilhas de controle de estacas, blocos e sapatas</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="layers" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Fundação</span></div><div class="page-title">Fundação</div><div class="page-sub">Planilhas de controle de estacas, blocos e sapatas</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-civil-fundacao','Nova Fundação')"><i data-lucide="plus"></i> Nova Planilha</button></div>
+        
+      <div class="kpi-grid kpi-grid-3" style="margin-top:8px">
+        <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-plan-civil-fundacao-total">0</div></div>
+        <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-plan-civil-fundacao-ok">0</div></div>
+        <div class="kpi amber"><div class="kpi-label">Em andamento</div><div class="kpi-value" id="kpi-plan-civil-fundacao-pend">0</div></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="card-header">
+          <div class="card-title">Registros — Fundação Civil</div>
+          <button class="btn btn-sm btn-secondary" onclick="exportarCSV('plan-civil-fundacao')" title="Exportar CSV"><i data-lucide="download" style="width:13px;height:13px;margin-right:4px"></i> CSV</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+          <tbody id="tbody-plan-civil-fundacao">
+            <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
       </div>
 
       <div class="page" id="page-plan-geo-lancamento">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Plano de Lançamento</span></div><div class="page-title">Plano de Lançamento</div><div class="page-sub">Planilhas de lançamento de cabos, vãos e sequência de montagem</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="git-branch" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Plano de Lançamento</span></div><div class="page-title">Plano de Lançamento</div><div class="page-sub">Planilhas de lançamento de cabos, vãos e sequência de montagem</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-geo-lancamento','Novo Plano de Lançamento')"><i data-lucide="plus"></i> Nova Planilha</button></div>
+        
+      <div class="kpi-grid kpi-grid-3" style="margin-top:8px">
+        <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-plan-geo-lancamento-total">0</div></div>
+        <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-plan-geo-lancamento-ok">0</div></div>
+        <div class="kpi amber"><div class="kpi-label">Em andamento</div><div class="kpi-value" id="kpi-plan-geo-lancamento-pend">0</div></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="card-header">
+          <div class="card-title">Registros — Plano de Lançamento</div>
+          <button class="btn btn-sm btn-secondary" onclick="exportarCSV('plan-geo-lancamento')" title="Exportar CSV"><i data-lucide="download" style="width:13px;height:13px;margin-right:4px"></i> CSV</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+          <tbody id="tbody-plan-geo-lancamento">
+            <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
       </div>
 
       <div class="page" id="page-plan-geo-esticamento">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Tabela de Esticamento</span></div><div class="page-title">Tabela de Esticamento</div><div class="page-sub">Tabelas de flechas, tensões e parâmetros de esticamento de cabos</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="move-horizontal" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Tabela de Esticamento</span></div><div class="page-title">Tabela de Esticamento</div><div class="page-sub">Tabelas de flechas, tensões e parâmetros de esticamento de cabos</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-geo-esticamento','Nova Tabela de Esticamento')"><i data-lucide="plus"></i> Nova Planilha</button></div>
+        
+      <div class="kpi-grid kpi-grid-3" style="margin-top:8px">
+        <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-plan-geo-esticamento-total">0</div></div>
+        <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-plan-geo-esticamento-ok">0</div></div>
+        <div class="kpi amber"><div class="kpi-label">Em andamento</div><div class="kpi-value" id="kpi-plan-geo-esticamento-pend">0</div></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="card-header">
+          <div class="card-title">Registros — Tabela de Esticamento</div>
+          <button class="btn btn-sm btn-secondary" onclick="exportarCSV('plan-geo-esticamento')" title="Exportar CSV"><i data-lucide="download" style="width:13px;height:13px;margin-right:4px"></i> CSV</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+          <tbody id="tbody-plan-geo-esticamento">
+            <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
       </div>
 
       <div class="page" id="page-acomp-rel-nc">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Acomp. de Obra</span><i data-lucide="chevron-right"></i><span>Relatórios</span><i data-lucide="chevron-right"></i><span>Não Conformidade</span></div><div class="page-title">Relatórios de Não Conformidade</div><div class="page-sub">Registros fotográficos de não conformidades identificadas em obra</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo relatório</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="triangle-alert" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        
+      <div class="kpi-grid kpi-grid-3" style="margin-top:8px">
+        <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-acomp-rel-nc-total">0</div></div>
+        <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-acomp-rel-nc-ok">0</div></div>
+        <div class="kpi amber"><div class="kpi-label">Em andamento</div><div class="kpi-value" id="kpi-acomp-rel-nc-pend">0</div></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="card-header">
+          <div class="card-title">Registros — Não Conformidade</div>
+          <button class="btn btn-sm btn-secondary" onclick="exportarCSV('acomp-rel-nc')" title="Exportar CSV"><i data-lucide="download" style="width:13px;height:13px;margin-right:4px"></i> CSV</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+          <tbody id="tbody-acomp-rel-nc">
+            <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
       </div>
 
       <div class="page" id="page-acomp-rel-antes-depois">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Acomp. de Obra</span><i data-lucide="chevron-right"></i><span>Relatórios</span><i data-lucide="chevron-right"></i><span>Antes e Depois</span></div><div class="page-title">Antes e Depois</div><div class="page-sub">Comparativo fotográfico de intervenções e evoluções de obra</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo registro</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="images" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        
+      <div class="kpi-grid kpi-grid-3" style="margin-top:8px">
+        <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-acomp-rel-antes-depois-total">0</div></div>
+        <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-acomp-rel-antes-depois-ok">0</div></div>
+        <div class="kpi amber"><div class="kpi-label">Em andamento</div><div class="kpi-value" id="kpi-acomp-rel-antes-depois-pend">0</div></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="card-header">
+          <div class="card-title">Registros — Antes e Depois</div>
+          <button class="btn btn-sm btn-secondary" onclick="exportarCSV('acomp-rel-antes-depois')" title="Exportar CSV"><i data-lucide="download" style="width:13px;height:13px;margin-right:4px"></i> CSV</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+          <tbody id="tbody-acomp-rel-antes-depois">
+            <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
       </div>
 
       <!-- AMBIENTAL novos -->
-      <div class="page" id="page-ambiental-arqueologia">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Arqueologia</span></div><div class="page-title">Arqueologia</div><div class="page-sub">Programas de prospecção, monitoramento e resgate arqueológico</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo registro</button></div>
-        <div class="kpi-grid kpi-grid-3" id="kpi-fundiario-acoes">
-          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-fundiario-acoes-total">0</div></div>
-          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-fundiario-acoes-ok">0</div></div>
-          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-fundiario-acoes-pend">0</div></div>
+      <div class="page" id="page-ambiental-arqueologia2">
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Arqueologia</span></div><div class="page-title">Arqueologia</div><div class="page-sub">Programas de prospecção, monitoramento e resgate arqueológico</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('ambiental-arqueologia','Arqueologia')"><i data-lucide="plus"></i> Novo registro</button></div>
+        <div class="kpi-grid kpi-grid-3">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-arqueologia-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-arqueologia-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-arqueologia-pend">0</div></div>
         </div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Registros — Ações Fundiárias</div>
-            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('fundiario-acoes','Ações Fundiárias')"><i data-lucide="plus"></i> Novo</button>
+            <div class="card-title">Registros — Arqueologia</div>
+            <button class="btn btn-sm btn-secondary" onclick="exportarCSV('ambiental-arqueologia')" title="Exportar CSV"><i data-lucide="download" style="width:13px;height:13px;margin-right:4px"></i> CSV</button>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-arqueologia','Arqueologia')"><i data-lucide="plus"></i> Novo</button>
           </div>
           <div class="table-wrap"><table>
             <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
-            <tbody id="tbody-fundiario-acoes">
+            <tbody id="tbody-ambiental-arqueologia">
               <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
             </tbody>
           </table></div>
@@ -3699,8 +3802,19 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <div class="page" id="page-fundiario-embargos">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Fundiário</span><i data-lucide="chevron-right"></i><span>Embargos</span></div><div class="page-title">Embargos Fundiários</div><div class="page-sub">Impedimentos de acesso, liminares e ordens de paralisação</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo embargo</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="ban" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Fundiário</span><i data-lucide="chevron-right"></i><span>Embargos</span></div><div class="page-title">Embargos Fundiários</div><div class="page-sub">Impedimentos de acesso, liminares e ordens de paralisação</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('fundiario-embargos','Novo Embargo')"><i data-lucide="plus"></i> Novo embargo</button></div>
+        <div class="kpi-grid kpi-grid-3">
+          <div class="kpi red"><div class="kpi-label">Total de embargos</div><div class="kpi-value" id="kpi-fundiario-embargos-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Resolvidos</div><div class="kpi-value" id="kpi-fundiario-embargos-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em aberto</div><div class="kpi-value" id="kpi-fundiario-embargos-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Embargos Fundiários</div><button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('fundiario-embargos','Novo Embargo')"><i data-lucide="plus"></i> Novo</button></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-fundiario-embargos"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum embargo registrado. Clique em "+ Novo" para adicionar.</td></tr></tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-fundiario-liberacoes">
@@ -4381,7 +4495,12 @@ function navTo(pageId){
     'fundiario-liberacoes','proj-materiais','nova-licenca','novo-contrato',
     'novo-prazo','nova-notificacao','novo-projeto','novo-submittal',
     'nova-planilha','novo-cronograma','novo-plano','novo-item',
-    'novo-protocolo','nova-medicao','novo-ter','registrar-entrega'
+    'novo-protocolo','nova-medicao','novo-ter','registrar-entrega',
+    // Novos módulos desta sessão
+    'plan-civil-topografia','plan-civil-sondagem','plan-civil-fundacao',
+    'plan-geo-lancamento','plan-geo-esticamento',
+    'acomp-rel-nc','acomp-rel-antes-depois',
+    'contrato-juridico'
   ];
   MODULOS_GENERICOS.forEach(tipo=>{
     if(document.getElementById('tbody-'+tipo)){
@@ -7996,9 +8115,17 @@ function exportarCSV(tipo){
     nome='atas_engelinhas';
     linhas.push(['ID','Título','Obra','Data','Participantes','Status','Ações']);
     ATAS_LISTA.forEach(a=>linhas.push([a.id,a.titulo,a.obraNome||'',a.data,a.participantes||'',a.status,a.acoes||'']));
+  } else {
+    // Módulo genérico — tentar ler do localStorage
+    try{
+      const lista=JSON.parse(localStorage.getItem('engelinhas_registros_'+tipo)||'[]');
+      nome=tipo.replace(/-/g,'_')+'_engelinhas';
+      linhas.push(['ID','Título','Obra','Data','Responsável','Status','Observações','Criado em']);
+      lista.forEach(r=>linhas.push([r.id,r.titulo,r.obraNome||'',r.data||'',r.responsavel||'',r.status,r.obs||'',r.criadoEm||'']));
+    }catch(e){ showToast('Erro ao ler dados para exportação.','error'); return; }
   }
 
-  if(linhas.length<=1){ alert('Nenhum dado para exportar.'); return; }
+  if(linhas.length<=1){ showToast('Nenhum dado para exportar.','warn'); return; }
 
   const csv=linhas.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
   const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
@@ -8007,7 +8134,25 @@ function exportarCSV(tipo){
   a.href=url; a.download=nome+'_'+new Date().toISOString().slice(0,10)+'.csv';
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
-  alert('✅ CSV exportado: '+a.download);
+  showToast('✅ CSV exportado: '+a.download,'success');
+}
+
+// Toast notification leve (sem depender de alert)
+function showToast(msg, tipo='info'){
+  let t=document.getElementById('engelinhas-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='engelinhas-toast';
+    t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:99999;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,.18);transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  const cores={success:'#22c55e',error:'#ef4444',warn:'#f59e0b',info:'#3b82f6'};
+  t.style.background=cores[tipo]||cores.info;
+  t.style.color='#fff';
+  t.textContent=msg;
+  t.style.opacity='1';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{ t.style.opacity='0'; },3000);
 }
 
 // ═══════════════════════════════════════════════════════
