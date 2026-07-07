@@ -3292,10 +3292,10 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
-          <div class="kpi blue"><div class="kpi-label">Certificações ativas</div><div class="kpi-value" id="rh-tr-kpi-ativas">218</div></div>
-          <div class="kpi green"><div class="kpi-label">Em dia</div><div class="kpi-value" id="rh-tr-kpi-emdia">202</div></div>
-          <div class="kpi amber"><div class="kpi-label">Vencendo em 30 dias</div><div class="kpi-value" id="rh-tr-kpi-vencendo">12</div></div>
-          <div class="kpi red"><div class="kpi-label">Vencidas</div><div class="kpi-value" id="rh-tr-kpi-vencidas">4</div></div>
+          <div class="kpi blue"><div class="kpi-label">Certificações ativas</div><div class="kpi-value" id="rh-tr-kpi-ativas">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Em dia</div><div class="kpi-value" id="rh-tr-kpi-emdia">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Vencendo em 30 dias</div><div class="kpi-value" id="rh-tr-kpi-vencendo">0</div></div>
+          <div class="kpi red"><div class="kpi-label">Vencidas</div><div class="kpi-value" id="rh-tr-kpi-vencidas">0</div></div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">Matriz de treinamentos</div></div>
@@ -7693,6 +7693,14 @@ document.addEventListener('DOMContentLoaded', function(){
     if(pageId === 'rh-anexos'){
       repoRender('rh-anexos');
     }
+    // Atualizar KPIs globais de RH sempre que navegar para qualquer sub-página RH
+    if(pageId && pageId.startsWith('rh-') && typeof rhAtualizarKpis==='function'){
+      setTimeout(rhAtualizarKpis, 80);
+    }
+    // Atualizar notificações ao abrir o app ou navegar para dashboard
+    if(pageId==='dashboard' && typeof notificacoesAtualizar==='function'){
+      setTimeout(notificacoesAtualizar, 100);
+    }
   };
 });
 
@@ -9071,50 +9079,95 @@ function salvarPerfil(){
 // NOTIFICAÇÕES DINÂMICAS
 // ═══════════════════════════════════════════════════════
 function notificacoesAtualizar(){
-  // Verificar atas com muitas ações pendentes
   atasCarregar();
   let notifs=[];
-
-  // Obras com prazo próximo
   const hoje=new Date();
+  hoje.setHours(0,0,0,0);
+
+  // ── Obras com prazo próximo ──────────────────────────
   OBRAS_LISTA.forEach(o=>{
     if(o.prazo){
       const diff=Math.ceil((new Date(o.prazo)-hoje)/(1000*60*60*24));
       if(diff>0&&diff<=30){
-        notifs.push({
-          tipo:'amber', icone:'calendar',
+        notifs.push({tipo:'amber',icone:'calendar',
           titulo:'Prazo se aproximando — '+o.nome,
-          meta:'Obras · '+diff+' dias restantes',
-          acao:"navTo('obras')"
-        });
+          meta:'Obras · '+diff+' dias restantes',acao:"navTo('obras')"});
       } else if(diff<=0&&diff>-180){
-        notifs.push({
-          tipo:'red', icone:'alert-triangle',
+        notifs.push({tipo:'red',icone:'alert-triangle',
           titulo:'Prazo vencido — '+o.nome,
-          meta:'Obras · venceu há '+Math.abs(diff)+' dias',
-          acao:"navTo('obras')"
-        });
+          meta:'Obras · venceu há '+Math.abs(diff)+' dias',acao:"navTo('obras')"});
       }
     }
   });
 
-  // Atas recentes
+  // ── Atas em rascunho ────────────────────────────────
   const atUnpub=ATAS_LISTA.filter(a=>a.status==='rascunho').length;
   if(atUnpub>0){
-    notifs.push({
-      tipo:'blue', icone:'file-text',
+    notifs.push({tipo:'blue',icone:'file-text',
       titulo:atUnpub+' ata(s) em rascunho aguardando publicação',
-      meta:'Atas de Reunião',
-      acao:"navTo('acomp-atas')"
-    });
+      meta:'Atas de Reunião',acao:"navTo('acomp-atas')"});
   }
 
-  // Renderizar no dropdown
+  // ── NRs / Treinamentos vencendo ou vencidos ─────────
+  try{
+    const funcs = (typeof FUNCIONARIOS!=='undefined' ? FUNCIONARIOS : [])
+                  .filter(f=>f.ativo!==false);
+    let nrVencendo=[], nrVencidas=[];
+    funcs.forEach(f=>{
+      const det = f.nrsDetalhes || {};
+      (f.nrsExigidas||[]).forEach(nr=>{
+        const d = det[nr];
+        if(!d||!d.dataVencimento) return;
+        const temAnexo = (d.arquivosNomes||[]).length>0;
+        const st = trCalcularStatus(d.dataVencimento, temAnexo);
+        if(st==='vencendo') nrVencendo.push(f.nome.split(' ')[0]+' / '+nr);
+        if(st==='vencida')  nrVencidas.push(f.nome.split(' ')[0]+' / '+nr);
+      });
+    });
+    if(nrVencidas.length>0){
+      notifs.push({tipo:'red',icone:'shield-alert',
+        titulo:nrVencidas.length+' certificado(s) NR vencido(s)',
+        meta:'Treinamentos · '+nrVencidas.slice(0,2).join(', ')+(nrVencidas.length>2?' e mais...':''),
+        acao:"navTo('rh-treinamentos')"});
+    }
+    if(nrVencendo.length>0){
+      notifs.push({tipo:'amber',icone:'shield',
+        titulo:nrVencendo.length+' certificado(s) NR vencendo em 30 dias',
+        meta:'Treinamentos · '+nrVencendo.slice(0,2).join(', ')+(nrVencendo.length>2?' e mais...':''),
+        acao:"navTo('rh-treinamentos')"});
+    }
+  }catch(e){}
+
+  // ── ASOs vencidos ou vencendo ────────────────────────
+  try{
+    const asos = JSON.parse(localStorage.getItem('engelinhas_rh_asos')||'[]');
+    let asoVencendo=[], asoVencidas=[];
+    asos.forEach(a=>{
+      if(!a.validade) return;
+      const diff = Math.round((new Date(a.validade+'T00:00:00') - hoje) / 86400000);
+      if(diff<0)      asoVencidas.push(a.nomeFuncionario||a.matricula);
+      else if(diff<=30) asoVencendo.push(a.nomeFuncionario||a.matricula);
+    });
+    if(asoVencidas.length>0){
+      notifs.push({tipo:'red',icone:'heart-crack',
+        titulo:asoVencidas.length+' ASO(s) vencido(s)',
+        meta:'ASOs · '+asoVencidas.slice(0,2).join(', ')+(asoVencidas.length>2?' e mais...':''),
+        acao:"navTo('rh-aso')"});
+    }
+    if(asoVencendo.length>0){
+      notifs.push({tipo:'amber',icone:'heart',
+        titulo:asoVencendo.length+' ASO(s) vencendo em 30 dias',
+        meta:'ASOs · '+asoVencendo.slice(0,2).join(', ')+(asoVencendo.length>2?' e mais...':''),
+        acao:"navTo('rh-aso')"});
+    }
+  }catch(e){}
+
+  // ── Renderizar no dropdown ───────────────────────────
   const list=document.getElementById('notif-list');
   const badge=document.getElementById('notif-badge');
   if(!list) return;
 
-  const novas_html = notifs.slice(0,5).map(n=>`
+  const novas_html = notifs.slice(0,8).map(n=>`
     <div class="notif-item" onclick="${n.acao};closeNotif()">
       <div class="notif-dot ${n.tipo}"></div>
       <div class="notif-item-body">
@@ -9123,47 +9176,58 @@ function notificacoesAtualizar(){
       </div>
     </div>`).join('');
 
-  // Adicionar antes das notificações fixas existentes
-  const fixas=list.innerHTML;
-  list.innerHTML = novas_html + fixas;
+  list.innerHTML = novas_html || '<div style="padding:16px;text-align:center;font-size:13px;color:var(--text3)">Nenhuma notificação pendente.</div>';
 
-  // Atualizar badge
-  const totalNotifs=notifs.length+4; // 4 fixas originais
-  if(badge) badge.textContent=Math.min(totalNotifs,9);
+  if(badge){
+    badge.textContent = Math.min(notifs.length, 9);
+    badge.style.display = notifs.length>0 ? '' : 'none';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
 // KPIs RH DINÂMICOS
 // ═══════════════════════════════════════════════════════
 function rhAtualizarKpis(){
-  // Usar funcionários do localStorage se disponível
-  let funcs=[];
-  try{ funcs=JSON.parse(localStorage.getItem('engelinhas_rh_funcionarios_v1')||'[]'); }catch(e){}
+  // Usar o array FUNCIONARIOS em memória (que já está carregado com a chave correta)
+  const funcs = typeof FUNCIONARIOS !== 'undefined' ? FUNCIONARIOS : [];
+  const ativos = funcs.filter(f=>f.ativo!==false);
 
-  const kpiTotal=document.getElementById('rh-kpi-total');
-  const kpiComp=document.getElementById('rh-kpi-completo');
-  const kpiPend=document.getElementById('rh-kpi-pendente');
-
-  if(funcs.length>0){
-    const ativos=funcs.filter(f=>f.ativo!==false);
-    const comDoc=ativos.filter(f=>f.cpf&&f.rg&&f.ctps&&f.aso).length;
-    const semDoc=ativos.length-comDoc;
-    if(kpiTotal) kpiTotal.textContent=ativos.length;
-    if(kpiComp) kpiComp.textContent=comDoc;
-    if(kpiPend) kpiPend.textContent=semDoc;
-  } else {
-    // Manter valores estáticos se não há dados no localStorage
-    if(kpiTotal && kpiTotal.textContent==='—') kpiTotal.textContent='0';
+  // KPIs de Funcionários (página rh-funcionarios / rh-documentacao)
+  const kpiTotal = document.getElementById('rh-kpi-total');
+  const kpiComp  = document.getElementById('rh-kpi-completo');
+  const kpiPend  = document.getElementById('rh-kpi-pendente');
+  if(kpiTotal) kpiTotal.textContent = ativos.length;
+  if(kpiComp || kpiPend){
+    const comDoc = ativos.filter(f=>f.docs==='Completo').length;
+    if(kpiComp) kpiComp.textContent = comDoc;
+    if(kpiPend) kpiPend.textContent = ativos.length - comDoc;
   }
 
-  // KPIs de treinamentos
-  try{
-    const trein=JSON.parse(localStorage.getItem('engelinhas_registros_sesmt-vistorias')||'[]');
-    const kpiTrT=document.getElementById('rh-kpi-treinamentos-total');
-    const kpiTrV=document.getElementById('rh-kpi-treinamentos-venc');
-    if(kpiTrT) kpiTrT.textContent=trein.length;
-    if(kpiTrV) kpiTrV.textContent=trein.filter(t=>t.status==='Vencido'||t.status==='Pendente').length;
-  }catch(e){}
+  // KPIs de Treinamentos — recalcular de nrsDetalhes (fonte única de verdade)
+  if(typeof trCalcularStatus === 'function'){
+    let trAtivas=0, trEmDia=0, trVencendo=0, trVencidas=0;
+    ativos.forEach(f=>{
+      const det = f.nrsDetalhes || {};
+      (f.nrsExigidas||[]).forEach(nr=>{
+        trAtivas++;
+        const d = det[nr];
+        if(!d||!d.dataVencimento) return; // sem doc — nem conta como em dia
+        const temAnexo = (d.arquivosNomes||[]).length>0;
+        const st = trCalcularStatus(d.dataVencimento, temAnexo);
+        if(st==='ok')       trEmDia++;
+        else if(st==='vencendo') trVencendo++;
+        else if(st==='vencida')  trVencidas++;
+      });
+    });
+    const elA=document.getElementById('rh-tr-kpi-ativas');
+    const elE=document.getElementById('rh-tr-kpi-emdia');
+    const elV=document.getElementById('rh-tr-kpi-vencendo');
+    const elX=document.getElementById('rh-tr-kpi-vencidas');
+    if(elA) elA.textContent=trAtivas;
+    if(elE) elE.textContent=trEmDia;
+    if(elV) elV.textContent=trVencendo;
+    if(elX) elX.textContent=trVencidas;
+  }
 }
 let uploadFotosContexto = '';
 let uploadFotosTemp = [];
