@@ -380,16 +380,15 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
     <div class="login-field">
       <label>Empresa</label>
-      <input type="text" id="inp-empresa" value="Engelinhas">
+      <input type="text" id="inp-empresa" autocomplete="organization" placeholder="Nome da empresa">
     </div>
     <div class="login-field">
       <label>E-mail</label>
-      <input type="email" id="inp-email" value="guilherme@engelinhas.com.br">
+      <input type="email" id="inp-email" autocomplete="email" placeholder="seu@email.com.br">
     </div>
     <div class="login-field">
       <label>Senha</label>
-      <input type="password" id="inp-senha" value="1234">
-      <div class="login-hint">Demo: guilherme@engelinhas.com.br / 1234</div>
+      <input type="password" id="inp-senha" autocomplete="current-password" placeholder="••••••">
     </div>
     <button class="login-btn" onclick="doLogin()">Entrar</button>
     <div class="login-error" id="login-error">Credenciais inválidas. Verifique e tente novamente.</div>
@@ -4450,19 +4449,27 @@ function debugClear(){
 document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('login-logo-mount').innerHTML  = buildLogo('lg');
   document.getElementById('topbar-logo-mount').innerHTML = buildLogo('sm');
+  // Restaurar empresa+email do cache do navegador (preenchidos após o 1º login)
+  const cache = JSON.parse(localStorage.getItem('engelinhas_login_cache')||'null');
+  if(cache){
+    if(cache.empresa) document.getElementById('inp-empresa').value = cache.empresa;
+    if(cache.email)   document.getElementById('inp-email').value   = cache.email;
+  }
 });
 
 // ── AUTH ──────────────────────────────────────────────
 const USUARIO = {email:'guilherme@engelinhas.com.br',senha:'1234',nome:'Guilherme'};
 function doLogin(){
-  const email = document.getElementById('inp-email').value.trim().toLowerCase();
-  const senha = document.getElementById('inp-senha').value;
-  const err   = document.getElementById('login-error');
+  const empresa = document.getElementById('inp-empresa').value.trim();
+  const email   = document.getElementById('inp-email').value.trim().toLowerCase();
+  const senha   = document.getElementById('inp-senha').value;
+  const err     = document.getElementById('login-error');
   const usuariosList = typeof USUARIOS_LISTA !== 'undefined' ? USUARIOS_LISTA : [{email:USUARIO.email,senha:USUARIO.senha,nome:USUARIO.nome,ativo:true}];
   const user = usuariosList.find(u=>u.email===email&&u.senha===senha&&u.ativo!==false);
   if(user){
-    // Salvar sessão no localStorage
+    // Salvar sessão e cache dos campos empresa+email para próximo acesso
     localStorage.setItem('engelinhas_session', JSON.stringify({email:user.email, nome:user.nome, ts:Date.now()}));
+    localStorage.setItem('engelinhas_login_cache', JSON.stringify({empresa: empresa||user.empresa||'', email:user.email}));
     _aplicarLogin(user);
     err.style.display='none';
   } else { err.style.display='block'; }
@@ -4480,8 +4487,11 @@ function doLogout(){
   localStorage.removeItem('engelinhas_session');
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-screen').style.display='flex';
-  document.getElementById('inp-email').value='';
-  document.getElementById('inp-senha').value='';
+  // Restaurar empresa+email do cache (preenchimento conveniente, sem expor senha)
+  const cache = JSON.parse(localStorage.getItem('engelinhas_login_cache')||'null');
+  document.getElementById('inp-empresa').value = cache ? (cache.empresa||'') : '';
+  document.getElementById('inp-email').value   = cache ? (cache.email||'')   : '';
+  document.getElementById('inp-senha').value   = '';
 }
 
 // Enter no campo senha → submete login
