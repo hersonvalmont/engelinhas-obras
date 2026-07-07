@@ -955,7 +955,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Contrato Técnico</div>
             <div class="page-sub">Escopo técnico, especificações, memoriais descritivos e requisitos de qualidade</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo documento</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Documentos técnicos</div><div class="kpi-value">34</div></div>
@@ -981,7 +981,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Contrato Comercial</div>
             <div class="page-sub">Escopo financeiro, marcos, aditivos, medições e compliance</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo contrato</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-contrato','Novo Contrato')"><i data-lucide="plus"></i> Novo Contrato</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Contratos ativos</div><div class="kpi-value">8</div></div>
@@ -1082,7 +1082,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Licenças e Autorizações</div>
             <div class="page-sub">Autorizações ANEEL, ARTs, alvarás, licenças e registros com controle de validade</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Nova licença</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('nova-licenca','Nova Licença')"><i data-lucide="plus"></i> Nova Licença</button>
         </div>
         <div class="kpi-grid kpi-grid-4">
           <div class="kpi blue"><div class="kpi-label">Total de documentos</div><div class="kpi-value">24</div></div>
@@ -1160,7 +1160,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Prazos Regulatórios</div>
             <div class="page-sub">Marcos contratuais com ANEEL e clientes — risco de multa por atraso</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo prazo</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-prazo','Novo Prazo Regulatório')"><i data-lucide="plus"></i> Novo Prazo Regulatório</button>
         </div>
         <div class="kpi-grid kpi-grid-4">
           <div class="kpi blue"><div class="kpi-label">Marcos cadastrados</div><div class="kpi-value">18</div></div>
@@ -1227,7 +1227,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Notificações de Órgãos</div>
             <div class="page-sub">Notificações recebidas de ANEEL, ONS, IBAMA, SEMAD e prefeituras — prazo de resposta e tratativa</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Registrar notificação</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('nova-notificacao','Registrar Notificação')"><i data-lucide="plus"></i> Registrar Notificação</button>
         </div>
         <div class="kpi-grid kpi-grid-4">
           <div class="kpi blue"><div class="kpi-label">Total recebidas</div><div class="kpi-value">11</div></div>
@@ -1312,7 +1312,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Licenças Ambientais</div>
             <div class="page-sub">Licenças, condicionantes, outorgas e controle de vencimentos</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Nova licença</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('nova-licenca','Nova Licença')"><i data-lucide="plus"></i> Nova Licença</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Condicionantes ativas</div><div class="kpi-value">38</div></div>
@@ -1342,10 +1342,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Relatórios Fotográficos Ambientais</div>
             <div class="page-sub">Registros visuais de condicionantes, PRAD e ocorrências ambientais</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="upload"></i> Adicionar fotos</button>
-        </div>
-        <div class="kpi-grid kpi-grid-3">
-          <div class="kpi blue"><div class="kpi-label">Fotos indexadas</div><div class="kpi-value">412</div></div>
+          <button class="btn btn-primary" onclick="abrirUploadFotosGlobal('ambiental')"><i data-lucide="upload"></i> Adicionar fotos</button>
           <div class="kpi"><div class="kpi-label">Relatórios gerados</div><div class="kpi-value">18</div></div>
           <div class="kpi"><div class="kpi-label">Última atualização</div><div class="kpi-value">Hoje</div></div>
         </div>
@@ -1368,7 +1365,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Projetos Básicos — Civis</div>
             <div class="page-sub">Implantação, fundações, drenagem e obras civis</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo projeto</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-projeto','Novo Projeto')"><i data-lucide="plus"></i> Novo Projeto</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi green"><div class="kpi-label">Aprovados</div><div class="kpi-value">12</div></div>
@@ -1408,7 +1405,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Projetos Básicos — Eletromecânicos</div>
             <div class="page-sub">Sistemas elétricos, proteção, controle e mecânicos</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo projeto</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-projeto','Novo Projeto')"><i data-lucide="plus"></i> Novo Projeto</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi green"><div class="kpi-label">Aprovados</div><div class="kpi-value">22</div></div>
@@ -1447,7 +1444,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Projetos Executivos — Civis</div>
             <div class="page-sub">Armaduras, formas, cofragens e especificações detalhadas</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo projeto</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-projeto','Novo Projeto')"><i data-lucide="plus"></i> Novo Projeto</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi green"><div class="kpi-label">Aprovados</div><div class="kpi-value">18</div></div>
@@ -1486,7 +1483,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Projetos Executivos — Eletromecânicos</div>
             <div class="page-sub">Submittals, listas técnicas, diagramas e testes de aceitação</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo submittal</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-submittal','Novo Submittal')"><i data-lucide="plus"></i> Novo Submittal</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Submittals</div><div class="kpi-value">47</div></div>
@@ -2009,7 +2006,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Planilhas Técnicas</div>
             <div class="page-sub">Medições, quantitativos e controle de qualidade</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Nova planilha</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Planilhas ativas</div><div class="kpi-value">31</div></div>
@@ -2034,7 +2031,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Relatórios Fotográficos</div>
             <div class="page-sub">Galeria indexada por obra, disciplina e data</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="upload"></i> Adicionar fotos</button>
+          <button class="btn btn-primary" onclick="abrirUploadFotosGlobal('acomp')"><i data-lucide="upload"></i> Adicionar fotos</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Fotos indexadas</div><div class="kpi-value">1.847</div><div class="kpi-sub">↑ 94 esta semana</div></div>
@@ -2060,7 +2057,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Cronogramas</div>
             <div class="page-sub">Planejamento físico-financeiro, linha de base e desvios</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo cronograma</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-cronograma','Novo Cronograma')"><i data-lucide="plus"></i> Novo Cronograma</button>
         </div>
         <div class="kpi-grid kpi-grid-4">
           <div class="kpi blue"><div class="kpi-label">Cronogramas ativos</div><div class="kpi-value">8</div></div>
@@ -2281,7 +2278,7 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
           <div class="btn-group">
             <button class="btn"><i data-lucide="download"></i> Exportar</button>
-            <button class="btn btn-primary"><i data-lucide="plus"></i> Novo plano</button>
+            <button class="btn btn-primary" onclick="abrirModalRegistro('novo-plano','Novo Plano')"><i data-lucide="plus"></i> Novo Plano</button>
           </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
@@ -2378,7 +2375,7 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
           <div class="btn-group">
             <button class="btn"><i data-lucide="download"></i> Exportar</button>
-            <button class="btn btn-primary"><i data-lucide="plus"></i> Novo item</button>
+            <button class="btn btn-primary" onclick="abrirModalRegistro('novo-item','Novo Item')"><i data-lucide="plus"></i> Novo Item</button>
           </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
@@ -2485,7 +2482,7 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
           <div class="btn-group">
             <button class="btn"><i data-lucide="download"></i> Exportar</button>
-            <button class="btn btn-primary"><i data-lucide="plus"></i> Novo protocolo</button>
+            <button class="btn btn-primary" onclick="abrirModalRegistro('novo-protocolo','Novo Protocolo')"><i data-lucide="plus"></i> Novo Protocolo</button>
           </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
@@ -2555,7 +2552,7 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
           <div class="btn-group">
             <button class="btn"><i data-lucide="download"></i> Exportar planilha</button>
-            <button class="btn btn-primary"><i data-lucide="plus"></i> Nova medição</button>
+            <button class="btn btn-primary" onclick="abrirModalRegistro('nova-medicao','Nova Medição')"><i data-lucide="plus"></i> Nova Medição</button>
           </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
@@ -2611,7 +2608,7 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
           <div class="btn-group">
             <button class="btn"><i data-lucide="download"></i> Exportar</button>
-            <button class="btn btn-primary"><i data-lucide="plus"></i> Novo TER</button>
+            <button class="btn btn-primary" onclick="abrirModalRegistro('novo-ter','Novo TER')"><i data-lucide="plus"></i> Novo TER</button>
           </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
@@ -2797,7 +2794,7 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
           <div class="btn-group">
             <button class="btn"><i data-lucide="download"></i> Exportar</button>
-            <button class="btn btn-primary"><i data-lucide="plus"></i> Novo documento</button>
+            <button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button>
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
@@ -2932,7 +2929,7 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
           <div class="btn-group">
             <button class="btn"><i data-lucide="download"></i> Exportar</button>
-            <button class="btn btn-primary"><i data-lucide="plus"></i> Registrar entrega</button>
+            <button class="btn btn-primary" onclick="abrirModalRegistro('registrar-entrega','Registrar Entrega')"><i data-lucide="plus"></i> Registrar Entrega</button>
           </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
@@ -3052,17 +3049,17 @@ tbody tr:hover td{background:var(--bg3)}
 
       <!-- PÁGINAS NOVAS -->
       <div class="page" id="page-contrato-juridico">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Contrato</span><i data-lucide="chevron-right"></i><span>Jurídico</span></div><div class="page-title">Contrato Jurídico</div><div class="page-sub">Documentos jurídicos, pareceres e instrumentos legais</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo documento</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Contrato</span><i data-lucide="chevron-right"></i><span>Jurídico</span></div><div class="page-title">Contrato Jurídico</div><div class="page-sub">Documentos jurídicos, pareceres e instrumentos legais</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="gavel" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
       <div class="page" id="page-sesmt-recuperacao">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Recuperação Ambiental</span></div><div class="page-title">Recuperação Ambiental</div><div class="page-sub">Planos e registros de recuperação de áreas degradadas</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo documento</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Recuperação Ambiental</span></div><div class="page-title">Recuperação Ambiental</div><div class="page-sub">Planos e registros de recuperação de áreas degradadas</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="sprout" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
       <div class="page" id="page-sesmt-seguranca">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span></div><div class="page-title">Segurança do Trabalho</div><div class="page-sub">PTAs, APRs, treinamentos e registros de SST</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo documento</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span></div><div class="page-title">Segurança do Trabalho</div><div class="page-sub">PTAs, APRs, treinamentos e registros de SST</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="hard-hat" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
@@ -3237,7 +3234,7 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Controle de EPI</div>
             <div class="page-sub">Ficha de entrega, CA vigente, reposição e descarte por funcionário</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Registrar entrega</button>
+          <button class="btn btn-primary" onclick="abrirModalRegistro('registrar-entrega','Registrar Entrega')"><i data-lucide="plus"></i> Registrar Entrega</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Entregas registradas</div><div class="kpi-value">312</div><div class="kpi-sub">este mês</div></div>
@@ -3331,7 +3328,7 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <div class="page" id="page-sesmt-seg-planos">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span><i data-lucide="chevron-right"></i><span>Planos de Ação</span></div><div class="page-title">Planos de Ação — Segurança</div><div class="page-sub">Planos corretivos, preventivos e de resposta a emergências</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo plano</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span><i data-lucide="chevron-right"></i><span>Planos de Ação</span></div><div class="page-title">Planos de Ação — Segurança</div><div class="page-sub">Planos corretivos, preventivos e de resposta a emergências</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-plano','Novo Plano')"><i data-lucide="plus"></i> Novo Plano</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="list-checks" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
@@ -3342,33 +3339,33 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <div class="page" id="page-ambiental-planos">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Planos de Ação</span></div><div class="page-title">Planos de Ação Ambiental</div><div class="page-sub">Planos de mitigação, compensação e tratativa de condicionantes</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo plano</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Planos de Ação</span></div><div class="page-title">Planos de Ação Ambiental</div><div class="page-sub">Planos de mitigação, compensação e tratativa de condicionantes</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-plano','Novo Plano')"><i data-lucide="plus"></i> Novo Plano</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="list-checks" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
       <!-- PLANILHAS TÉCNICAS -->
       <div class="page" id="page-plan-civil-topografia">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Topografia</span></div><div class="page-title">Topografia</div><div class="page-sub">Levantamentos topográficos, plantas e cadernetas de campo</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova planilha</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Topografia</span></div><div class="page-title">Topografia</div><div class="page-sub">Levantamentos topográficos, plantas e cadernetas de campo</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="mountain" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
       <div class="page" id="page-plan-civil-sondagem">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Sondagem</span></div><div class="page-title">Sondagem</div><div class="page-sub">Laudos de sondagem SPT, boletins de ensaio e perfis de solo</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova planilha</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Sondagem</span></div><div class="page-title">Sondagem</div><div class="page-sub">Laudos de sondagem SPT, boletins de ensaio e perfis de solo</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="drill" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
       <div class="page" id="page-plan-civil-fundacao">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Fundação</span></div><div class="page-title">Fundação</div><div class="page-sub">Planilhas de controle de estacas, blocos e sapatas</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova planilha</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Fundação</span></div><div class="page-title">Fundação</div><div class="page-sub">Planilhas de controle de estacas, blocos e sapatas</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="layers" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
       <div class="page" id="page-plan-geo-lancamento">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Plano de Lançamento</span></div><div class="page-title">Plano de Lançamento</div><div class="page-sub">Planilhas de lançamento de cabos, vãos e sequência de montagem</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova planilha</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Plano de Lançamento</span></div><div class="page-title">Plano de Lançamento</div><div class="page-sub">Planilhas de lançamento de cabos, vãos e sequência de montagem</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="git-branch" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
       <div class="page" id="page-plan-geo-esticamento">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Tabela de Esticamento</span></div><div class="page-title">Tabela de Esticamento</div><div class="page-sub">Tabelas de flechas, tensões e parâmetros de esticamento de cabos</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova planilha</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Tabela de Esticamento</span></div><div class="page-title">Tabela de Esticamento</div><div class="page-sub">Tabelas de flechas, tensões e parâmetros de esticamento de cabos</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
         <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="move-horizontal" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
       </div>
 
@@ -3442,6 +3439,64 @@ tbody tr:hover td{background:var(--bg3)}
 </div>
 
 <!-- MODAL NOVA ATA -->
+<!-- ═══ MODAL — REGISTRO GENÉRICO ═══ -->
+<div class="modal-overlay" id="modal-registro-generico">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-registro-titulo">Novo Registro</div>
+      <button class="modal-close" onclick="closeModal('modal-registro-generico')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">Título / Descrição</label><input type="text" class="form-input" id="reg-titulo" placeholder="Informe o título do registro..."></div>
+      <div class="form-group"><label class="form-label">Obra relacionada</label><select class="form-select" id="reg-obra"><option value="">Todas as obras</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="reg-data"></div>
+      <div class="form-group"><label class="form-label">Responsável</label><input type="text" class="form-input" id="reg-responsavel" placeholder="Nome do responsável..."></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="reg-status">
+          <option value="Em elaboração">Em elaboração</option>
+          <option value="Publicado">Publicado</option>
+          <option value="Em revisão">Em revisão</option>
+          <option value="Aprovado">Aprovado</option>
+          <option value="Vencido">Vencido</option>
+        </select>
+      </div>
+      <div class="form-group full"><label class="form-label">Observações</label><textarea class="form-textarea" id="reg-obs" placeholder="Observações adicionais..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-registro-generico')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarRegistroGenerico()"><i data-lucide="save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — UPLOAD DE FOTOS GLOBAL ═══ -->
+<div class="modal-overlay" id="modal-upload-fotos">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title">Adicionar Fotos</div>
+      <button class="modal-close" onclick="closeModal('modal-upload-fotos')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="padding:0 0 12px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px" id="upload-fotos-count">0 foto(s) selecionada(s)</div>
+      <div class="upload-area" onclick="document.getElementById('upload-fotos-input').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--blue)'"
+        ondragleave="this.style.borderColor=''"
+        ondrop="event.preventDefault();this.style.borderColor='';uploadFotosAdicionarArquivos(event.dataTransfer.files)"
+        style="margin-bottom:12px">
+        <i data-lucide="image" style="width:28px;height:28px;color:var(--text3);margin-bottom:6px"></i>
+        <div class="upload-label">Clique ou arraste fotos aqui</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">JPG, PNG, HEIC — múltiplas fotos aceitas</div>
+      </div>
+      <input type="file" id="upload-fotos-input" accept="image/*" multiple style="display:none" onchange="uploadFotosAdicionarArquivos(this.files)">
+      <div id="upload-fotos-preview" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-upload-fotos')">Cancelar</button>
+      <button class="btn btn-primary" onclick="uploadFotosSalvar()"><i data-lucide="upload"></i> Salvar fotos</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-ata">
   <div class="modal">
     <div class="modal-header">
@@ -7199,8 +7254,120 @@ function usuariosExcluir(email){
   usuariosRender();
 }
 
-// Atualizar doLogin para usar USUARIOS_LISTA dinamicamente
-// (A função doLogin principal já usa USUARIOS_LISTA via closure — não redefinir aqui)
+// ═══════════════════════════════════════════════════════
+// MODAL DE REGISTRO GENÉRICO
+// ═══════════════════════════════════════════════════════
+let registroGenericoTipo = '';
+
+function abrirModalRegistro(tipo, titulo){
+  registroGenericoTipo = tipo;
+  document.getElementById('modal-registro-titulo').textContent = titulo;
+  // Popular select de obras
+  const sel=document.getElementById('reg-obra');
+  if(sel){
+    sel.innerHTML='<option value="">Todas as obras</option>';
+    OBRAS_LISTA.forEach(o=>{
+      const op=document.createElement('option');
+      op.value=o.id; op.textContent=o.nome;
+      sel.appendChild(op);
+    });
+    if(window.obraAtiva) sel.value=window.obraAtiva.id||'';
+  }
+  // Data padrão = hoje
+  const hoje=new Date();
+  const hojeStr=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
+  const elData=document.getElementById('reg-data'); if(elData) elData.value=hojeStr;
+  ['reg-titulo','reg-responsavel','reg-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  openModal('modal-registro-generico');
+  setTimeout(()=>lucide.createIcons(),50);
+}
+
+function salvarRegistroGenerico(){
+  const titulo=(document.getElementById('reg-titulo')||{}).value||'';
+  if(!titulo.trim()){ alert('Informe o título/descrição do registro.'); return; }
+  const obraId=(document.getElementById('reg-obra')||{}).value||'';
+  const obraObj=OBRAS_LISTA.find(o=>o.id===obraId);
+  const obraNome=obraObj?obraObj.nome:'Todas as obras';
+  const data=(document.getElementById('reg-data')||{}).value||'';
+  const responsavel=(document.getElementById('reg-responsavel')||{}).value||'';
+  const status=(document.getElementById('reg-status')||{}).value||'Em elaboração';
+  const obs=(document.getElementById('reg-obs')||{}).value||'';
+
+  const key='engelinhas_registros_'+registroGenericoTipo;
+  let lista=[];
+  try{ lista=JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){}
+  lista.push({
+    id:'reg-'+Date.now(), tipo:registroGenericoTipo,
+    titulo:titulo.trim(), obraId, obraNome, data, responsavel, status, obs,
+    criadoEm:new Date().toISOString()
+  });
+  try{ localStorage.setItem(key, JSON.stringify(lista)); }catch(e){}
+  closeModal('modal-registro-generico');
+  alert('✅ Registro "'+titulo+'" salvo com sucesso!\nObra: '+obraNome+'\nStatus: '+status);
+}
+
+// ═══════════════════════════════════════════════════════
+// UPLOAD DE FOTOS GLOBAL
+// ═══════════════════════════════════════════════════════
+let uploadFotosContexto = '';
+let uploadFotosTemp = [];
+
+function abrirUploadFotosGlobal(contexto){
+  uploadFotosContexto = contexto;
+  uploadFotosTemp = [];
+  uploadFotosRenderPreview();
+  openModal('modal-upload-fotos');
+  setTimeout(()=>lucide.createIcons(),50);
+}
+
+function uploadFotosAdicionarArquivos(files){
+  Array.from(files).forEach(f=>{
+    if(!f.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e=>{
+      uploadFotosTemp.push({nome:f.name, dataUrl:e.target.result, contexto:uploadFotosContexto});
+      uploadFotosRenderPreview();
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function uploadFotosRenderPreview(){
+  const el=document.getElementById('upload-fotos-preview');
+  const cnt=document.getElementById('upload-fotos-count');
+  if(cnt) cnt.textContent=uploadFotosTemp.length+' foto(s) selecionada(s)';
+  if(!el) return;
+  el.innerHTML = uploadFotosTemp.map((f,i)=>`
+    <div style="position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)">
+      <img src="${f.dataUrl}" alt="${f.nome}" style="width:100%;height:80px;object-fit:cover;display:block">
+      <div style="padding:2px 5px;font-size:9px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--bg2)">${f.nome}</div>
+      <button onclick="uploadFotosRemover(${i})" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer">✕</button>
+    </div>`).join('');
+}
+
+function uploadFotosRemover(i){
+  uploadFotosTemp.splice(i,1);
+  uploadFotosRenderPreview();
+}
+
+function uploadFotosSalvar(){
+  if(uploadFotosTemp.length===0){ alert('Selecione ao menos uma foto.'); return; }
+  // Salvar no localStorage por contexto
+  const key='engelinhas_fotos_'+uploadFotosContexto;
+  let lista=[];
+  try{ lista=JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){}
+  const obraAtualNome = (window.obraAtiva&&window.obraAtiva.nome) || document.getElementById('obra-ativa-label')?.textContent || '—';
+  uploadFotosTemp.forEach(f=>{
+    lista.push({nome:f.nome, dataUrl:f.dataUrl, obra:obraAtualNome, data:new Date().toISOString()});
+  });
+  // Manter apenas as últimas 50 fotos para não lotar o localStorage
+  if(lista.length>50) lista=lista.slice(-50);
+  try{ localStorage.setItem(key, JSON.stringify(lista)); }catch(e){ alert('Armazenamento cheio. Remova algumas fotos antigas.'); }
+  closeModal('modal-upload-fotos');
+  alert('✅ '+uploadFotosTemp.length+' foto(s) adicionada(s) com sucesso!');
+  uploadFotosTemp=[];
+}
+
 
 // ═══════════════════════════════════════════════════════
 // SISTEMA DE ATAS DE REUNIÃO
