@@ -438,7 +438,7 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
     </div>
     <div class="topbar-right">
-      <div class="topbar-user">Olá, <span id="user-name">Guilherme</span></div>
+      <div class="topbar-user" onclick="abrirPerfil()" title="Meu perfil" style="cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">Olá, <span id="user-name">Guilherme</span> <i data-lucide="chevron-down" style="width:11px;height:11px;vertical-align:middle;opacity:.5"></i></div>
 
       <!-- SINO DE NOTIFICAÇÕES -->
       <div class="notif-wrap" id="notif-wrap">
@@ -934,7 +934,7 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><div><div class="card-title">Documentos recentes</div><div class="card-sub">Últimos arquivos publicados ou em revisão</div></div><button class="btn btn-sm"><i data-lucide="search"></i> Busca global</button></div>
+          <div class="card-header"><div><div class="card-title">Documentos recentes</div><div class="card-sub">Últimos arquivos publicados ou em revisão</div></div><button class="btn btn-sm" onclick="buscaGlobal()"><i data-lucide="search"></i> Busca global</button></div>
           <div class="table-wrap"><table>
             <thead><tr><th>Nome</th><th>Tipo</th><th>Módulo</th><th>Obra</th><th>Data</th><th>Status</th><th></th></tr></thead>
             <tbody>
@@ -1534,7 +1534,10 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Atas de Reunião</div>
             <div class="page-sub">Decisões, responsáveis, prazos e pendências por reunião</div>
           </div>
-          <button class="btn btn-primary" onclick="openModalAta()"><i data-lucide="plus"></i> Nova ata</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('atas')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> Exportar CSV</button>
+            <button class="btn btn-primary" onclick="openModalAta()"><i data-lucide="plus"></i> Nova ata</button>
+          </div>
         </div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Atas emitidas no mês</div><div class="kpi-value" id="atas-kpi-total">0</div></div>
@@ -3005,7 +3008,10 @@ tbody tr:hover td{background:var(--bg3)}
       <div class="page" id="page-obras">
         <div class="page-header">
           <div><div class="page-title">Carteira de Obras</div><div class="page-sub">Gestão por fase, criticidade e indicadores</div></div>
-          <button class="btn btn-primary" onclick="obrasOpenModal()"><i data-lucide="plus"></i> Nova obra</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('obras')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> Exportar CSV</button>
+            <button class="btn btn-primary" onclick="obrasOpenModal()"><i data-lucide="plus"></i> Nova obra</button>
+          </div>
         </div>
         <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px">
           <div class="kpi blue" id="obras-kpi-total"><div class="kpi-label">Total de obras</div><div class="kpi-value">—</div></div>
@@ -3028,7 +3034,10 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Gestão de Usuários</div>
             <div class="page-sub">Controle de acesso, perfis e permissões da plataforma</div>
           </div>
-          <button class="btn btn-primary" onclick="usuariosOpenModal()"><i data-lucide="plus"></i> Novo usuário</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('usuarios')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> Exportar CSV</button>
+            <button class="btn btn-primary" onclick="usuariosOpenModal()"><i data-lucide="plus"></i> Novo usuário</button>
+          </div>
         </div>
         <div class="kpi-grid kpi-grid-3" style="margin-bottom:20px">
           <div class="kpi blue"><div class="kpi-label">Usuários cadastrados</div><div class="kpi-value" id="usr-kpi-total">1</div></div>
@@ -3050,37 +3059,149 @@ tbody tr:hover td{background:var(--bg3)}
       <!-- PÁGINAS NOVAS -->
       <div class="page" id="page-contrato-juridico">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Contrato</span><i data-lucide="chevron-right"></i><span>Jurídico</span></div><div class="page-title">Contrato Jurídico</div><div class="page-sub">Documentos jurídicos, pareceres e instrumentos legais</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="gavel" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-novo-documento">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-novo-documento-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-novo-documento-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-novo-documento-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Contrato Jurídico</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('novo-documento','Contrato Jurídico')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Código</th><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-novo-documento">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-sesmt-recuperacao">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Recuperação Ambiental</span></div><div class="page-title">Recuperação Ambiental</div><div class="page-sub">Planos e registros de recuperação de áreas degradadas</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="sprout" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-recuperacao-ambiental">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-recuperacao-ambiental-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-recuperacao-ambiental-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-recuperacao-ambiental-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Recuperação Ambiental</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('recuperacao-ambiental','Recuperação Ambiental')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-recuperacao-ambiental">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-sesmt-seguranca">
         <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span></div><div class="page-title">Segurança do Trabalho</div><div class="page-sub">PTAs, APRs, treinamentos e registros de SST</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="hard-hat" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-sesmt-seguranca">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-sesmt-seguranca-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-sesmt-seguranca-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-sesmt-seguranca-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Segurança do Trabalho</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('sesmt-seguranca','Segurança do Trabalho')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Documento</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-sesmt-seguranca">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-sesmt-vistorias">
         <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Vistorias</span></div><div class="page-title">Vistorias</div><div class="page-sub">Registros de vistorias técnicas e auditorias de campo</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova vistoria</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="clipboard-check" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-sesmt-vistorias">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-sesmt-vistorias-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-sesmt-vistorias-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-sesmt-vistorias-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Vistorias</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('sesmt-vistorias','Vistorias')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-sesmt-vistorias">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-sesmt-relatorios">
         <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Relatórios</span></div><div class="page-title">Relatórios SESMT</div><div class="page-sub">Relatórios periódicos de saúde, segurança e meio ambiente</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo relatório</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="file-bar-chart" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-sesmt-relatorios">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-sesmt-relatorios-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-sesmt-relatorios-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-sesmt-relatorios-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Relatórios SESMT</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('sesmt-relatorios','Relatórios SESMT')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-sesmt-relatorios">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-ambiental-nc">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Relatórios</span><i data-lucide="chevron-right"></i><span>Não Conformidade</span></div><div class="page-title">Relatórios de Não Conformidade</div><div class="page-sub">Registros fotográficos de não conformidades ambientais</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo relatório</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="triangle-alert" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-ambiental-nc">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-nc-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-nc-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-nc-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Não Conformidades Ambientais</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-nc','Não Conformidades Ambientais')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-ambiental-nc">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-ambiental-antes-depois">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Relatórios</span><i data-lucide="chevron-right"></i><span>Antes e Depois</span></div><div class="page-title">Antes e Depois</div><div class="page-sub">Comparativo fotográfico de intervenções ambientais</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo registro</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="images" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-ambiental-antes-depois">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-antes-depois-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-antes-depois-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-antes-depois-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Antes e Depois</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-antes-depois','Antes e Depois')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-ambiental-antes-depois">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <!-- RH -->
@@ -3314,39 +3435,151 @@ tbody tr:hover td{background:var(--bg3)}
       <!-- SESMT Segurança sub-itens -->
       <div class="page" id="page-sesmt-seg-vistorias">
         <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span><i data-lucide="chevron-right"></i><span>Vistorias</span></div><div class="page-title">Vistorias de Segurança</div><div class="page-sub">Inspeções de campo, PPRA, laudo de condições de trabalho</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova vistoria</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="clipboard-check" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-sesmt-seg-vistorias">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-sesmt-seg-vistorias-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-sesmt-seg-vistorias-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-sesmt-seg-vistorias-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Vistorias SST</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('sesmt-seg-vistorias','Vistorias SST')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-sesmt-seg-vistorias">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-sesmt-seg-itinerarios">
         <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span><i data-lucide="chevron-right"></i><span>Itinerários</span></div><div class="page-title">Itinerários</div><div class="page-sub">Rotas de transporte, APR de deslocamento e controle de trajetos</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo itinerário</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="route" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-sesmt-seg-itinerarios">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-sesmt-seg-itinerarios-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-sesmt-seg-itinerarios-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-sesmt-seg-itinerarios-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Itinerários</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('sesmt-seg-itinerarios','Itinerários')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-sesmt-seg-itinerarios">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-sesmt-seg-notificacoes">
         <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span><i data-lucide="chevron-right"></i><span>Notificações</span></div><div class="page-title">Notificações de Segurança</div><div class="page-sub">Notificações de irregularidade, advertências e comunicados de risco</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova notificação</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="bell-ring" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-sesmt-seg-notificacoes">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-sesmt-seg-notificacoes-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-sesmt-seg-notificacoes-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-sesmt-seg-notificacoes-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Notificações SST</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('sesmt-seg-notificacoes','Notificações SST')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-sesmt-seg-notificacoes">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-sesmt-seg-planos">
         <div class="page-header"><div><div class="page-breadcrumb"><span>SESMT</span><i data-lucide="chevron-right"></i><span>Segurança do Trabalho</span><i data-lucide="chevron-right"></i><span>Planos de Ação</span></div><div class="page-title">Planos de Ação — Segurança</div><div class="page-sub">Planos corretivos, preventivos e de resposta a emergências</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-plano','Novo Plano')"><i data-lucide="plus"></i> Novo Plano</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="list-checks" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-sesmt-seg-planos">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-sesmt-seg-planos-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-sesmt-seg-planos-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-sesmt-seg-planos-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Planos SST</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('sesmt-seg-planos','Planos SST')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-sesmt-seg-planos">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <!-- Ambiental novos -->
       <div class="page" id="page-ambiental-notificacoes">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Notificações</span></div><div class="page-title">Notificações Ambientais</div><div class="page-sub">Notificações de órgãos ambientais, multas e autuações</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova notificação</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="bell-ring" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-ambiental-notificacoes">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-notificacoes-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-notificacoes-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-notificacoes-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Notificações Ambientais</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-notificacoes','Notificações Ambientais')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-ambiental-notificacoes">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-ambiental-planos">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Planos de Ação</span></div><div class="page-title">Planos de Ação Ambiental</div><div class="page-sub">Planos de mitigação, compensação e tratativa de condicionantes</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-plano','Novo Plano')"><i data-lucide="plus"></i> Novo Plano</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="list-checks" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-ambiental-planos">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-planos-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-planos-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-planos-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Planos Ambientais</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-planos','Planos Ambientais')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-ambiental-planos">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <!-- PLANILHAS TÉCNICAS -->
       <div class="page" id="page-plan-civil-topografia">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Civil</span><i data-lucide="chevron-right"></i><span>Topografia</span></div><div class="page-title">Topografia</div><div class="page-sub">Levantamentos topográficos, plantas e cadernetas de campo</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('nova-planilha','Nova Planilha')"><i data-lucide="plus"></i> Nova Planilha</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="mountain" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-ambiental-arqueologia">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-arqueologia-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-arqueologia-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-arqueologia-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Arqueologia</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-arqueologia','Arqueologia')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-ambiental-arqueologia">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-plan-civil-sondagem">
@@ -3382,23 +3615,87 @@ tbody tr:hover td{background:var(--bg3)}
       <!-- AMBIENTAL novos -->
       <div class="page" id="page-ambiental-arqueologia">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Arqueologia</span></div><div class="page-title">Arqueologia</div><div class="page-sub">Programas de prospecção, monitoramento e resgate arqueológico</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo registro</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="landmark" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-fundiario-acoes">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-fundiario-acoes-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-fundiario-acoes-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-fundiario-acoes-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Ações Fundiárias</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('fundiario-acoes','Ações Fundiárias')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-fundiario-acoes">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-ambiental-prad">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>PRAD</span></div><div class="page-title">PRAD</div><div class="page-sub">Plano de Recuperação de Áreas Degradadas — execução e monitoramento</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo registro</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="sprout" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-ambiental-prad">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-prad-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-prad-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-prad-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — PRAD</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-prad','PRAD')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-ambiental-prad">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-ambiental-embargos">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Ambiental</span><i data-lucide="chevron-right"></i><span>Embargos</span></div><div class="page-title">Embargos Ambientais</div><div class="page-sub">Autos de infração, embargos de órgãos ambientais e tratativas</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo registro</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="ban" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-ambiental-embargos">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-ambiental-embargos-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-ambiental-embargos-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-ambiental-embargos-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Embargos Ambientais</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('ambiental-embargos','Embargos Ambientais')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-ambiental-embargos">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <!-- FUNDIÁRIO -->
       <div class="page" id="page-fundiario-acoes">
         <div class="page-header"><div><div class="page-breadcrumb"><span>Fundiário</span><i data-lucide="chevron-right"></i><span>Ações</span></div><div class="page-title">Ações Fundiárias</div><div class="page-sub">Ações judiciais, negociações e instrumentos de faixa de servidão</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova ação</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="gavel" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="kpi-grid kpi-grid-3" id="kpi-fundiario-embargos">
+          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-fundiario-embargos-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-fundiario-embargos-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-fundiario-embargos-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Registros — Embargos Fundiários</div>
+            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('fundiario-embargos','Embargos Fundiários')"><i data-lucide="plus"></i> Novo</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-fundiario-embargos">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
       <div class="page" id="page-fundiario-embargos">
@@ -3407,14 +3704,36 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <div class="page" id="page-fundiario-liberacoes">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Fundiário</span><i data-lucide="chevron-right"></i><span>Liberações</span></div><div class="page-title">Liberações</div><div class="page-sub">Autorizações de acesso, acordos firmados e áreas liberadas para obra</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Nova liberação</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="unlock" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Fundiário</span><i data-lucide="chevron-right"></i><span>Liberações</span></div><div class="page-title">Liberações</div><div class="page-sub">Autorizações de acesso, acordos firmados e áreas liberadas para obra</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('fundiario-liberacoes','Nova Liberação de Área')"><i data-lucide="plus"></i> Nova liberação</button></div>
+        <div class="kpi-grid kpi-grid-3">
+          <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-fundiario-liberacoes-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovadas</div><div class="kpi-value" id="kpi-fundiario-liberacoes-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Pendentes</div><div class="kpi-value" id="kpi-fundiario-liberacoes-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Liberações de Área</div><button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('fundiario-liberacoes','Nova Liberação de Área')"><i data-lucide="plus"></i> Novo</button></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-fundiario-liberacoes"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr></tbody>
+          </table></div>
+        </div>
       </div>
 
       <!-- PROJETOS — Materiais -->
       <div class="page" id="page-proj-materiais">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Projetos</span><i data-lucide="chevron-right"></i><span>Materiais</span></div><div class="page-title">Materiais</div><div class="page-sub">Especificações técnicas, listas de materiais e controle de aprovações</div></div><button class="btn btn-primary"><i data-lucide="plus"></i> Novo material</button></div>
-        <div class="card"><div class="card-body" style="padding:48px;text-align:center;color:var(--text3)"><i data-lucide="package" style="width:40px;height:40px;margin-bottom:12px"></i><div>Módulo em implantação</div></div></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Projetos</span><i data-lucide="chevron-right"></i><span>Materiais</span></div><div class="page-title">Materiais</div><div class="page-sub">Especificações técnicas, listas de materiais e controle de aprovações</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('proj-materiais','Novo Material')"><i data-lucide="plus"></i> Novo material</button></div>
+        <div class="kpi-grid kpi-grid-3">
+          <div class="kpi blue"><div class="kpi-label">Itens cadastrados</div><div class="kpi-value" id="kpi-proj-materiais-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aprovados</div><div class="kpi-value" id="kpi-proj-materiais-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Em análise</div><div class="kpi-value" id="kpi-proj-materiais-pend">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Especificações de Materiais</div><button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('proj-materiais','Novo Material')"><i data-lucide="plus"></i> Novo</button></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-proj-materiais"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr></tbody>
+          </table></div>
+        </div>
       </div>
 
     </main>
@@ -3465,6 +3784,129 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-registro-generico')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarRegistroGenerico()"><i data-lucide="save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — BUSCA GLOBAL ═══ -->
+<div class="modal-overlay" id="modal-busca-global">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <div class="modal-title"><i data-lucide="search" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"></i> Busca Global</div>
+      <button class="modal-close" onclick="closeModal('modal-busca-global')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="padding:0 0 4px">
+      <div style="position:relative;margin-bottom:12px">
+        <i data-lucide="search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--text3)"></i>
+        <input type="text" id="busca-global-input"
+          style="width:100%;padding:10px 12px 10px 34px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg2);color:var(--text);outline:none"
+          placeholder="Buscar obras, atas, usuários, registros..."
+          oninput="buscaGlobalFiltrar()"
+          onkeydown="if(event.key==='Escape')closeModal('modal-busca-global')">
+      </div>
+      <div id="busca-global-filtros" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn btn-sm busca-filtro active" data-cat="todos" onclick="buscaGlobalSetCat(this,'todos')">Todos</button>
+        <button class="btn btn-sm busca-filtro" data-cat="obras" onclick="buscaGlobalSetCat(this,'obras')">Obras</button>
+        <button class="btn btn-sm busca-filtro" data-cat="atas" onclick="buscaGlobalSetCat(this,'atas')">Atas</button>
+        <button class="btn btn-sm busca-filtro" data-cat="usuarios" onclick="buscaGlobalSetCat(this,'usuarios')">Usuários</button>
+        <button class="btn btn-sm busca-filtro" data-cat="registros" onclick="buscaGlobalSetCat(this,'registros')">Registros</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px" id="busca-global-count">Digite para buscar em todo o sistema</div>
+      <div id="busca-global-resultados" style="max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;background:var(--bg2)">
+        <div style="padding:32px;text-align:center;color:var(--text3)">
+          <i data-lucide="search" style="width:32px;height:32px;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;opacity:.4"></i>
+          <div style="font-size:13px">Use a busca acima para encontrar qualquer informação no sistema</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-busca-global')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — PERFIL DO USUÁRIO ═══ -->
+<div class="modal-overlay" id="modal-perfil">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title"><i data-lucide="user-circle" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"></i> Meu Perfil</div>
+      <button class="modal-close" onclick="closeModal('modal-perfil')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="padding:0 0 8px">
+      <!-- Avatar -->
+      <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--bg2);border-radius:10px;margin-bottom:16px;border:1px solid var(--border)">
+        <div id="perfil-avatar" style="width:56px;height:56px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0">G</div>
+        <div>
+          <div id="perfil-nome-exibido" style="font-size:16px;font-weight:600;color:var(--text)">Guilherme Diniz</div>
+          <div id="perfil-email-exibido" style="font-size:12px;color:var(--text3);margin-top:2px">guilherme@engelinhas.com.br</div>
+          <div id="perfil-cargo-exibido" style="font-size:12px;color:var(--blue);margin-top:2px;font-weight:500">Admin · Engelinhas</div>
+        </div>
+      </div>
+      <!-- Dados pessoais -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Nome completo</label>
+          <input type="text" id="perfil-nome" class="input" style="margin-top:4px" placeholder="Seu nome">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">E-mail</label>
+          <input type="email" id="perfil-email" class="input" style="margin-top:4px" placeholder="seu@email.com" readonly style="opacity:.6;cursor:not-allowed">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Empresa</label>
+          <input type="text" id="perfil-empresa" class="input" style="margin-top:4px" placeholder="Nome da empresa">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Perfil</label>
+          <input type="text" id="perfil-cargo" class="input" style="margin-top:4px" readonly style="opacity:.6;cursor:not-allowed">
+        </div>
+      </div>
+      <!-- Trocar senha -->
+      <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--bg2)">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          <i data-lucide="lock" style="width:13px;height:13px"></i> Alterar senha
+        </div>
+        <div style="display:grid;gap:8px">
+          <div>
+            <label style="font-size:11px;color:var(--text3)">Senha atual</label>
+            <input type="password" id="perfil-senha-atual" class="input" style="margin-top:4px" placeholder="••••••">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <label style="font-size:11px;color:var(--text3)">Nova senha</label>
+              <input type="password" id="perfil-senha-nova" class="input" style="margin-top:4px" placeholder="••••••">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--text3)">Confirmar</label>
+              <input type="password" id="perfil-senha-conf" class="input" style="margin-top:4px" placeholder="••••••">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="perfil-msg" style="margin-top:10px;font-size:12px;display:none"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-perfil')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPerfil()"><i data-lucide="save" style="width:13px;height:13px;margin-right:4px"></i> Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — DETALHES DE REGISTRO GENÉRICO ═══ -->
+<div class="modal-overlay" id="modal-ver-registro">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title" id="ver-reg-titulo-header">Detalhes do Registro</div>
+      <button class="modal-close" onclick="closeModal('modal-ver-registro')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="padding:0 0 8px" id="ver-reg-body">
+      <!-- preenchido dinamicamente -->
+    </div>
+    <div class="modal-footer" id="ver-reg-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-ver-registro')">Fechar</button>
+      <button class="btn btn-danger" id="ver-reg-btn-excluir" onclick="excluirRegistroGenerico()">
+        <i data-lucide="trash-2" style="width:13px;height:13px;margin-right:4px"></i> Excluir
+      </button>
     </div>
   </div>
 </div>
@@ -3929,6 +4371,23 @@ function navTo(pageId){
   if(pageId==='acomp-atas'||pageId==='regulatorio') { atasRender(); popularFiltrosObra(); }
   if(pageId==='reg-licencas'||pageId==='comissionamento'||pageId==='comiss-punchlist'||pageId==='asbuilt') popularFiltrosObra();
   if(pageId==='dashboard') dashboardRender();
+  // Módulos genéricos — carregar tabela ao navegar
+  const MODULOS_GENERICOS = [
+    'novo-documento','recuperacao-ambiental','sesmt-seguranca','sesmt-vistorias',
+    'sesmt-relatorios','ambiental-nc','ambiental-antes-depois','sesmt-seg-vistorias',
+    'sesmt-seg-itinerarios','sesmt-seg-notificacoes','sesmt-seg-planos',
+    'ambiental-notificacoes','ambiental-planos','ambiental-arqueologia',
+    'ambiental-prad','ambiental-embargos','fundiario-acoes','fundiario-embargos',
+    'fundiario-liberacoes','proj-materiais','nova-licenca','novo-contrato',
+    'novo-prazo','nova-notificacao','novo-projeto','novo-submittal',
+    'nova-planilha','novo-cronograma','novo-plano','novo-item',
+    'novo-protocolo','nova-medicao','novo-ter','registrar-entrega'
+  ];
+  MODULOS_GENERICOS.forEach(tipo=>{
+    if(document.getElementById('tbody-'+tipo)){
+      registroGenericoCarregarPagina(tipo);
+    }
+  });
   window.scrollTo(0,0);
   setTimeout(()=>lucide.createIcons(),50);
 }
@@ -7142,6 +7601,8 @@ document.addEventListener('DOMContentLoaded',function(){
   atasRender();
   popularFiltrosObra();
   dashboardRender();
+  notificacoesAtualizar();
+  rhAtualizarKpis();
 });
 
 // ══════════════════════════════════════════════════════
@@ -7287,7 +7748,7 @@ function salvarRegistroGenerico(){
   if(!titulo.trim()){ alert('Informe o título/descrição do registro.'); return; }
   const obraId=(document.getElementById('reg-obra')||{}).value||'';
   const obraObj=OBRAS_LISTA.find(o=>o.id===obraId);
-  const obraNome=obraObj?obraObj.nome:'Todas as obras';
+  const obraNome=obraObj?obraObj.nome:(obraId||'Geral');
   const data=(document.getElementById('reg-data')||{}).value||'';
   const responsavel=(document.getElementById('reg-responsavel')||{}).value||'';
   const status=(document.getElementById('reg-status')||{}).value||'Em elaboração';
@@ -7296,19 +7757,420 @@ function salvarRegistroGenerico(){
   const key='engelinhas_registros_'+registroGenericoTipo;
   let lista=[];
   try{ lista=JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){}
+  const novoId='reg-'+Date.now();
   lista.push({
-    id:'reg-'+Date.now(), tipo:registroGenericoTipo,
+    id:novoId, tipo:registroGenericoTipo,
     titulo:titulo.trim(), obraId, obraNome, data, responsavel, status, obs,
     criadoEm:new Date().toISOString()
   });
   try{ localStorage.setItem(key, JSON.stringify(lista)); }catch(e){}
+  // Renderizar na tabela correspondente
+  registroGenericoRenderTabela(registroGenericoTipo, lista);
   closeModal('modal-registro-generico');
-  alert('✅ Registro "'+titulo+'" salvo com sucesso!\nObra: '+obraNome+'\nStatus: '+status);
+  alert('✅ "'+titulo+'" salvo!\nObra: '+obraNome+'\nStatus: '+status);
+}
+
+function registroGenericoRenderTabela(tipo, lista){
+  if(!lista){
+    try{ lista=JSON.parse(localStorage.getItem('engelinhas_registros_'+tipo)||'[]'); }catch(e){ lista=[]; }
+  }
+  const tbody=document.getElementById('tbody-'+tipo);
+  if(!tbody) return;
+  if(lista.length===0){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>';
+  } else {
+    tbody.innerHTML = lista.slice().reverse().map(r=>{
+      const statusColor = r.status==='Aprovado'||r.status==='Válido'?'badge-green':
+                          r.status==='Publicado'?'badge-blue':
+                          r.status==='Vencido'?'badge-red':'badge-amber';
+      const dataFmt = r.data ? r.data.split('-').reverse().join('/') : '—';
+      return `<tr>
+        <td style="font-weight:500">${r.titulo}</td>
+        <td>${r.obraNome||'—'}</td>
+        <td>${dataFmt}</td>
+        <td>${r.responsavel||'—'}</td>
+        <td><span class="badge ${statusColor}">${r.status}</span></td>
+        <td><button class="btn btn-sm" onclick="verRegistroGenerico('${tipo}','${r.id}')">Ver</button></td>
+      </tr>`;
+    }).join('');
+  }
+  // KPIs
+  const total=lista.length;
+  const ok=lista.filter(r=>r.status==='Aprovado'||r.status==='Publicado'||r.status==='Válido').length;
+  const pend=lista.filter(r=>r.status==='Em elaboração'||r.status==='Em revisão').length;
+  const el1=document.getElementById('kpi-'+tipo+'-total'); if(el1) el1.textContent=total;
+  const el2=document.getElementById('kpi-'+tipo+'-ok'); if(el2) el2.textContent=ok;
+  const el3=document.getElementById('kpi-'+tipo+'-pend'); if(el3) el3.textContent=pend;
+  setTimeout(()=>lucide.createIcons(),50);
+}
+
+let verRegistroAtualTipo = '';
+let verRegistroAtualId = '';
+
+function verRegistroGenerico(tipo, id){
+  let lista=[];
+  try{ lista=JSON.parse(localStorage.getItem('engelinhas_registros_'+tipo)||'[]'); }catch(e){}
+  const r=lista.find(x=>x.id===id);
+  if(!r) return;
+  verRegistroAtualTipo=tipo;
+  verRegistroAtualId=id;
+  const dataFmt = r.data ? r.data.split('-').reverse().join('/') : '—';
+  const statusColor = r.status==='Aprovado'||r.status==='Válido'?'var(--green)':
+                      r.status==='Publicado'?'var(--blue)':
+                      r.status==='Vencido'?'var(--red)':'var(--amber)';
+  document.getElementById('ver-reg-titulo-header').textContent=r.titulo;
+  document.getElementById('ver-reg-body').innerHTML=`
+    <div style="display:grid;gap:0">
+      <div style="padding:14px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Título</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text)">${r.titulo}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+        <div style="padding:12px 12px 12px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Obra</div>
+          <div style="font-size:13px;font-weight:500">${r.obraNome||'—'}</div>
+        </div>
+        <div style="padding:12px 0 12px 12px;border-bottom:1px solid var(--border);border-left:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Data</div>
+          <div style="font-size:13px;font-weight:500">${dataFmt}</div>
+        </div>
+        <div style="padding:12px 12px 12px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Responsável</div>
+          <div style="font-size:13px;font-weight:500">${r.responsavel||'—'}</div>
+        </div>
+        <div style="padding:12px 0 12px 12px;border-bottom:1px solid var(--border);border-left:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Status</div>
+          <div style="font-size:13px;font-weight:600;color:${statusColor}">${r.status}</div>
+        </div>
+      </div>
+      ${r.obs ? `<div style="padding:12px 0">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Observações</div>
+        <div style="font-size:13px;line-height:1.6;color:var(--text2);background:var(--bg2);padding:10px 12px;border-radius:6px;border:1px solid var(--border)">${r.obs}</div>
+      </div>` : ''}
+      <div style="padding:10px 0 0;font-size:11px;color:var(--text3)">Cadastrado em: ${r.criadoEm||'—'} · Módulo: ${tipo}</div>
+    </div>`;
+  openModal('modal-ver-registro');
+  setTimeout(()=>lucide.createIcons(),50);
+}
+
+function excluirRegistroGenerico(){
+  if(!verRegistroAtualTipo||!verRegistroAtualId) return;
+  if(!confirm('Deseja excluir este registro? Esta ação não pode ser desfeita.')) return;
+  try{
+    let lista=JSON.parse(localStorage.getItem('engelinhas_registros_'+verRegistroAtualTipo)||'[]');
+    lista=lista.filter(x=>x.id!==verRegistroAtualId);
+    localStorage.setItem('engelinhas_registros_'+verRegistroAtualTipo, JSON.stringify(lista));
+    registroGenericoRenderTabela(verRegistroAtualTipo, lista);
+    closeModal('modal-ver-registro');
+  }catch(e){ alert('Erro ao excluir.'); }
+}
+
+function registroGenericoCarregarPagina(tipo){
+  try{
+    const lista=JSON.parse(localStorage.getItem('engelinhas_registros_'+tipo)||'[]');
+    registroGenericoRenderTabela(tipo, lista);
+  }catch(e){}
 }
 
 // ═══════════════════════════════════════════════════════
-// UPLOAD DE FOTOS GLOBAL
+// BUSCA GLOBAL
 // ═══════════════════════════════════════════════════════
+function buscaGlobal(){
+  const termo=(document.getElementById('busca-global-input')||{}).value||'';
+  if(!termo.trim()){ alert('Digite algo para buscar.'); return; }
+  const q=termo.toLowerCase();
+  const resultados=[];
+
+  // Buscar em obras
+  OBRAS_LISTA.forEach(o=>{
+    if(o.nome.toLowerCase().includes(q)||o.fiscal?.toLowerCase().includes(q)||o.uf?.toLowerCase().includes(q)){
+      resultados.push({tipo:'Obra', titulo:o.nome, sub:o.fase+' — '+o.uf, acao:`navTo('obras')`});
+    }
+  });
+  // Buscar em atas
+  atasCarregar();
+  ATAS_LISTA.forEach(a=>{
+    if(a.titulo.toLowerCase().includes(q)||a.obraNome?.toLowerCase().includes(q)||a.participantes?.toLowerCase().includes(q)){
+      resultados.push({tipo:'Ata', titulo:a.titulo, sub:a.obraNome+' · '+atasFmtData(a.data), acao:`navTo('acomp-atas')`});
+    }
+  });
+  // Buscar em usuários
+  USUARIOS_LISTA.forEach(u=>{
+    if(u.nome.toLowerCase().includes(q)||u.email.toLowerCase().includes(q)){
+      resultados.push({tipo:'Usuário', titulo:u.nome, sub:u.email+' · '+u.perfil, acao:`navTo('usuarios')`});
+    }
+  });
+  // Buscar em módulos genéricos
+  const todos_tipos=['novo-documento','sesmt-seguranca','sesmt-vistorias','sesmt-relatorios',
+    'ambiental-nc','ambiental-planos','ambiental-prad','fundiario-acoes','fundiario-liberacoes'];
+  todos_tipos.forEach(tipo=>{
+    try{
+      const lista=JSON.parse(localStorage.getItem('engelinhas_registros_'+tipo)||'[]');
+      lista.forEach(r=>{
+        if(r.titulo.toLowerCase().includes(q)||r.obraNome?.toLowerCase().includes(q)){
+          resultados.push({tipo:tipo.replace(/-/g,' '), titulo:r.titulo, sub:r.obraNome+' · '+r.status, acao:''});
+        }
+      });
+    }catch(e){}
+  });
+
+  buscaGlobalRenderResultados(resultados, termo);
+}
+
+let buscaGlobalCatAtiva = 'todos';
+let buscaGlobalUltimosResultados = [];
+
+function buscaGlobal(){
+  // Abrir modal e limpar
+  document.getElementById('busca-global-input').value='';
+  document.getElementById('busca-global-resultados').innerHTML='<div style="padding:32px;text-align:center;color:var(--text3)"><div style="font-size:13px">Use a busca acima para encontrar qualquer informação no sistema</div></div>';
+  document.getElementById('busca-global-count').textContent='Digite para buscar em todo o sistema';
+  buscaGlobalCatAtiva='todos';
+  document.querySelectorAll('.busca-filtro').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.busca-filtro[data-cat="todos"]').classList.add('active');
+  openModal('modal-busca-global');
+  setTimeout(()=>{ lucide.createIcons(); document.getElementById('busca-global-input').focus(); },80);
+}
+
+function buscaGlobalSetCat(btn, cat){
+  buscaGlobalCatAtiva=cat;
+  document.querySelectorAll('.busca-filtro').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buscaGlobalRenderResultados(buscaGlobalUltimosResultados, document.getElementById('busca-global-input').value);
+}
+
+function buscaGlobalFiltrar(){
+  const termo=document.getElementById('busca-global-input').value.trim();
+  if(!termo){ document.getElementById('busca-global-resultados').innerHTML='<div style="padding:32px;text-align:center;color:var(--text3)"><div style="font-size:13px">Digite para buscar em todo o sistema</div></div>'; document.getElementById('busca-global-count').textContent='Digite para buscar em todo o sistema'; return; }
+  const q=termo.toLowerCase();
+  const resultados=[];
+  // Obras
+  OBRAS_LISTA.forEach(o=>{ if(o.nome.toLowerCase().includes(q)||o.fiscal?.toLowerCase().includes(q)||o.uf?.toLowerCase().includes(q)){ resultados.push({tipo:'obras',tipoLabel:'Obra',titulo:o.nome,sub:o.fase+' — '+o.uf,acao:`navTo('obras')`}); } });
+  // Atas
+  atasCarregar();
+  ATAS_LISTA.forEach(a=>{ if(a.titulo.toLowerCase().includes(q)||a.obraNome?.toLowerCase().includes(q)||a.participantes?.toLowerCase().includes(q)){ resultados.push({tipo:'atas',tipoLabel:'Ata',titulo:a.titulo,sub:(a.obraNome||'')+'·'+atasFmtData(a.data),acao:`navTo('acomp-atas')`}); } });
+  // Usuários
+  USUARIOS_LISTA.forEach(u=>{ if(u.nome.toLowerCase().includes(q)||u.email.toLowerCase().includes(q)){ resultados.push({tipo:'usuarios',tipoLabel:'Usuário',titulo:u.nome,sub:u.email+' · '+u.perfil,acao:`navTo('usuarios')`}); } });
+  // Módulos genéricos
+  const gtipos=['novo-documento','sesmt-seguranca','sesmt-vistorias','sesmt-relatorios','ambiental-nc','ambiental-planos','ambiental-prad','fundiario-acoes','fundiario-liberacoes','proj-materiais'];
+  gtipos.forEach(tipo=>{ try{ const lista=JSON.parse(localStorage.getItem('engelinhas_registros_'+tipo)||'[]'); lista.forEach(r=>{ if(r.titulo.toLowerCase().includes(q)||r.obraNome?.toLowerCase().includes(q)){ resultados.push({tipo:'registros',tipoLabel:tipo.replace(/-/g,' '),titulo:r.titulo,sub:(r.obraNome||'')+'·'+r.status,acao:''}); } }); }catch(e){} });
+  buscaGlobalUltimosResultados=resultados;
+  buscaGlobalRenderResultados(resultados, termo);
+}
+
+function buscaGlobalRenderResultados(todos, termo){
+  const filtrados = buscaGlobalCatAtiva==='todos' ? todos : todos.filter(r=>r.tipo===buscaGlobalCatAtiva);
+  const countEl=document.getElementById('busca-global-count');
+  const listEl=document.getElementById('busca-global-resultados');
+  if(!filtrados.length){
+    listEl.innerHTML='<div style="padding:32px;text-align:center;color:var(--text3)"><div style="font-size:13px">Nenhum resultado encontrado'+(termo?' para "'+termo+'"':'')+'</div></div>';
+    countEl.textContent='0 resultados';
+    return;
+  }
+  countEl.textContent=filtrados.length+' resultado(s)'+(termo?' para "'+termo+'"':'');
+  listEl.innerHTML=filtrados.slice(0,30).map(r=>
+    `<div style="padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:start;gap:10px" ${r.acao?`onclick="${r.acao};closeModal('modal-busca-global')"`:''} onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <span style="font-size:10px;background:var(--blue-light);color:var(--blue);padding:2px 7px;border-radius:10px;white-space:nowrap;margin-top:2px;flex-shrink:0">${r.tipoLabel}</span>
+      <div><div style="font-weight:500;font-size:13px">${r.titulo}</div><div style="font-size:11px;color:var(--text3)">${r.sub}</div></div>
+    </div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORTAÇÃO CSV
+// ═══════════════════════════════════════════════════════
+function exportarCSV(tipo){
+  let linhas=[];
+  let nome='';
+
+  if(tipo==='obras'){
+    nome='obras_engelinhas';
+    linhas.push(['ID','Nome','UF','Fase','Criticidade','Fiscal','Prazo','Progresso%','Status']);
+    OBRAS_LISTA.forEach(o=>linhas.push([o.id,o.nome,o.uf,o.fase,o.criticidade,o.fiscal||'',o.prazo||'',o.progresso||0,o.status]));
+  } else if(tipo==='usuarios'){
+    nome='usuarios_engelinhas';
+    linhas.push(['Nome','E-mail','Perfil','Empresa','Cadastrado em','Ativo']);
+    USUARIOS_LISTA.forEach(u=>linhas.push([u.nome,u.email,u.perfil,u.empresa||'',u.criadoEm,u.ativo!==false?'Sim':'Não']));
+  } else if(tipo==='atas'){
+    atasCarregar();
+    nome='atas_engelinhas';
+    linhas.push(['ID','Título','Obra','Data','Participantes','Status','Ações']);
+    ATAS_LISTA.forEach(a=>linhas.push([a.id,a.titulo,a.obraNome||'',a.data,a.participantes||'',a.status,a.acoes||'']));
+  }
+
+  if(linhas.length<=1){ alert('Nenhum dado para exportar.'); return; }
+
+  const csv=linhas.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=nome+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  alert('✅ CSV exportado: '+a.download);
+}
+
+// ═══════════════════════════════════════════════════════
+// PERFIL DE USUÁRIO LOGADO
+// ═══════════════════════════════════════════════════════
+let usuarioLogadoEmail = '';
+
+function abrirPerfil(){
+  // Detectar usuário logado pelo nome exibido
+  const nomeEl=document.getElementById('user-name');
+  const nomeExibido=nomeEl?nomeEl.textContent:'';
+  const user=USUARIOS_LISTA.find(u=>u.nome.startsWith(nomeExibido)||u.ativo!==false&&u.perfil==='Admin');
+  if(user){
+    usuarioLogadoEmail=user.email;
+    document.getElementById('perfil-nome').value=user.nome;
+    document.getElementById('perfil-email').value=user.email;
+    document.getElementById('perfil-cargo').value=user.perfil||'Fiscal';
+    // Avatar com inicial
+    const avatarEl=document.getElementById('perfil-avatar');
+    if(avatarEl) avatarEl.textContent=(user.nome||'U')[0].toUpperCase();
+    const nomeExEl=document.getElementById('perfil-nome-exibido');
+    if(nomeExEl) nomeExEl.textContent=user.nome;
+    const emailExEl=document.getElementById('perfil-email-exibido');
+    if(emailExEl) emailExEl.textContent=user.email;
+    const cargoExEl=document.getElementById('perfil-cargo-exibido');
+    if(cargoExEl) cargoExEl.textContent=(user.perfil||'Fiscal')+' · '+(user.empresa||'Engelinhas');
+    document.getElementById('perfil-empresa').value=user.empresa||'Engelinhas';
+  }
+  document.getElementById('perfil-senha-atual').value='';
+  document.getElementById('perfil-senha-nova').value='';
+  document.getElementById('perfil-senha-conf').value='';
+  openModal('modal-perfil');
+  setTimeout(()=>lucide.createIcons(),50);
+}
+
+function salvarPerfil(){
+  const nome=document.getElementById('perfil-nome').value.trim();
+  const senhaAtual=document.getElementById('perfil-senha-atual').value;
+  const senhaNova=document.getElementById('perfil-senha-nova').value;
+  const senhaConf=document.getElementById('perfil-senha-conf').value;
+
+  if(!nome){ alert('Nome não pode estar vazio.'); return; }
+
+  const idx=USUARIOS_LISTA.findIndex(u=>u.email===usuarioLogadoEmail);
+  if(idx<0){ alert('Usuário não encontrado.'); return; }
+  const user=USUARIOS_LISTA[idx];
+
+  if(senhaNova){
+    if(senhaAtual!==user.senha){ alert('Senha atual incorreta.'); return; }
+    if(senhaNova.length<4){ alert('A nova senha deve ter no mínimo 4 caracteres.'); return; }
+    if(senhaNova!==senhaConf){ alert('As novas senhas não coincidem.'); return; }
+    USUARIOS_LISTA[idx].senha=senhaNova;
+  }
+
+  USUARIOS_LISTA[idx].nome=nome;
+  USUARIOS_LISTA[idx].empresa=document.getElementById('perfil-empresa').value.trim()||user.empresa;
+  usuariosSalvarStorage(USUARIOS_LISTA);
+  // Atualizar nome exibido no topbar
+  document.getElementById('user-name').textContent=nome.split(' ')[0];
+  // Feedback visual no modal
+  const msgEl=document.getElementById('perfil-msg');
+  if(msgEl){ msgEl.style.display='block'; msgEl.style.color='var(--green)'; msgEl.textContent='✅ Perfil atualizado com sucesso!'; }
+  setTimeout(()=>{ closeModal('modal-perfil'); if(msgEl) msgEl.style.display='none'; },1200);
+}
+
+// ═══════════════════════════════════════════════════════
+// NOTIFICAÇÕES DINÂMICAS
+// ═══════════════════════════════════════════════════════
+function notificacoesAtualizar(){
+  // Verificar atas com muitas ações pendentes
+  atasCarregar();
+  let notifs=[];
+
+  // Obras com prazo próximo
+  const hoje=new Date();
+  OBRAS_LISTA.forEach(o=>{
+    if(o.prazo){
+      const diff=Math.ceil((new Date(o.prazo)-hoje)/(1000*60*60*24));
+      if(diff>0&&diff<=30){
+        notifs.push({
+          tipo:'amber', icone:'calendar',
+          titulo:'Prazo se aproximando — '+o.nome,
+          meta:'Obras · '+diff+' dias restantes',
+          acao:"navTo('obras')"
+        });
+      } else if(diff<=0&&diff>-180){
+        notifs.push({
+          tipo:'red', icone:'alert-triangle',
+          titulo:'Prazo vencido — '+o.nome,
+          meta:'Obras · venceu há '+Math.abs(diff)+' dias',
+          acao:"navTo('obras')"
+        });
+      }
+    }
+  });
+
+  // Atas recentes
+  const atUnpub=ATAS_LISTA.filter(a=>a.status==='rascunho').length;
+  if(atUnpub>0){
+    notifs.push({
+      tipo:'blue', icone:'file-text',
+      titulo:atUnpub+' ata(s) em rascunho aguardando publicação',
+      meta:'Atas de Reunião',
+      acao:"navTo('acomp-atas')"
+    });
+  }
+
+  // Renderizar no dropdown
+  const list=document.getElementById('notif-list');
+  const badge=document.getElementById('notif-badge');
+  if(!list) return;
+
+  const novas_html = notifs.slice(0,5).map(n=>`
+    <div class="notif-item" onclick="${n.acao};closeNotif()">
+      <div class="notif-dot ${n.tipo}"></div>
+      <div class="notif-item-body">
+        <div class="notif-item-title">${n.titulo}</div>
+        <div class="notif-item-meta">${n.meta}</div>
+      </div>
+    </div>`).join('');
+
+  // Adicionar antes das notificações fixas existentes
+  const fixas=list.innerHTML;
+  list.innerHTML = novas_html + fixas;
+
+  // Atualizar badge
+  const totalNotifs=notifs.length+4; // 4 fixas originais
+  if(badge) badge.textContent=Math.min(totalNotifs,9);
+}
+
+// ═══════════════════════════════════════════════════════
+// KPIs RH DINÂMICOS
+// ═══════════════════════════════════════════════════════
+function rhAtualizarKpis(){
+  // Usar funcionários do localStorage se disponível
+  let funcs=[];
+  try{ funcs=JSON.parse(localStorage.getItem('engelinhas_rh_funcionarios_v1')||'[]'); }catch(e){}
+
+  const kpiTotal=document.getElementById('rh-kpi-total');
+  const kpiComp=document.getElementById('rh-kpi-completo');
+  const kpiPend=document.getElementById('rh-kpi-pendente');
+
+  if(funcs.length>0){
+    const ativos=funcs.filter(f=>f.ativo!==false);
+    const comDoc=ativos.filter(f=>f.cpf&&f.rg&&f.ctps&&f.aso).length;
+    const semDoc=ativos.length-comDoc;
+    if(kpiTotal) kpiTotal.textContent=ativos.length;
+    if(kpiComp) kpiComp.textContent=comDoc;
+    if(kpiPend) kpiPend.textContent=semDoc;
+  } else {
+    // Manter valores estáticos se não há dados no localStorage
+    if(kpiTotal && kpiTotal.textContent==='—') kpiTotal.textContent='0';
+  }
+
+  // KPIs de treinamentos
+  try{
+    const trein=JSON.parse(localStorage.getItem('engelinhas_registros_sesmt-vistorias')||'[]');
+    const kpiTrT=document.getElementById('rh-kpi-treinamentos-total');
+    const kpiTrV=document.getElementById('rh-kpi-treinamentos-venc');
+    if(kpiTrT) kpiTrT.textContent=trein.length;
+    if(kpiTrV) kpiTrV.textContent=trein.filter(t=>t.status==='Vencido'||t.status==='Pendente').length;
+  }catch(e){}
+}
 let uploadFotosContexto = '';
 let uploadFotosTemp = [];
 
