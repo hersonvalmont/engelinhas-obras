@@ -3284,12 +3284,12 @@ tbody tr:hover td{background:var(--bg3)}
       <!-- ═══ RH — TREINAMENTOS E NRs ═══ -->
       <div class="page" id="page-rh-treinamentos">
         <div class="page-header">
+// Botão "Registrar treinamento" removido — matriz é gerada automaticamente pelos docs
           <div>
             <div class="page-breadcrumb"><i data-lucide="users-round"></i> Recursos Humanos <i data-lucide="chevron-right"></i> Funcionários <i data-lucide="chevron-right"></i> <span>Treinamentos e NRs</span></div>
             <div class="page-title">Treinamentos e Normas Regulamentadoras</div>
             <div class="page-sub">Controle de validade de NRs, certificados e reciclagens por funcionário</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Registrar treinamento</button>
         </div>
         <div class="kpi-grid kpi-grid-4">
           <div class="kpi blue"><div class="kpi-label">Certificações ativas</div><div class="kpi-value" id="rh-tr-kpi-ativas">218</div></div>
@@ -3315,33 +3315,36 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="page-title">Atestados de Saúde Ocupacional</div>
             <div class="page-sub">Admissionais, periódicos, demissionais e de retorno ao trabalho</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Registrar ASO</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('asos')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> CSV</button>
+            <button class="btn btn-primary" onclick="asoOpenModal()"><i data-lucide="plus"></i> Registrar ASO</button>
+          </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
-          <div class="kpi blue"><div class="kpi-label">ASOs registrados</div><div class="kpi-value">74</div></div>
-          <div class="kpi green"><div class="kpi-label">Aptos</div><div class="kpi-value">69</div></div>
-          <div class="kpi amber"><div class="kpi-label">Vencendo em 30 dias</div><div class="kpi-value">9</div></div>
-          <div class="kpi red"><div class="kpi-label">Vencidos / inaptos</div><div class="kpi-value">2</div></div>
+          <div class="kpi blue"><div class="kpi-label">ASOs registrados</div><div class="kpi-value" id="aso-kpi-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Aptos / Vigentes</div><div class="kpi-value" id="aso-kpi-aptos">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Vencendo em 30 dias</div><div class="kpi-value" id="aso-kpi-vencendo">0</div></div>
+          <div class="kpi red"><div class="kpi-label">Vencidos / Inaptos</div><div class="kpi-value" id="aso-kpi-vencidos">0</div></div>
         </div>
         <div class="card">
           <div class="card-header">
             <div class="card-title">Controle de ASOs</div>
-            <select class="form-select" style="width:160px;font-size:12px">
-              <option>Todos os tipos</option>
-              <option>Admissional</option>
-              <option>Periódico</option>
-              <option>Demissional</option>
-              <option>Retorno ao trabalho</option>
-            </select>
+            <div style="display:flex;gap:8px">
+              <input type="text" class="form-input" id="aso-busca" placeholder="Buscar funcionário..." style="width:200px;font-size:12px" oninput="asoRender()">
+              <select class="form-select" id="aso-filtro-tipo" style="width:160px;font-size:12px" onchange="asoRender()">
+                <option value="">Todos os tipos</option>
+                <option value="Admissional">Admissional</option>
+                <option value="Periódico">Periódico</option>
+                <option value="Demissional">Demissional</option>
+                <option value="Retorno ao trabalho">Retorno ao trabalho</option>
+                <option value="Mudança de função">Mudança de função</option>
+              </select>
+            </div>
           </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Funcionário</th><th>Tipo</th><th>Médico</th><th>Data emissão</th><th>Validade</th><th>Resultado</th><th>Situação</th><th></th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:500">Juan Carlos S.</td><td>Periódico</td><td>Dr. Alves</td><td>10/04/2025</td><td>10/04/2026</td><td><span class="badge badge-green">Apto</span></td><td><span class="badge badge-amber">23 dias</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-weight:500">Wlisses A.</td><td>Periódico</td><td>Dr. Alves</td><td>20/04/2025</td><td>20/04/2026</td><td><span class="badge badge-red">Inapto temp.</span></td><td><span class="badge badge-red">Vencido</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-weight:500">Silvanio M.</td><td>Admissional</td><td>Dr. Costa</td><td>01/09/2024</td><td>01/09/2025</td><td><span class="badge badge-green">Apto</span></td><td><span class="badge badge-red">Vencido</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-weight:500">Mauricio F.</td><td>Periódico</td><td>Dr. Costa</td><td>15/05/2025</td><td>15/05/2026</td><td><span class="badge badge-green">Apto</span></td><td><span class="badge badge-green">Vigente</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-weight:500">Thiago R.</td><td>Periódico</td><td>Dr. Alves</td><td>02/06/2025</td><td>02/06/2026</td><td><span class="badge badge-green">Apto</span></td><td><span class="badge badge-green">Vigente</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
+            <thead><tr><th>Funcionário</th><th>Tipo</th><th>Médico</th><th>Emissão</th><th>Validade</th><th>Resultado</th><th>Situação</th><th></th></tr></thead>
+            <tbody id="aso-tbody">
+              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum ASO registrado. Clique em "+ Registrar ASO" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -3353,25 +3356,27 @@ tbody tr:hover td{background:var(--bg3)}
           <div>
             <div class="page-breadcrumb"><i data-lucide="users-round"></i> Recursos Humanos <i data-lucide="chevron-right"></i> Funcionários <i data-lucide="chevron-right"></i> <span>EPI / Entrega</span></div>
             <div class="page-title">Controle de EPI</div>
-            <div class="page-sub">Ficha de entrega, CA vigente, reposição e descarte por funcionário</div>
+            <div class="page-sub">Repositório de fichas de entrega de EPI por funcionário — arraste ou anexe qualquer arquivo</div>
           </div>
-          <button class="btn btn-primary" onclick="abrirModalRegistro('registrar-entrega','Registrar Entrega')"><i data-lucide="plus"></i> Registrar Entrega</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('rh-epi')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> CSV</button>
+            <button class="btn btn-primary" onclick="repoOpenModal('rh-epi','EPI')"><i data-lucide="plus"></i> Registrar Entrega</button>
+          </div>
         </div>
         <div class="kpi-grid kpi-grid-3">
-          <div class="kpi blue"><div class="kpi-label">Entregas registradas</div><div class="kpi-value">312</div><div class="kpi-sub">este mês</div></div>
-          <div class="kpi amber"><div class="kpi-label">CAs a vencer (60 dias)</div><div class="kpi-value">7</div></div>
-          <div class="kpi green"><div class="kpi-label">Funcionários com ficha completa</div><div class="kpi-value">68</div></div>
+          <div class="kpi blue"><div class="kpi-label">Registros cadastrados</div><div class="kpi-value" id="kpi-rh-epi-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Com arquivo anexado</div><div class="kpi-value" id="kpi-rh-epi-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Sem arquivo</div><div class="kpi-value" id="kpi-rh-epi-pend">0</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><div class="card-title">Fichas de entrega de EPI</div></div>
+          <div class="card-header">
+            <div class="card-title">Fichas de entrega de EPI</div>
+            <input type="text" class="form-input" id="repo-rh-epi-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('rh-epi')">
+          </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Funcionário</th><th>EPI</th><th>CA nº</th><th>Qtd</th><th>Data entrega</th><th>Próx. troca</th><th>Assinatura</th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:500">Juan Carlos S.</td><td>Capacete class B</td><td>CA-31469</td><td>1</td><td>01/09/2024</td><td>01/09/2025</td><td><span class="badge badge-green">Assinado</span></td></tr>
-              <tr><td style="font-weight:500">Juan Carlos S.</td><td>Botina c/ biq. aço</td><td>CA-28839</td><td>1 par</td><td>01/09/2024</td><td>01/03/2025</td><td><span class="badge badge-green">Assinado</span></td></tr>
-              <tr><td style="font-weight:500">Wlisses A.</td><td>Talabarte duplo</td><td>CA-40123</td><td>1</td><td>15/09/2024</td><td>15/09/2025</td><td><span class="badge badge-green">Assinado</span></td></tr>
-              <tr><td style="font-weight:500">Wlisses A.</td><td>Luva de vaqueta</td><td>CA-19256</td><td>2 pares</td><td>01/04/2026</td><td>01/07/2026</td><td><span class="badge badge-amber">Pendente</span></td></tr>
-              <tr><td style="font-weight:500">Silvanio M.</td><td>Óculos de proteção</td><td>CA-11268</td><td>1</td><td>01/09/2024</td><td>01/09/2025</td><td><span class="badge badge-green">Assinado</span></td></tr>
+            <thead><tr><th>Funcionário</th><th>EPI / Descrição</th><th>CA nº</th><th>Data entrega</th><th>Obra</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-rh-epi">
+              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Registrar Entrega" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -3415,18 +3420,27 @@ tbody tr:hover td{background:var(--bg3)}
           <div>
             <div class="page-breadcrumb"><i data-lucide="users-round"></i> Recursos Humanos <i data-lucide="chevron-right"></i> <span>Anexos Contratuais</span></div>
             <div class="page-title">Anexos Contratuais</div>
-            <div class="page-sub">Aditivos, convenções coletivas, planilhas de mobilização e acordos</div>
+            <div class="page-sub">Repositório de aditivos, CCTs, planilhas de mobilização e acordos — arraste ou anexe qualquer arquivo</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Novo anexo</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('rh-anexos')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> CSV</button>
+            <button class="btn btn-primary" onclick="repoOpenModal('rh-anexos','Anexo Contratual')"><i data-lucide="plus"></i> Novo Anexo</button>
+          </div>
+        </div>
+        <div class="kpi-grid kpi-grid-3">
+          <div class="kpi blue"><div class="kpi-label">Documentos cadastrados</div><div class="kpi-value" id="kpi-rh-anexos-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Com arquivo anexado</div><div class="kpi-value" id="kpi-rh-anexos-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Sem arquivo</div><div class="kpi-value" id="kpi-rh-anexos-pend">0</div></div>
         </div>
         <div class="card">
+          <div class="card-header">
+            <div class="card-title">Repositório de Anexos</div>
+            <input type="text" class="form-input" id="repo-rh-anexos-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('rh-anexos')">
+          </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Código</th><th>Documento</th><th>Obra</th><th>Tipo</th><th>Vigência</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-              <tr><td style="font-size:11px;color:var(--text3)">ANX-001</td><td style="font-weight:500">Convenção Coletiva 2025/2026 — SINTRACOM</td><td>Todas</td><td>CCT</td><td>01/01/2026 a 31/12/2026</td><td>R.H. Central</td><td><span class="badge badge-green">Vigente</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-size:11px;color:var(--text3)">ANX-002</td><td style="font-weight:500">Planilha de mobilização — LD 69kV Lagoa Nova</td><td>LD 69kV Lagoa Nova</td><td>Mobilização</td><td>Set/2024</td><td>J. Almeida</td><td><span class="badge badge-green">Aprovado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-size:11px;color:var(--text3)">ANX-003</td><td style="font-weight:500">Aditivo nº 01 — Prorrogação prazo SE Uberlândia</td><td>SE Uberlândia</td><td>Aditivo</td><td>01/04/2026</td><td>G. Diniz</td><td><span class="badge badge-amber">Em análise</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-size:11px;color:var(--text3)">ANX-004</td><td style="font-weight:500">Acordo de Compensação de Horas — Abr/2026</td><td>LD 69kV Lagoa Nova</td><td>Acordo interno</td><td>Abr/2026</td><td>J. Almeida</td><td><span class="badge badge-green">Vigente</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
+            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-rh-anexos">
+              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum anexo cadastrado. Clique em "+ Novo Anexo" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -3902,6 +3916,158 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </div>
 
+<!-- ═══ MODAL — REGISTRAR/EDITAR ASO ═══ -->
+<div class="modal-overlay" id="modal-aso">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title" id="aso-modal-titulo">Registrar ASO</div>
+      <button class="modal-close" onclick="closeModal('modal-aso')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Funcionário *</label>
+        <select class="form-select" id="aso-funcionario">
+          <option value="">Selecione o funcionário...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de ASO *</label>
+        <select class="form-select" id="aso-tipo">
+          <option value="">Selecione...</option>
+          <option>Admissional</option>
+          <option>Periódico</option>
+          <option>Demissional</option>
+          <option>Retorno ao trabalho</option>
+          <option>Mudança de função</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Resultado *</label>
+        <select class="form-select" id="aso-resultado">
+          <option value="">Selecione...</option>
+          <option value="Apto">Apto</option>
+          <option value="Apto c/ restrição">Apto c/ restrição</option>
+          <option value="Inapto temporário">Inapto temporário</option>
+          <option value="Inapto">Inapto</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Médico responsável</label>
+        <input type="text" class="form-input" id="aso-medico" placeholder="Dr. Nome do Médico">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CRM</label>
+        <input type="text" class="form-input" id="aso-crm" placeholder="CRM/UF 000000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data de emissão *</label>
+        <input type="date" class="form-input" id="aso-data-emissao">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Validade *</label>
+        <input type="date" class="form-input" id="aso-validade">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Observações</label>
+        <textarea class="form-input" id="aso-obs" rows="2" placeholder="Restrições, exames realizados, observações..."></textarea>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Anexar ASO (PDF ou imagem)</label>
+        <div class="upload-area" onclick="document.getElementById('aso-file-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--blue)'"
+          ondragleave="this.style.borderColor=''"
+          ondrop="event.preventDefault();this.style.borderColor='';repoAdicionarArquivos('aso',event.dataTransfer.files)">
+          <div class="upload-icon"><i data-lucide="upload-cloud"></i></div>
+          <div class="upload-label">Clique ou arraste o arquivo aqui</div>
+          <div class="upload-hint">PDF, imagem ou qualquer formato</div>
+        </div>
+        <input type="file" id="aso-file-input" multiple style="display:none" onchange="repoAdicionarArquivos('aso',this.files)">
+        <div id="aso-arquivos-lista" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-aso')">Cancelar</button>
+      <button class="btn btn-primary" onclick="asoSalvar()"><i data-lucide="save" style="width:13px;height:13px;margin-right:4px"></i> Salvar ASO</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — REPOSITÓRIO (EPI / ANEXOS) ═══ -->
+<div class="modal-overlay" id="modal-repo">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <div class="modal-title" id="repo-modal-titulo">Registrar Entrega</div>
+      <button class="modal-close" onclick="closeModal('modal-repo')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="form-grid">
+      <!-- campos dinâmicos conforme contexto -->
+      <div class="form-group full" id="repo-campo-funcionario" style="display:none">
+        <label class="form-label">Funcionário *</label>
+        <select class="form-select" id="repo-funcionario">
+          <option value="">Selecione o funcionário...</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label" id="repo-label-titulo">Título / Descrição *</label>
+        <input type="text" class="form-input" id="repo-titulo" placeholder="Ex: Capacete classe B — CA-31469">
+      </div>
+      <div class="form-group" id="repo-campo-ca" style="display:none">
+        <label class="form-label">CA nº</label>
+        <input type="text" class="form-input" id="repo-ca" placeholder="CA-00000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo / Categoria</label>
+        <input type="text" class="form-input" id="repo-tipo" placeholder="Ex: Capacete, Luva, CCT, Aditivo...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data *</label>
+        <input type="date" class="form-input" id="repo-data">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Obra</label>
+        <select class="form-select obra-filtro-select" id="repo-obra">
+          <option value="">Todas as obras</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Responsável</label>
+        <input type="text" class="form-input" id="repo-responsavel" placeholder="Nome do responsável">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="repo-status">
+          <option value="Vigente">Vigente</option>
+          <option value="Assinado">Assinado</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Em análise">Em análise</option>
+          <option value="Vencido">Vencido</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Observações</label>
+        <textarea class="form-input" id="repo-obs" rows="2" placeholder="Detalhes adicionais..."></textarea>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Anexar arquivos <span style="font-size:11px;color:var(--text3)">(qualquer formato — PDF, Word, Excel, imagem, ZIP...)</span></label>
+        <div class="upload-area" onclick="document.getElementById('repo-file-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--blue)';this.style.background='var(--blue-light)'"
+          ondragleave="this.style.borderColor='';this.style.background=''"
+          ondrop="event.preventDefault();this.style.borderColor='';this.style.background='';repoAdicionarArquivos('repo',event.dataTransfer.files)">
+          <div class="upload-icon"><i data-lucide="upload-cloud"></i></div>
+          <div class="upload-label">Clique ou arraste arquivos aqui</div>
+          <div class="upload-hint">Qualquer formato aceito — PDF, Word, Excel, imagem, ZIP...</div>
+        </div>
+        <input type="file" id="repo-file-input" multiple style="display:none" onchange="repoAdicionarArquivos('repo',this.files)">
+        <div id="repo-arquivos-lista" style="display:flex;flex-direction:column;gap:6px;margin-top:10px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-repo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="repoSalvar()"><i data-lucide="save" style="width:13px;height:13px;margin-right:4px"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODAL — BUSCA GLOBAL ═══ -->
 <div class="modal-overlay" id="modal-busca-global">
   <div class="modal" style="max-width:640px">
@@ -4080,7 +4246,7 @@ tbody tr:hover td{background:var(--bg3)}
 <div class="modal-overlay" id="modal-funcionario">
   <div class="modal" style="max-width:560px">
     <div class="modal-header">
-      <div class="modal-title">Novo Funcionário</div>
+      <div class="modal-title" id="func-modal-titulo">Novo Funcionário</div>
       <button class="modal-close" onclick="closeModal('modal-funcionario')"><i data-lucide="x"></i></button>
     </div>
     <div class="form-grid">
@@ -4092,7 +4258,17 @@ tbody tr:hover td{background:var(--bg3)}
         <label class="form-label">CPF</label>
         <input type="text" class="form-input" id="func-cpf" placeholder="000.000.000-00" maxlength="14" oninput="funcFormatarCPF(this)">
       </div>
-      <div class="form-group" style="position:relative">
+      <div class="form-group">
+        <label class="form-label">Regime contratual</label>
+        <select class="form-select" id="func-regime">
+          <option value="CLT">CLT</option>
+          <option value="PJ">PJ</option>
+          <option value="Temporário">Temporário</option>
+          <option value="Terceirizado">Terceirizado</option>
+          <option value="Aprendiz">Aprendiz</option>
+        </select>
+      </div>
+      <div class="form-group full" style="position:relative">
         <label class="form-label">Função</label>
         <input type="text" class="form-input" id="func-funcao-input" placeholder="Digite para buscar a função..."
           autocomplete="off"
@@ -4129,7 +4305,7 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-funcionario')">Cancelar</button>
-      <button class="btn btn-primary" onclick="funcSalvar()"><i data-lucide="save"></i> Cadastrar funcionário</button>
+      <button class="btn btn-primary" onclick="funcSalvar()"><i data-lucide="save"></i> Salvar funcionário</button>
     </div>
   </div>
 </div>
@@ -4284,24 +4460,57 @@ function doLogin(){
   const email = document.getElementById('inp-email').value.trim().toLowerCase();
   const senha = document.getElementById('inp-senha').value;
   const err   = document.getElementById('login-error');
-  // Verificar na lista dinâmica de usuários (carregada do localStorage)
   const usuariosList = typeof USUARIOS_LISTA !== 'undefined' ? USUARIOS_LISTA : [{email:USUARIO.email,senha:USUARIO.senha,nome:USUARIO.nome,ativo:true}];
   const user = usuariosList.find(u=>u.email===email&&u.senha===senha&&u.ativo!==false);
   if(user){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app').classList.add('visible');
-    document.getElementById('user-name').textContent=(user.nome||USUARIO.nome).split(' ')[0];
+    // Salvar sessão no localStorage
+    localStorage.setItem('engelinhas_session', JSON.stringify({email:user.email, nome:user.nome, ts:Date.now()}));
+    _aplicarLogin(user);
     err.style.display='none';
-    lucide.createIcons();
   } else { err.style.display='block'; }
 }
-document.getElementById('inp-senha').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-function doLogout(){
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('login-screen').style.display='flex';
+
+function _aplicarLogin(user){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('user-name').textContent=(user.nome||USUARIO.nome).split(' ')[0];
+  usuarioLogadoEmail = user.email;
+  lucide.createIcons();
 }
 
-// ── OBRAS DROPDOWN ────────────────────────────────────
+function doLogout(){
+  localStorage.removeItem('engelinhas_session');
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('inp-email').value='';
+  document.getElementById('inp-senha').value='';
+}
+
+// Enter no campo senha → submete login
+document.getElementById('inp-senha').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ── Auto-login por sessão salva (refresh da página) ────
+(function verificarSessaoSalva(){
+  try{
+    const sess = JSON.parse(localStorage.getItem('engelinhas_session')||'null');
+    if(!sess) return;
+    // Sessão expira em 8 horas
+    if(Date.now() - sess.ts > 8*60*60*1000){ localStorage.removeItem('engelinhas_session'); return; }
+    const usuariosList = typeof USUARIOS_LISTA !== 'undefined' ? USUARIOS_LISTA : [];
+    const user = usuariosList.find(u=>u.email===sess.email&&u.ativo!==false)
+               || {email:sess.email, nome:sess.nome||USUARIO.nome};
+    _aplicarLogin(user);
+    // Re-renderizar módulos após login automático
+    setTimeout(()=>{
+      if(typeof obrasRender==='function') obrasRender();
+      if(typeof atasRender==='function'){ atasCarregar(); atasRender(); }
+      if(typeof popularFiltrosObra==='function') popularFiltrosObra();
+      if(typeof dashboardRender==='function') dashboardRender();
+      if(typeof notificacoesAtualizar==='function') notificacoesAtualizar();
+      if(typeof rhAtualizarKpis==='function') rhAtualizarKpis();
+    }, 150);
+  }catch(e){ console.warn('Erro ao restaurar sessão:', e); }
+})();
 function toggleObrasMenu(){
   const menu=document.getElementById('obras-menu');
   const btn=document.getElementById('obras-btn');
@@ -5986,19 +6195,23 @@ function rhRenderFuncionarios(){
   const busca=(document.getElementById('rh-busca-func')?.value||'').trim().toLowerCase();
   const obraFiltro=document.getElementById('rh-filtro-obra')?.value||'';
   const lista = FUNCIONARIOS.filter(f=>{
-    const matchBusca = !busca || f.nome.toLowerCase().includes(busca) || f.cpf.includes(busca);
+    const matchBusca = !busca || f.nome.toLowerCase().includes(busca) || (f.cpf||'').includes(busca);
     const matchObra = !obraFiltro || f.obraId===obraFiltro;
     return matchBusca && matchObra;
   });
   if(lista.length===0){
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:24px">Nenhum funcionário encontrado.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--text3);padding:24px">Nenhum funcionário encontrado.</td></tr>';
   } else {
     tbody.innerHTML = lista.map(f=>{
-      const obraNome = RDO_OBRAS[f.obraId]?.nome || f.obraId;
+      const obraNome = RDO_OBRAS[f.obraId]?.nome || OBRAS_LISTA.find(o=>o.id===f.obraId)?.nome || f.obraId;
       const docsBadge = f.docs==='Completo'
         ? '<span class="badge badge-green">Completo</span>'
         : '<span class="badge badge-amber">Pendente</span>';
-      return `<tr>
+      const ativo = f.ativo !== false;
+      const statusBadge = ativo
+        ? '<span class="status green">Ativo</span>'
+        : '<span class="status" style="background:var(--bg3);color:var(--text3)">Inativo</span>';
+      return `<tr style="${ativo?'':'opacity:.6'}">
         <td style="font-size:11px;color:var(--text3)">${f.matricula}</td>
         <td style="font-weight:500">${f.nome}</td>
         <td style="font-size:12px;color:var(--text2)">${f.cpf}</td>
@@ -6007,10 +6220,18 @@ function rhRenderFuncionarios(){
         <td>${f.admissao}</td>
         <td>${f.regime}</td>
         <td>${docsBadge}</td>
-        <td><span class="status green">Ativo</span></td>
-        <td><button class="btn btn-sm" onclick="funcVerDetalhes('${f.matricula}')">Ver</button></td>
+        <td>${statusBadge}</td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-sm" onclick="funcEditar('${f.matricula}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+            <button class="btn btn-sm ${ativo?'':'btn-primary'}" onclick="funcToggleAtivo('${f.matricula}')" title="${ativo?'Desativar':'Ativar'}">
+              ${ativo?'<i data-lucide="user-x" style="width:12px;height:12px"></i>':'<i data-lucide="user-check" style="width:12px;height:12px"></i>'}
+            </button>
+          </div>
+        </td>
       </tr>`;
     }).join('');
+    setTimeout(()=>lucide.createIcons(),50);
   }
   rhAtualizarKpisFuncionarios();
 }
@@ -6029,11 +6250,15 @@ const NRS_VALIDADE_MESES = {
 };
 
 function rhBadgeNR(status){
-  if(status==='ok') return '<span class="badge badge-green">✓</span>';
-  if(status==='vencendo') return '<span class="badge badge-amber">⚠</span>';
-  if(status==='vencida') return '<span class="badge badge-red">✗</span>';
-  if(status==='sem_doc') return '<span class="badge" style="background:var(--bg3);color:var(--text2);border:1px dashed var(--border2)" title="Data em dia, mas sem certificado anexado">📎</span>';
-  return '—'; // 'na' — não aplicável a esta função
+  // ✓ verde  = doc enviado e vigente (ok)
+  // ⚠ âmbar  = vencendo em breve (vencendo)
+  // ✗ vermelho = doc vencido (vencida)
+  // × cinza   = pendente — exigida mas sem doc/cadastro (na ou sem_doc)
+  if(status==='ok')      return '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:13px;font-weight:700" title="Concluído / Vigente">✓</span>';
+  if(status==='vencendo') return '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#fef3c7;color:#d97706;font-size:13px" title="Vencendo em breve">⚠</span>';
+  if(status==='vencida')  return '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#fee2e2;color:#dc2626;font-size:14px;font-weight:700" title="Vencida">✗</span>';
+  if(status==='sem_doc')  return '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#fee2e2;color:#dc2626;font-size:14px;font-weight:700" title="Pendente de envio / cadastro">✗</span>';
+  return '<span style="color:var(--text3);font-size:18px;line-height:1" title="Não aplicável">—</span>';
 }
 
 function rhPrimeiroNome(nomeCompleto){
@@ -6196,25 +6421,35 @@ function trSalvar(){
 function rhRenderTreinamentos(){
   const tbody=document.getElementById('rh-treinamentos-tbody');
   if(!tbody) return;
-  if(FUNCIONARIOS.length===0){
-    tbody.innerHTML = `<tr><td colspan="${NRS_COLUNAS.length+1}" style="text-align:center;color:var(--text3);padding:24px">Nenhum funcionário cadastrado.</td></tr>`;
+  const funcAtivos = FUNCIONARIOS.filter(f=>f.ativo!==false);
+  if(funcAtivos.length===0){
+    tbody.innerHTML = `<tr><td colspan="${NRS_COLUNAS.length+1}" style="text-align:center;color:var(--text3);padding:24px">Nenhum funcionário ativo cadastrado.</td></tr>`;
   } else {
-    tbody.innerHTML = FUNCIONARIOS.map(f=>{
+    tbody.innerHTML = funcAtivos.map(f=>{
       const status = f.nrsStatus || {};
       const celulas = NRS_COLUNAS.map(nr=>{
         const exigida = (f.nrsExigidas||[]).includes(nr);
-        if(!exigida) return '<td style="text-align:center">—</td>';
-        return `<td style="text-align:center;cursor:pointer" onclick="trVerOuRegistrar('${f.matricula}','${nr.replace(/'/g,"\\'")}')">${rhBadgeNR(status[nr]||'na')}</td>`;
+        if(!exigida) return '<td style="text-align:center;color:var(--text3)">—</td>';
+        // Se exigida mas sem status definido ou 'na' → pendente (sem_doc = X vermelho)
+        const s = status[nr];
+        const statusReal = (!s || s==='na') ? 'sem_doc' : s;
+        return `<td style="text-align:center;cursor:pointer" onclick="trVerOuRegistrar('${f.matricula}','${nr.replace(/'/g,"\\'")}')">${rhBadgeNR(statusReal)}</td>`;
       }).join('');
-      return `<tr><td style="font-weight:500;white-space:nowrap">${rhPrimeiroNome(f.nome)}</td>${celulas}</tr>`;
+      const obraNome = RDO_OBRAS[f.obraId]?.nome || OBRAS_LISTA.find(o=>o.id===f.obraId)?.nome || f.obraId || '—';
+      return `<tr>
+        <td style="font-weight:500;white-space:nowrap">
+          ${rhPrimeiroNome(f.nome)}
+          <div style="font-size:10px;color:var(--text3);font-weight:400">${obraNome}</div>
+        </td>${celulas}</tr>`;
     }).join('');
   }
   rhAtualizarKpisTreinamentos();
+  setTimeout(()=>lucide.createIcons(),50);
 }
 
 function rhAtualizarKpisTreinamentos(){
   let ativas=0, emDia=0, vencendo=0, vencidas=0;
-  FUNCIONARIOS.forEach(f=>{
+  FUNCIONARIOS.filter(f=>f.ativo!==false).forEach(f=>{
     const status = f.nrsStatus || {};
     (f.nrsExigidas||[]).forEach(nr=>{
       ativas++;
@@ -6222,6 +6457,7 @@ function rhAtualizarKpisTreinamentos(){
       if(s==='ok') emDia++;
       else if(s==='vencendo') vencendo++;
       else if(s==='vencida') vencidas++;
+      // sem_doc / na / undefined → não contabiliza em "emDia"
     });
   });
   const elA=document.getElementById('rh-tr-kpi-ativas'), elE=document.getElementById('rh-tr-kpi-emdia'),
@@ -6335,18 +6571,61 @@ function funcRenderArquivos(){
   if(window.lucide) lucide.createIcons();
 }
 
+let funcEditandoMatricula = null; // null = novo, matricula = editando
+
 function openModalFuncionario(){
+  funcEditandoMatricula = null;
   funcPopularSelects();
   funcArquivosTemp=[];
+  document.getElementById('func-modal-titulo').textContent = 'Novo Funcionário';
   document.getElementById('func-nome').value='';
   document.getElementById('func-cpf').value='';
   document.getElementById('func-funcao-input').value='';
   document.getElementById('func-funcao').value='';
   document.getElementById('func-obra').value='';
+  const regimeEl = document.getElementById('func-regime');
+  if(regimeEl) regimeEl.value='CLT';
   funcFecharDropdown();
   funcRenderNRs('');
   funcRenderArquivos();
   openModal('modal-funcionario');
+}
+
+function funcEditar(matricula){
+  const f = FUNCIONARIOS.find(x=>x.matricula===matricula);
+  if(!f){ showToast('Funcionário não encontrado.','error'); return; }
+  funcEditandoMatricula = matricula;
+  funcPopularSelects();
+  funcArquivosTemp=[];
+  document.getElementById('func-modal-titulo').textContent = 'Editar Funcionário — '+f.matricula;
+  document.getElementById('func-nome').value = f.nome||'';
+  document.getElementById('func-cpf').value = f.cpf||'';
+  document.getElementById('func-funcao-input').value = f.funcao||'';
+  document.getElementById('func-funcao').value = f.funcao||'';
+  document.getElementById('func-obra').value = f.obraId||'';
+  const regimeEl = document.getElementById('func-regime');
+  if(regimeEl) regimeEl.value = f.regime||'CLT';
+  funcFecharDropdown();
+  funcRenderNRs(f.funcao||'');
+  // Pré-marcar NRs existentes
+  const nrsExigidas = f.nrsExigidas||[];
+  document.querySelectorAll('#func-nrs-lista input[type=checkbox]').forEach(c=>{
+    if(nrsExigidas.includes(c.value)) c.checked=true;
+  });
+  funcRenderArquivos();
+  openModal('modal-funcionario');
+}
+
+function funcToggleAtivo(matricula){
+  const idx = FUNCIONARIOS.findIndex(x=>x.matricula===matricula);
+  if(idx<0) return;
+  const ativo = FUNCIONARIOS[idx].ativo !== false;
+  const acao = ativo ? 'desativar' : 'reativar';
+  if(!confirm(`Deseja ${acao} o funcionário "${FUNCIONARIOS[idx].nome}"?`)) return;
+  FUNCIONARIOS[idx].ativo = !ativo;
+  rhSalvarFuncionarios();
+  rhRenderFuncionarios();
+  showToast(`Funcionário ${!ativo?'ativado':'desativado'} com sucesso.`, !ativo?'success':'warn');
 }
 
 function funcSalvar(){
@@ -6355,33 +6634,48 @@ function funcSalvar(){
   const funcaoInput=document.getElementById('func-funcao-input').value.trim();
   const funcao=document.getElementById('func-funcao').value;
   const obraId=document.getElementById('func-obra').value;
-  if(!nome){ alert('Informe o nome do funcionário.'); return; }
-  if(!cpf || cpf.replace(/\D/g,'').length!==11){ alert('Informe um CPF válido.'); return; }
-  if(!funcao || funcao!==funcaoInput){ alert('Selecione uma função válida na lista.'); return; }
-  if(!obraId){ alert('Selecione a obra.'); return; }
+  const regime=(document.getElementById('func-regime')?.value)||'CLT';
+  if(!nome){ showToast('Informe o nome do funcionário.','error'); return; }
+  if(!cpf || cpf.replace(/\D/g,'').length!==11){ showToast('Informe um CPF válido (11 dígitos).','error'); return; }
+  if(!funcao || funcao!==funcaoInput){ showToast('Selecione uma função válida na lista.','error'); return; }
+  if(!obraId){ showToast('Selecione a obra.','error'); return; }
 
   const nrsExigidas = funcColetarNRs();
-  const nrsStatus = {};
-  NRS_COLUNAS.forEach(nr=>{ nrsStatus[nr] = nrsExigidas.includes(nr) ? 'ok' : 'na'; });
-  const hoje = new Date();
-  const admissao = String(hoje.getDate()).padStart(2,'0')+'/'+String(hoje.getMonth()+1).padStart(2,'0')+'/'+hoje.getFullYear();
-  const novoFuncionario = {
-    matricula: rhGerarMatricula(funcao),
-    nome, cpf, funcao, obraId,
-    admissao,
-    regime: 'CLT',
-    docs: funcArquivosTemp.length>0 ? 'Completo' : 'Pendente',
-    nrsExigidas,
-    nrsStatus,
-  };
-  FUNCIONARIOS.push(novoFuncionario);
-  rhSalvarFuncionarios();
-  rhRenderFuncionarios();
-  if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
 
-  closeModal('modal-funcionario');
-  const nrsTxt = nrsExigidas.length ? nrsExigidas.join(', ') : 'nenhuma';
-  alert('Funcionário "'+nome+'" cadastrado em '+RDO_OBRAS[obraId].nome+' com sucesso.\nMatrícula: '+novoFuncionario.matricula+'\nNRs/treinamentos exigidos: '+nrsTxt);
+  if(funcEditandoMatricula){
+    // EDIÇÃO
+    const idx = FUNCIONARIOS.findIndex(x=>x.matricula===funcEditandoMatricula);
+    if(idx<0){ showToast('Funcionário não encontrado.','error'); return; }
+    const f = FUNCIONARIOS[idx];
+    // Manter nrsStatus existente, adicionar novas NRs como 'ok' se não existirem
+    const nrsStatus = f.nrsStatus || {};
+    nrsExigidas.forEach(nr=>{ if(!nrsStatus[nr]) nrsStatus[nr]='ok'; });
+    FUNCIONARIOS[idx] = { ...f, nome, cpf, funcao, obraId, regime, nrsExigidas, nrsStatus,
+      docs: (funcArquivosTemp.length>0||f.docs==='Completo') ? 'Completo' : 'Pendente' };
+    rhSalvarFuncionarios();
+    rhRenderFuncionarios();
+    if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
+    closeModal('modal-funcionario');
+    showToast('Funcionário "'+nome+'" atualizado com sucesso.','success');
+  } else {
+    // NOVO
+    const nrsStatus = {};
+    NRS_COLUNAS.forEach(nr=>{ nrsStatus[nr] = nrsExigidas.includes(nr) ? 'ok' : 'na'; });
+    const hoje = new Date();
+    const admissao = String(hoje.getDate()).padStart(2,'0')+'/'+String(hoje.getMonth()+1).padStart(2,'0')+'/'+hoje.getFullYear();
+    const novoFuncionario = {
+      matricula: rhGerarMatricula(funcao),
+      nome, cpf, funcao, obraId, admissao, regime,
+      docs: funcArquivosTemp.length>0 ? 'Completo' : 'Pendente',
+      nrsExigidas, nrsStatus, ativo: true,
+    };
+    FUNCIONARIOS.push(novoFuncionario);
+    rhSalvarFuncionarios();
+    rhRenderFuncionarios();
+    if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
+    closeModal('modal-funcionario');
+    showToast('Funcionário "'+nome+'" cadastrado. Matrícula: '+novoFuncionario.matricula,'success');
+  }
 }
 
 function openModalAta(){openModal('modal-ata');}
@@ -7341,6 +7635,16 @@ document.addEventListener('DOMContentLoaded', function(){
     if(pageId === 'acomp-rdpp'){
       rdppShowLista();
     }
+    if(pageId === 'rh-aso'){
+      asoCarregar();
+      asoRender();
+    }
+    if(pageId === 'rh-epi'){
+      repoRender('rh-epi');
+    }
+    if(pageId === 'rh-anexos'){
+      repoRender('rh-anexos');
+    }
   };
 });
 
@@ -8096,6 +8400,488 @@ function buscaGlobalRenderResultados(todos, termo){
 }
 
 // ═══════════════════════════════════════════════════════
+// ASO — CRUD COMPLETO
+// ═══════════════════════════════════════════════════════
+const ASO_STORAGE_KEY = 'engelinhas_rh_asos';
+let ASO_LISTA = [];
+let asoEditandoId = null;
+let asoArquivosTemp = [];
+
+function asoCarregar(){
+  try{ ASO_LISTA = JSON.parse(localStorage.getItem(ASO_STORAGE_KEY)||'[]'); }
+  catch(e){ ASO_LISTA=[]; }
+}
+function asoSalvarStorage(){ localStorage.setItem(ASO_STORAGE_KEY, JSON.stringify(ASO_LISTA)); }
+
+function asoPopularFuncionarioSelect(){
+  const sel = document.getElementById('aso-funcionario');
+  if(!sel) return;
+  const atual = sel.value;
+  sel.innerHTML = '<option value="">Selecione o funcionário...</option>';
+  const ativos = (FUNCIONARIOS||[]).filter(f=>f.ativo!==false);
+  ativos.forEach(f=>{
+    const opt = document.createElement('option');
+    opt.value = f.matricula;
+    opt.textContent = f.nome + ' — ' + (f.matricula||'');
+    sel.appendChild(opt);
+  });
+  if(atual) sel.value = atual;
+}
+
+function asoOpenModal(id=null){
+  asoCarregar();
+  asoEditandoId = id;
+  asoArquivosTemp = [];
+  asoPopularFuncionarioSelect();
+  // Limpar campos
+  ['aso-funcionario','aso-tipo','aso-resultado'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
+  ['aso-medico','aso-crm','aso-obs'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
+  ['aso-data-emissao','aso-validade'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
+  const lista = document.getElementById('aso-arquivos-lista');
+  if(lista) lista.innerHTML='';
+  const fi = document.getElementById('aso-file-input');
+  if(fi) fi.value='';
+
+  if(id){
+    const aso = ASO_LISTA.find(a=>a.id===id);
+    if(!aso){ showToast('ASO não encontrado.','error'); return; }
+    document.getElementById('aso-modal-titulo').textContent = 'Editar ASO';
+    document.getElementById('aso-funcionario').value = aso.matricula||'';
+    document.getElementById('aso-tipo').value = aso.tipo||'';
+    document.getElementById('aso-resultado').value = aso.resultado||'';
+    document.getElementById('aso-medico').value = aso.medico||'';
+    document.getElementById('aso-crm').value = aso.crm||'';
+    document.getElementById('aso-data-emissao').value = aso.dataEmissao||'';
+    document.getElementById('aso-validade').value = aso.validade||'';
+    document.getElementById('aso-obs').value = aso.obs||'';
+    asoArquivosTemp = aso.arquivos ? [...aso.arquivos] : [];
+    repoRenderArquivos('aso');
+  } else {
+    document.getElementById('aso-modal-titulo').textContent = 'Registrar ASO';
+    // data emissão default = hoje
+    document.getElementById('aso-data-emissao').value = new Date().toISOString().slice(0,10);
+  }
+  openModal('modal-aso');
+}
+
+function asoSalvar(){
+  asoCarregar();
+  const matricula = document.getElementById('aso-funcionario').value;
+  const tipo      = document.getElementById('aso-tipo').value;
+  const resultado = document.getElementById('aso-resultado').value;
+  const medico    = document.getElementById('aso-medico').value.trim();
+  const crm       = document.getElementById('aso-crm').value.trim();
+  const dataEmissao = document.getElementById('aso-data-emissao').value;
+  const validade  = document.getElementById('aso-validade').value;
+  const obs       = document.getElementById('aso-obs').value.trim();
+
+  if(!matricula){ showToast('Selecione o funcionário.','error'); return; }
+  if(!tipo)     { showToast('Selecione o tipo de ASO.','error'); return; }
+  if(!resultado){ showToast('Selecione o resultado.','error'); return; }
+  if(!dataEmissao){ showToast('Informe a data de emissão.','error'); return; }
+  if(!validade)  { showToast('Informe a data de validade.','error'); return; }
+
+  const func = (FUNCIONARIOS||[]).find(f=>f.matricula===matricula);
+  const nomeFuncionario = func ? func.nome : matricula;
+
+  if(asoEditandoId){
+    const idx = ASO_LISTA.findIndex(a=>a.id===asoEditandoId);
+    if(idx<0){ showToast('ASO não encontrado.','error'); return; }
+    ASO_LISTA[idx] = { ...ASO_LISTA[idx], matricula, nomeFuncionario, tipo, resultado, medico, crm, dataEmissao, validade, obs, arquivos:[...asoArquivosTemp] };
+    showToast('ASO atualizado com sucesso.','success');
+  } else {
+    const novo = {
+      id: 'aso_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      matricula, nomeFuncionario, tipo, resultado, medico, crm, dataEmissao, validade, obs,
+      arquivos:[...asoArquivosTemp], criadoEm: new Date().toISOString()
+    };
+    ASO_LISTA.push(novo);
+    showToast('ASO registrado com sucesso.','success');
+  }
+  asoSalvarStorage();
+  closeModal('modal-aso');
+  asoRender();
+}
+
+function asoStatusCalc(validade, resultado){
+  if(resultado==='Inapto' || resultado==='Inapto temporário') return {label:'Inapto', cls:'badge-red'};
+  if(!validade) return {label:'Sem validade', cls:'badge-amber'};
+  const diff = (new Date(validade) - new Date()) / (1000*60*60*24);
+  if(diff < 0) return {label:'Vencido', cls:'badge-red'};
+  if(diff <= 30) return {label:'Vencendo', cls:'badge-amber'};
+  return {label:'Vigente', cls:'badge-green'};
+}
+
+function asoRender(){
+  asoCarregar();
+  const tbody = document.getElementById('aso-tbody');
+  if(!tbody) return;
+  const q = (document.getElementById('aso-busca')||{value:''}).value.toLowerCase();
+  const ft = (document.getElementById('aso-filtro-tipo')||{value:''}).value;
+
+  let lista = ASO_LISTA.filter(a=>{
+    const matchQ = !q || a.nomeFuncionario.toLowerCase().includes(q) || (a.matricula||'').toLowerCase().includes(q);
+    const matchT = !ft || a.tipo===ft;
+    return matchQ && matchT;
+  });
+  // Ordenar: mais recente primeiro
+  lista = lista.slice().sort((a,b)=> (b.criadoEm||'').localeCompare(a.criadoEm||''));
+
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum ASO encontrado.</td></tr>';
+    asoRenderKpis();
+    return;
+  }
+
+  tbody.innerHTML = lista.map(a=>{
+    const st = asoStatusCalc(a.validade, a.resultado);
+    const qtdArq = (a.arquivos||[]).length;
+    const validadeFmt = a.validade ? new Date(a.validade+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    const emissaoFmt  = a.dataEmissao ? new Date(a.dataEmissao+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    return `<tr>
+      <td><span style="font-weight:500">${a.nomeFuncionario}</span><br><span style="font-size:11px;color:var(--text3)">${a.matricula||''}</span></td>
+      <td><span class="badge">${a.tipo||'—'}</span></td>
+      <td style="font-size:12px">${a.medico||'—'}${a.crm?' <span style="color:var(--text3)">'+a.crm+'</span>':''}</td>
+      <td style="font-size:13px">${emissaoFmt}</td>
+      <td style="font-size:13px">${validadeFmt}</td>
+      <td><span class="badge ${a.resultado==='Apto'?'badge-green':a.resultado==='Inapto'?'badge-red':'badge-amber'}">${a.resultado||'—'}</span></td>
+      <td><span class="badge ${st.cls}">${st.label}</span></td>
+      <td>
+        <div style="display:flex;gap:4px;align-items:center">
+          ${qtdArq>0?`<span title="${qtdArq} arquivo(s)" style="font-size:11px;color:var(--text3);margin-right:2px"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</span>`:''}
+          <button class="btn btn-sm" onclick="asoOpenModal('${a.id}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+          <button class="btn btn-sm" onclick="asoExcluir('${a.id}')" title="Excluir" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  if(typeof lucide !== 'undefined') lucide.createIcons();
+  asoRenderKpis();
+}
+
+function asoRenderKpis(){
+  asoCarregar();
+  let total=0, aptos=0, vencendo=0, vencidos=0;
+  ASO_LISTA.forEach(a=>{
+    total++;
+    const st = asoStatusCalc(a.validade, a.resultado);
+    if(st.label==='Vigente') aptos++;
+    else if(st.label==='Vencendo') vencendo++;
+    else if(st.label==='Vencido'||st.label==='Inapto') vencidos++;
+  });
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('aso-kpi-total',total);
+  set('aso-kpi-aptos',aptos);
+  set('aso-kpi-vencendo',vencendo);
+  set('aso-kpi-vencidos',vencidos);
+}
+
+function asoExcluir(id){
+  if(!confirm('Deseja excluir este ASO?')) return;
+  asoCarregar();
+  ASO_LISTA = ASO_LISTA.filter(a=>a.id!==id);
+  asoSalvarStorage();
+  asoRender();
+  showToast('ASO excluído.','warn');
+}
+
+// ═══════════════════════════════════════════════════════
+// REPOSITÓRIO GENÉRICO — EPI + ANEXOS CONTRATUAIS
+// ═══════════════════════════════════════════════════════
+let repoContextoAtual = ''; // 'rh-epi' | 'rh-anexos'
+let repoArquivosTemp = [];
+let repoEditandoId = null;
+
+function repoKey(tipo){ return 'engelinhas_repo_'+tipo; }
+
+function repoCarregar(tipo){
+  try{ return JSON.parse(localStorage.getItem(repoKey(tipo))||'[]'); }
+  catch(e){ return []; }
+}
+function repoSalvarLista(tipo, lista){ localStorage.setItem(repoKey(tipo), JSON.stringify(lista)); }
+
+function repoPopularFuncionarioSelect(selId){
+  const sel = document.getElementById(selId);
+  if(!sel) return;
+  const atual = sel.value;
+  sel.innerHTML = '<option value="">Selecione o funcionário...</option>';
+  const ativos = (FUNCIONARIOS||[]).filter(f=>f.ativo!==false);
+  ativos.forEach(f=>{
+    const opt = document.createElement('option');
+    opt.value = f.matricula;
+    opt.textContent = f.nome + ' — ' + (f.matricula||'');
+    sel.appendChild(opt);
+  });
+  if(atual) sel.value = atual;
+}
+
+function repoPopularObrasSelect(selId){
+  const sel = document.getElementById(selId);
+  if(!sel) return;
+  const atual = sel.value;
+  sel.innerHTML = '<option value="">Todas as obras</option>';
+  (OBRAS_LISTA||[]).forEach(o=>{
+    const opt = document.createElement('option');
+    opt.value = o.id||o.nome;
+    opt.textContent = o.nome;
+    sel.appendChild(opt);
+  });
+  if(atual) sel.value = atual;
+}
+
+function repoOpenModal(tipo, titulo, id=null){
+  repoContextoAtual = tipo;
+  repoEditandoId = id;
+  repoArquivosTemp = [];
+
+  // Ajustar título do modal
+  const isEpi = tipo === 'rh-epi';
+  document.getElementById('repo-modal-titulo').textContent = id ? 'Editar '+titulo : (isEpi ? 'Registrar Entrega de EPI' : 'Novo Anexo Contratual');
+
+  // Mostrar/ocultar campos contextuais
+  document.getElementById('repo-campo-funcionario').style.display = isEpi ? 'block' : 'none';
+  document.getElementById('repo-campo-ca').style.display = isEpi ? 'block' : 'none';
+  document.getElementById('repo-label-titulo').textContent = isEpi ? 'EPI / Descrição *' : 'Título do documento *';
+  document.getElementById('repo-titulo').placeholder = isEpi ? 'Ex: Capacete classe B — Luva de vaqueta' : 'Ex: Aditivo contratual nº 3 — CCT 2024';
+
+  // Popular selects
+  repoPopularFuncionarioSelect('repo-funcionario');
+  repoPopularObrasSelect('repo-obra');
+
+  // Limpar campos
+  ['repo-funcionario','repo-obra','repo-status'].forEach(i=>{ const el=document.getElementById(i); if(el && !id) el.value=''; });
+  ['repo-titulo','repo-ca','repo-tipo','repo-responsavel','repo-obs'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
+  document.getElementById('repo-data').value = new Date().toISOString().slice(0,10);
+  document.getElementById('repo-status').value = isEpi ? 'Vigente' : 'Vigente';
+  document.getElementById('repo-arquivos-lista').innerHTML = '';
+  const fi = document.getElementById('repo-file-input');
+  if(fi) fi.value='';
+
+  // Preencher se editando
+  if(id){
+    const lista = repoCarregar(tipo);
+    const reg = lista.find(r=>r.id===id);
+    if(!reg){ showToast('Registro não encontrado.','error'); return; }
+    document.getElementById('repo-funcionario').value = reg.matricula||'';
+    document.getElementById('repo-titulo').value = reg.titulo||'';
+    document.getElementById('repo-ca').value = reg.ca||'';
+    document.getElementById('repo-tipo').value = reg.tipo||'';
+    document.getElementById('repo-data').value = reg.data||'';
+    document.getElementById('repo-obra').value = reg.obraId||'';
+    document.getElementById('repo-responsavel').value = reg.responsavel||'';
+    document.getElementById('repo-status').value = reg.status||'Vigente';
+    document.getElementById('repo-obs').value = reg.obs||'';
+    repoArquivosTemp = reg.arquivos ? [...reg.arquivos] : [];
+    repoRenderArquivos('repo');
+  }
+
+  openModal('modal-repo');
+}
+
+function repoSalvar(){
+  const tipo      = repoContextoAtual;
+  const isEpi     = tipo === 'rh-epi';
+  const matricula = document.getElementById('repo-funcionario').value;
+  const titulo    = document.getElementById('repo-titulo').value.trim();
+  const ca        = document.getElementById('repo-ca').value.trim();
+  const tipoDoc   = document.getElementById('repo-tipo').value.trim();
+  const data      = document.getElementById('repo-data').value;
+  const obraId    = document.getElementById('repo-obra').value;
+  const responsavel = document.getElementById('repo-responsavel').value.trim();
+  const status    = document.getElementById('repo-status').value;
+  const obs       = document.getElementById('repo-obs').value.trim();
+
+  if(isEpi && !matricula){ showToast('Selecione o funcionário.','error'); return; }
+  if(!titulo){ showToast('Informe o título/descrição.','error'); return; }
+  if(!data)  { showToast('Informe a data.','error'); return; }
+
+  const func = (FUNCIONARIOS||[]).find(f=>f.matricula===matricula);
+  const nomeFuncionario = func ? func.nome : '';
+  const obra = (OBRAS_LISTA||[]).find(o=>(o.id||o.nome)===obraId);
+  const obraNome = obra ? obra.nome : '';
+
+  let lista = repoCarregar(tipo);
+
+  if(repoEditandoId){
+    const idx = lista.findIndex(r=>r.id===repoEditandoId);
+    if(idx<0){ showToast('Registro não encontrado.','error'); return; }
+    lista[idx] = { ...lista[idx], matricula, nomeFuncionario, titulo, ca, tipo:tipoDoc, data, obraId, obraNome, responsavel, status, obs, arquivos:[...repoArquivosTemp] };
+    showToast('Registro atualizado com sucesso.','success');
+  } else {
+    const novo = {
+      id: 'repo_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      matricula, nomeFuncionario, titulo, ca, tipo:tipoDoc, data, obraId, obraNome, responsavel, status, obs,
+      arquivos:[...repoArquivosTemp], criadoEm: new Date().toISOString()
+    };
+    lista.push(novo);
+    showToast('Registro salvo com sucesso.','success');
+  }
+
+  repoSalvarLista(tipo, lista);
+  closeModal('modal-repo');
+  repoRender(tipo);
+}
+
+function repoRender(tipo){
+  const isEpi = tipo === 'rh-epi';
+  const tbodyId = 'tbody-'+tipo;
+  const buscaId = 'repo-'+tipo+'-busca';
+  const tbody = document.getElementById(tbodyId);
+  if(!tbody) return;
+
+  const lista = repoCarregar(tipo);
+  const q = (document.getElementById(buscaId)||{value:''}).value.toLowerCase();
+  let filtrada = lista.filter(r=>{
+    if(!q) return true;
+    return (r.titulo||'').toLowerCase().includes(q) ||
+           (r.nomeFuncionario||'').toLowerCase().includes(q) ||
+           (r.obraNome||'').toLowerCase().includes(q) ||
+           (r.tipo||'').toLowerCase().includes(q);
+  });
+  filtrada = filtrada.slice().sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+
+  const colSpan = 8;
+
+  if(!filtrada.length){
+    tbody.innerHTML=`<tr><td colspan="${colSpan}" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro encontrado.</td></tr>`;
+    repoRenderKpis(tipo, lista);
+    return;
+  }
+
+  tbody.innerHTML = filtrada.map(r=>{
+    const dataFmt = r.data ? new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    const qtdArq  = (r.arquivos||[]).length;
+    const badgeSt = r.status==='Vigente'||r.status==='Assinado' ? 'badge-green' : r.status==='Pendente'||r.status==='Em análise' ? 'badge-amber' : r.status==='Vencido' ? 'badge-red' : '';
+
+    if(isEpi){
+      return `<tr>
+        <td><span style="font-weight:500">${r.nomeFuncionario||'—'}</span><br><span style="font-size:11px;color:var(--text3)">${r.matricula||''}</span></td>
+        <td style="font-size:13px">${r.titulo||'—'}</td>
+        <td style="font-size:12px;color:var(--text3)">${r.ca||'—'}</td>
+        <td style="font-size:13px">${dataFmt}</td>
+        <td style="font-size:12px">${r.obraNome||'—'}</td>
+        <td style="text-align:center">
+          ${qtdArq>0
+            ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--blue);cursor:pointer" onclick="repoVerArquivos('${tipo}','${r.id}')" title="Ver arquivos"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</span>`
+            : `<span style="font-size:11px;color:var(--text3)">—</span>`}
+        </td>
+        <td><span class="badge ${badgeSt}">${r.status||'—'}</span></td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-sm" onclick="repoOpenModal('${tipo}','EPI','${r.id}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+            <button class="btn btn-sm" onclick="repoExcluir('${tipo}','${r.id}')" title="Excluir" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    } else {
+      return `<tr>
+        <td style="font-size:13px;font-weight:500">${r.titulo||'—'}</td>
+        <td style="font-size:12px">${r.tipo||'—'}</td>
+        <td style="font-size:12px">${r.obraNome||'—'}</td>
+        <td style="font-size:13px">${dataFmt}</td>
+        <td style="font-size:12px">${r.responsavel||'—'}</td>
+        <td style="text-align:center">
+          ${qtdArq>0
+            ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--blue);cursor:pointer" onclick="repoVerArquivos('${tipo}','${r.id}')" title="Ver arquivos"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</span>`
+            : `<span style="font-size:11px;color:var(--text3)">—</span>`}
+        </td>
+        <td><span class="badge ${badgeSt}">${r.status||'—'}</span></td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-sm" onclick="repoOpenModal('${tipo}','Anexo Contratual','${r.id}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+            <button class="btn btn-sm" onclick="repoExcluir('${tipo}','${r.id}')" title="Excluir" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }
+  }).join('');
+
+  if(typeof lucide !== 'undefined') lucide.createIcons();
+  repoRenderKpis(tipo, lista);
+}
+
+function repoRenderKpis(tipo, lista){
+  if(!lista) lista = repoCarregar(tipo);
+  const total = lista.length;
+  const comArq = lista.filter(r=>(r.arquivos||[]).length>0).length;
+  const semArq = total - comArq;
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('kpi-'+tipo+'-total', total);
+  set('kpi-'+tipo+'-ok',    comArq);
+  set('kpi-'+tipo+'-pend',  semArq);
+}
+
+function repoExcluir(tipo, id){
+  if(!confirm('Deseja excluir este registro?')) return;
+  let lista = repoCarregar(tipo);
+  lista = lista.filter(r=>r.id!==id);
+  repoSalvarLista(tipo, lista);
+  repoRender(tipo);
+  showToast('Registro excluído.','warn');
+}
+
+function repoVerArquivos(tipo, id){
+  const lista = repoCarregar(tipo);
+  const reg = lista.find(r=>r.id===id);
+  if(!reg || !(reg.arquivos||[]).length){ showToast('Nenhum arquivo anexado.','info'); return; }
+  const nomes = reg.arquivos.map(a=>a.nome||a.name||'(arquivo)').join('\n');
+  alert('Arquivos anexados:\n\n'+nomes+'\n\n(Os arquivos são armazenados como referência. Para visualizar, re-abra o registro e os arquivos serão listados.)');
+}
+
+// ═══════════════════════════════════════════════════════
+// ARQUIVO — HANDLER COMPARTILHADO (ASO + REPO)
+// ═══════════════════════════════════════════════════════
+function repoAdicionarArquivos(ctx, files){
+  if(!files || !files.length) return;
+  const arr = ctx === 'aso' ? asoArquivosTemp : repoArquivosTemp;
+  Array.from(files).forEach(file=>{
+    // Verificar duplicata por nome
+    if(arr.find(a=>(a.nome||a.name)===file.name)) return;
+    arr.push({ nome: file.name, tamanho: file.size, tipo: file.type, adicionadoEm: new Date().toISOString() });
+  });
+  repoRenderArquivos(ctx);
+}
+
+function repoRenderArquivos(ctx){
+  const listaId = ctx === 'aso' ? 'aso-arquivos-lista' : 'repo-arquivos-lista';
+  const arr     = ctx === 'aso' ? asoArquivosTemp : repoArquivosTemp;
+  const lista   = document.getElementById(listaId);
+  if(!lista) return;
+  if(!arr.length){ lista.innerHTML=''; return; }
+
+  function fmtSize(bytes){
+    if(!bytes) return '';
+    if(bytes < 1024) return bytes+'B';
+    if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+'KB';
+    return (bytes/(1024*1024)).toFixed(1)+'MB';
+  }
+  function fileIcon(tipo){
+    if(!tipo) return '📄';
+    if(tipo.includes('pdf')) return '📕';
+    if(tipo.includes('image')) return '🖼️';
+    if(tipo.includes('word')||tipo.includes('document')) return '📝';
+    if(tipo.includes('sheet')||tipo.includes('excel')||tipo.includes('csv')) return '📊';
+    if(tipo.includes('zip')||tipo.includes('compressed')) return '🗜️';
+    return '📄';
+  }
+
+  lista.innerHTML = arr.map((a,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)">
+      <span style="font-size:16px">${fileIcon(a.tipo)}</span>
+      <span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.nome}">${a.nome}</span>
+      <span style="font-size:11px;color:var(--text3);min-width:40px;text-align:right">${fmtSize(a.tamanho)}</span>
+      <button style="background:none;border:none;cursor:pointer;color:#ef4444;padding:2px 4px;font-size:14px;line-height:1" onclick="repoRemoverArquivo('${ctx}',${i})" title="Remover">×</button>
+    </div>`).join('');
+}
+
+function repoRemoverArquivo(ctx, idx){
+  const arr = ctx === 'aso' ? asoArquivosTemp : repoArquivosTemp;
+  arr.splice(idx, 1);
+  repoRenderArquivos(ctx);
+}
+
+// ═══════════════════════════════════════════════════════
 // EXPORTAÇÃO CSV
 // ═══════════════════════════════════════════════════════
 function exportarCSV(tipo){
@@ -8115,6 +8901,21 @@ function exportarCSV(tipo){
     nome='atas_engelinhas';
     linhas.push(['ID','Título','Obra','Data','Participantes','Status','Ações']);
     ATAS_LISTA.forEach(a=>linhas.push([a.id,a.titulo,a.obraNome||'',a.data,a.participantes||'',a.status,a.acoes||'']));
+  } else if(tipo==='asos'){
+    asoCarregar();
+    nome='asos_engelinhas';
+    linhas.push(['ID','Funcionário','Matrícula','Tipo','Resultado','Médico','CRM','Data Emissão','Validade','Observações','Qtd Arquivos']);
+    ASO_LISTA.forEach(a=>linhas.push([a.id,a.nomeFuncionario||'',a.matricula||'',a.tipo||'',a.resultado||'',a.medico||'',a.crm||'',a.dataEmissao||'',a.validade||'',a.obs||'',(a.arquivos||[]).length]));
+  } else if(tipo==='rh-epi'){
+    const lista=repoCarregar('rh-epi');
+    nome='epi_engelinhas';
+    linhas.push(['ID','Funcionário','Matrícula','EPI/Descrição','CA nº','Data','Obra','Responsável','Status','Qtd Arquivos','Observações']);
+    lista.forEach(r=>linhas.push([r.id,r.nomeFuncionario||'',r.matricula||'',r.titulo||'',r.ca||'',r.data||'',r.obraNome||'',r.responsavel||'',r.status||'',(r.arquivos||[]).length,r.obs||'']));
+  } else if(tipo==='rh-anexos'){
+    const lista=repoCarregar('rh-anexos');
+    nome='anexos_engelinhas';
+    linhas.push(['ID','Título','Tipo','Obra','Data','Responsável','Status','Qtd Arquivos','Observações']);
+    lista.forEach(r=>linhas.push([r.id,r.titulo||'',r.tipo||'',r.obraNome||'',r.data||'',r.responsavel||'',r.status||'',(r.arquivos||[]).length,r.obs||'']));
   } else {
     // Módulo genérico — tentar ler do localStorage
     try{
