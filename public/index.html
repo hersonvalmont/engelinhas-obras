@@ -1060,11 +1060,8 @@ tbody tr:hover td{background:var(--bg3)}
           <div class="card-header"><div class="card-title">Atas de Reunião</div><button class="btn btn-sm btn-primary" onclick="openModalAta()"><i data-lucide="plus"></i> Nova ata</button></div>
           <div class="table-wrap"><table>
             <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Participantes</th><th>Ações abertas</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:500">Reunião semanal de progresso</td><td>SE Uberlândia</td><td>06/03/2026</td><td>4</td><td><span class="badge badge-amber">3</span></td><td><span class="status blue">Publicado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-weight:500">Revisão de projeto elétrico</td><td>LT 138kV</td><td>04/03/2026</td><td>6</td><td><span class="badge badge-red">5 (2 venc.)</span></td><td><span class="status blue">Publicado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-weight:500">Alinhamento ambiental PRAD</td><td>PRAD Faixa Oeste</td><td>03/03/2026</td><td>3</td><td><span class="badge badge-green">0</span></td><td><span class="status green">Concluída</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-              <tr><td style="font-weight:500">Kick-off comissionamento SE Goiás</td><td>SE Goiás</td><td>01/03/2026</td><td>8</td><td><span class="badge badge-amber">2</span></td><td><span class="status blue">Publicado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
+            <tbody id="atas-tbody-reg">
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:24px">Nenhuma ata registrada ainda.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -1102,11 +1099,8 @@ tbody tr:hover td{background:var(--bg3)}
           <span><strong>Alvará de Construção — SE Goiás</strong> venceu em 15/04/2026. Renovação urgente para não paralisar obra.</span>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-          <select class="form-select" style="font-size:12px;width:190px">
-            <option>Todas as obras</option>
-            <option>SE Uberlândia 500kV</option>
-            <option>LT 138kV Trecho Norte</option>
-            <option>Ampliação SE Goiás</option>
+          <select class="form-select obra-filtro-select" id="licencas-filtro-obra" style="font-size:12px;width:190px">
+            <option value="">Todas as obras</option>
           </select>
           <select class="form-select" style="font-size:12px;width:170px">
             <option>Todos os tipos</option>
@@ -1550,16 +1544,14 @@ tbody tr:hover td{background:var(--bg3)}
           <button class="btn btn-primary" onclick="openModalAta()"><i data-lucide="plus"></i> Nova ata</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
-          <div class="kpi blue"><div class="kpi-label">Atas emitidas no mês</div><div class="kpi-value">22</div></div>
-          <div class="kpi red"><div class="kpi-label">Ações vencidas</div><div class="kpi-value">5</div></div>
-          <div class="kpi amber"><div class="kpi-label">Ações em aberto</div><div class="kpi-value">18</div></div>
+          <div class="kpi blue"><div class="kpi-label">Atas emitidas no mês</div><div class="kpi-value" id="atas-kpi-total">0</div></div>
+          <div class="kpi red"><div class="kpi-label">Ações vencidas</div><div class="kpi-value" id="atas-kpi-acoes-v">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Ações em aberto</div><div class="kpi-value" id="atas-kpi-acoes-a">0</div></div>
         </div>
         <div class="card"><div class="table-wrap"><table>
           <thead><tr><th>Título</th><th>Obra</th><th>Data</th><th>Participantes</th><th>Ações abertas</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            <tr><td style="font-weight:500">Reunião semanal de progresso</td><td>SE Uberlândia</td><td>06/03/2026</td><td>4</td><td><span class="badge badge-amber">3</span></td><td><span class="status blue">Publicado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-            <tr><td style="font-weight:500">Revisão de projeto elétrico</td><td>LT 138kV</td><td>04/03/2026</td><td>6</td><td><span class="badge badge-red">5 (2 venc.)</span></td><td><span class="status blue">Publicado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-            <tr><td style="font-weight:500">Alinhamento ambiental PRAD</td><td>PRAD Faixa Oeste</td><td>03/03/2026</td><td>3</td><td><span class="badge badge-green">0</span></td><td><span class="status green">Concluída</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
+          <tbody id="atas-tbody">
+            <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhuma ata registrada. Clique em "Nova ata" para começar.</td></tr>
           </tbody>
         </table></div></div>
       </div>
@@ -2303,11 +2295,8 @@ tbody tr:hover td{background:var(--bg3)}
           <div class="kpi red"><div class="kpi-label">Com NC aberta</div><div class="kpi-value">8</div></div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-          <select class="form-select" style="font-size:12px;width:200px">
-            <option>Todas as obras</option>
-            <option>Ampliação SE Goiás</option>
-            <option>LT 138kV Trecho Norte</option>
-            <option>SE Uberlândia 500kV</option>
+          <select class="form-select obra-filtro-select" id="comiss-filtro-obra" style="font-size:12px;width:200px">
+            <option value="">Todas as obras</option>
           </select>
           <select class="form-select" style="font-size:12px;width:180px">
             <option>Todos os sistemas</option>
@@ -2403,11 +2392,8 @@ tbody tr:hover td{background:var(--bg3)}
           <div class="kpi blue"><div class="kpi-label">Média dias aberto</div><div class="kpi-value">8,4</div><div class="kpi-sub">dias</div></div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-          <select class="form-select" style="font-size:12px;width:200px">
-            <option>Todas as obras</option>
-            <option>Ampliação SE Goiás</option>
-            <option>LT 138kV Trecho Norte</option>
-            <option>SE Uberlândia 500kV</option>
+          <select class="form-select obra-filtro-select" id="punchlist-filtro-obra" style="font-size:12px;width:200px">
+            <option value="">Todas as obras</option>
           </select>
           <select class="form-select" style="font-size:12px;width:140px">
             <option>Todas as categorias</option>
@@ -2819,11 +2805,8 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-          <select class="form-select" style="font-size:12px;width:200px">
-            <option>Todas as obras</option>
-            <option>SE Uberlândia 500kV</option>
-            <option>Ampliação SE Goiás</option>
-            <option>LT 138kV Trecho Norte</option>
+          <select class="form-select obra-filtro-select" id="asbuilt-filtro-obra" style="font-size:12px;width:200px">
+            <option value="">Todas as obras</option>
           </select>
           <select class="form-select" style="font-size:12px;width:160px">
             <option>Todas as disciplinas</option>
@@ -3470,17 +3453,18 @@ tbody tr:hover td{background:var(--bg3)}
       <button class="modal-close" onclick="closeModal('modal-ata')"><i data-lucide="x"></i></button>
     </div>
     <div class="form-grid">
-      <div class="form-group full"><label class="form-label">Título da reunião</label><input type="text" class="form-input" placeholder="Ex: Reunião semanal de progresso"></div>
-      <div class="form-group"><label class="form-label">Obra</label><select class="form-select"><option>SE Uberlândia 500kV</option><option>LT 138kV Trecho Norte</option></select></div>
-      <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" value="2026-03-31"></div>
-      <div class="form-group full"><label class="form-label">Participantes</label><input type="text" class="form-input" placeholder="Guilherme Diniz, M. Santos..."></div>
-      <div class="form-group full"><label class="form-label">Pauta</label><textarea class="form-textarea" placeholder="1. Revisão de pendências&#10;2. Progresso de obra"></textarea></div>
-      <div class="form-group full"><label class="form-label">Decisões e encaminhamentos</label><textarea class="form-textarea" style="min-height:120px" placeholder="Registre as decisões tomadas..."></textarea></div>
+      <div class="form-group full"><label class="form-label">Título da reunião</label><input type="text" class="form-input" id="ata-titulo" placeholder="Ex: Reunião semanal de progresso"></div>
+      <div class="form-group"><label class="form-label">Obra</label><select class="form-select" id="ata-obra"><option value="">Selecione a obra...</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="ata-data"></div>
+      <div class="form-group full"><label class="form-label">Participantes</label><input type="text" class="form-input" id="ata-participantes" placeholder="Guilherme Diniz, M. Santos..."></div>
+      <div class="form-group full"><label class="form-label">Pauta</label><textarea class="form-textarea" id="ata-pauta" placeholder="1. Revisão de pendências&#10;2. Progresso de obra"></textarea></div>
+      <div class="form-group full"><label class="form-label">Decisões e encaminhamentos</label><textarea class="form-textarea" id="ata-decisoes" style="min-height:120px" placeholder="Registre as decisões tomadas..."></textarea></div>
+      <div class="form-group full"><label class="form-label">Ações em aberto</label><input type="text" class="form-input" id="ata-acoes" placeholder="Ex: Verificar aterramento torre 12, Enviar ART para CREA..."></div>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-ata')">Cancelar</button>
-      <button class="btn">Salvar rascunho</button>
-      <button class="btn btn-primary" onclick="closeModal('modal-ata')">Publicar ata</button>
+      <button class="btn" onclick="ataSalvar('rascunho')"><i data-lucide="save"></i> Salvar rascunho</button>
+      <button class="btn btn-primary" onclick="ataSalvar('publicado')"><i data-lucide="send"></i> Publicar ata</button>
     </div>
   </div>
 </div>
@@ -3874,6 +3858,8 @@ function navTo(pageId){
   if(pageId==='rh-treinamentos' && typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
   if(pageId==='obras') obrasRender();
   if(pageId==='usuarios') usuariosRender();
+  if(pageId==='acomp-atas'||pageId==='regulatorio') { atasRender(); popularFiltrosObra(); }
+  if(pageId==='reg-licencas'||pageId==='comissionamento'||pageId==='comiss-punchlist'||pageId==='asbuilt') popularFiltrosObra();
   window.scrollTo(0,0);
   setTimeout(()=>lucide.createIcons(),50);
 }
@@ -6976,6 +6962,8 @@ function obrasAtualizarSelects(){
       selFiltro.appendChild(op);
     });
   }
+  // Atualizar todos os selects de filtro de obra (classe obra-filtro-select)
+  if(typeof popularFiltrosObra === 'function') popularFiltrosObra();
 }
 
 function obrasOpenModal(id){
@@ -7077,6 +7065,9 @@ function obrasExcluirAtual(){
 // Inicializar obras ao carregar
 document.addEventListener('DOMContentLoaded',function(){
   obrasRender();
+  atasCarregar();
+  atasRender();
+  popularFiltrosObra();
 });
 
 // ══════════════════════════════════════════════════════
@@ -7191,6 +7182,195 @@ function usuariosExcluir(email){
 
 // Atualizar doLogin para usar USUARIOS_LISTA dinamicamente
 // (A função doLogin principal já usa USUARIOS_LISTA via closure — não redefinir aqui)
+
+// ═══════════════════════════════════════════════════════
+// SISTEMA DE ATAS DE REUNIÃO
+// ═══════════════════════════════════════════════════════
+var ATAS_LISTA = [];
+
+function atasCarregar(){
+  try{ ATAS_LISTA = JSON.parse(localStorage.getItem('engelinhas_atas')||'[]'); }catch(e){ ATAS_LISTA=[]; }
+}
+
+function atasSalvarStorage(lista){
+  localStorage.setItem('engelinhas_atas', JSON.stringify(lista));
+}
+
+function atasStatusColor(s){
+  if(s==='publicado') return 'blue';
+  if(s==='rascunho') return 'amber';
+  if(s==='concluida') return 'green';
+  return 'blue';
+}
+
+function atasStatusLabel(s){
+  if(s==='publicado') return 'Publicado';
+  if(s==='rascunho') return 'Rascunho';
+  if(s==='concluida') return 'Concluída';
+  return 'Publicado';
+}
+
+function atasFmtData(d){
+  if(!d) return '—';
+  // d pode ser YYYY-MM-DD ou DD/MM/YYYY
+  if(d.includes('-')){ const p=d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  return d;
+}
+
+function atasRender(){
+  atasCarregar();
+  // Tabela principal (acomp-atas)
+  const tbody = document.getElementById('atas-tbody');
+  if(tbody){
+    if(ATAS_LISTA.length===0){
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhuma ata registrada. Clique em "Nova ata" para começar.</td></tr>';
+    } else {
+      tbody.innerHTML = ATAS_LISTA.slice().reverse().map(a=>{
+        const partic = a.participantes ? a.participantes.split(',').length : 0;
+        const acoes = a.acoes ? a.acoes.split(',').filter(x=>x.trim()).length : 0;
+        const badgeClass = acoes===0?'badge-green':acoes>3?'badge-red':'badge-amber';
+        return `<tr>
+          <td style="font-weight:500">${a.titulo}</td>
+          <td>${a.obraNome||a.obraId||'—'}</td>
+          <td>${atasFmtData(a.data)}</td>
+          <td>${partic}</td>
+          <td><span class="badge ${badgeClass}">${acoes}</span></td>
+          <td><span class="status ${atasStatusColor(a.status)}">${atasStatusLabel(a.status)}</span></td>
+          <td><button class="btn btn-sm" onclick="atasVerDetalhes('${a.id}')">Ver</button></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+  // Tabela no painel regulatório
+  const tbodyReg = document.getElementById('atas-tbody-reg');
+  if(tbodyReg){
+    if(ATAS_LISTA.length===0){
+      tbodyReg.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:24px">Nenhuma ata registrada ainda.</td></tr>';
+    } else {
+      tbodyReg.innerHTML = ATAS_LISTA.slice(-4).reverse().map(a=>{
+        const partic = a.participantes ? a.participantes.split(',').length : 0;
+        const acoes = a.acoes ? a.acoes.split(',').filter(x=>x.trim()).length : 0;
+        const badgeClass = acoes===0?'badge-green':acoes>3?'badge-red':'badge-amber';
+        return `<tr>
+          <td style="font-weight:500">${a.titulo}</td>
+          <td>${a.obraNome||a.obraId||'—'}</td>
+          <td>${atasFmtData(a.data)}</td>
+          <td>${partic}</td>
+          <td><span class="badge ${badgeClass}">${acoes}</span></td>
+          <td><span class="status ${atasStatusColor(a.status)}">${atasStatusLabel(a.status)}</span></td>
+          <td><button class="btn btn-sm" onclick="atasVerDetalhes('${a.id}')">Ver</button></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+  // KPIs
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+  const atasMes = ATAS_LISTA.filter(a=>{
+    if(!a.data) return false;
+    const d = a.data.includes('-') ? new Date(a.data) : new Date(a.data.split('/').reverse().join('-'));
+    return d.getMonth()===mesAtual && d.getFullYear()===anoAtual;
+  }).length;
+  const totalAcoes = ATAS_LISTA.reduce((acc,a)=>acc+(a.acoes?a.acoes.split(',').filter(x=>x.trim()).length:0),0);
+  const el1=document.getElementById('atas-kpi-total'); if(el1) el1.textContent=atasMes||ATAS_LISTA.length;
+  const el2=document.getElementById('atas-kpi-acoes-v'); if(el2) el2.textContent=0;
+  const el3=document.getElementById('atas-kpi-acoes-a'); if(el3) el3.textContent=totalAcoes;
+  setTimeout(()=>lucide.createIcons(),50);
+}
+
+function atasVerDetalhes(id){
+  atasCarregar();
+  const a=ATAS_LISTA.find(x=>x.id===id);
+  if(!a) return;
+  const acoes = a.acoes ? a.acoes.split(',').filter(x=>x.trim()) : [];
+  const acoesHtml = acoes.length>0
+    ? '<ul style="margin:4px 0 0 16px;padding:0;font-size:13px;color:var(--text2)">'+acoes.map(ac=>`<li>${ac.trim()}</li>`).join('')+'</ul>'
+    : '<span style="color:var(--text3);font-size:13px">Nenhuma ação registrada</span>';
+  alert(
+    '📋 '+a.titulo+'\n\n'+
+    '🏗 Obra: '+(a.obraNome||a.obraId||'—')+'\n'+
+    '📅 Data: '+atasFmtData(a.data)+'\n'+
+    '👥 Participantes: '+(a.participantes||'—')+'\n\n'+
+    '📝 Pauta:\n'+(a.pauta||'—')+'\n\n'+
+    '✅ Decisões:\n'+(a.decisoes||'—')+'\n\n'+
+    '⚡ Ações:\n'+(a.acoes||'—')
+  );
+}
+
+function openModalAta(){
+  atasCarregar();
+  // Popular select de obras
+  const sel = document.getElementById('ata-obra');
+  if(sel){
+    sel.innerHTML='<option value="">Selecione a obra...</option>';
+    OBRAS_LISTA.forEach(o=>{
+      const op=document.createElement('option');
+      op.value=o.id; op.textContent=o.nome;
+      sel.appendChild(op);
+    });
+  }
+  // Data padrão = hoje
+  const hoje = new Date();
+  const hojeStr = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
+  const elData = document.getElementById('ata-data');
+  if(elData) elData.value=hojeStr;
+  // Limpar campos
+  ['ata-titulo','ata-participantes','ata-pauta','ata-decisoes','ata-acoes'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  openModal('modal-ata');
+  setTimeout(()=>lucide.createIcons(),50);
+}
+
+function ataSalvar(status){
+  atasCarregar();
+  const titulo=(document.getElementById('ata-titulo')||{}).value||'';
+  const obraId=(document.getElementById('ata-obra')||{}).value||'';
+  const data=(document.getElementById('ata-data')||{}).value||'';
+  const participantes=(document.getElementById('ata-participantes')||{}).value||'';
+  const pauta=(document.getElementById('ata-pauta')||{}).value||'';
+  const decisoes=(document.getElementById('ata-decisoes')||{}).value||'';
+  const acoes=(document.getElementById('ata-acoes')||{}).value||'';
+
+  if(!titulo.trim()){ alert('Informe o título da reunião.'); return; }
+  if(!data){ alert('Informe a data da reunião.'); return; }
+
+  const obraObj = OBRAS_LISTA.find(o=>o.id===obraId);
+  const obraNome = obraObj ? obraObj.nome : obraId;
+
+  const ata = {
+    id: 'ata-'+Date.now(),
+    titulo: titulo.trim(),
+    obraId, obraNome,
+    data, participantes, pauta, decisoes, acoes,
+    status,
+    criadoEm: new Date().toISOString()
+  };
+  ATAS_LISTA.push(ata);
+  atasSalvarStorage(ATAS_LISTA);
+  atasRender();
+  closeModal('modal-ata');
+  alert(status==='publicado'
+    ? '✅ Ata "'+titulo+'" publicada com sucesso!'
+    : '💾 Rascunho da ata "'+titulo+'" salvo!');
+}
+
+// ═══════════════════════════════════════════════════════
+// SELECTS DE FILTRO DINÂMICOS (obra-filtro-select)
+// ═══════════════════════════════════════════════════════
+function popularFiltrosObra(){
+  document.querySelectorAll('.obra-filtro-select').forEach(sel=>{
+    const valAtual = sel.value;
+    sel.innerHTML='<option value="">Todas as obras</option>';
+    OBRAS_LISTA.forEach(o=>{
+      const op=document.createElement('option');
+      op.value=o.id; op.textContent=o.nome;
+      sel.appendChild(op);
+    });
+    if(valAtual) sel.value=valAtual;
+  });
+}
+
 </script>
   <div class="debug-panel-header">
     <span class="debug-panel-title">🐛 Console — Engelinhas Obras</span>
