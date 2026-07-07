@@ -6086,23 +6086,7 @@ const FUNC_NRS = {
 };
 
 // ── Registro de funcionários (estado em memória) ──────
-const FUNCIONARIOS_SEED = [
-  {matricula:'ENG-001', nome:'Juan Carlos Silva dos Santos', cpf:'123.456.789-01', funcao:'Engenheiro de Produção', obraId:'ld-lagoa-nova', admissao:'01/09/2024', regime:'CLT', docs:'Pendente',
-    nrsExigidas:['NR-6','NR-10','NR-18','NR-23','NR-35','Primeiros Socorros'],
-    nrsStatus:{}, nrsDetalhes:{}},
-  {matricula:'MON-011', nome:'Wlisses Aparecido', cpf:'234.567.890-12', funcao:'Encarregado de Montagem', obraId:'ld-lagoa-nova', admissao:'15/09/2024', regime:'CLT', docs:'Pendente',
-    nrsExigidas:['NR-6','NR-10','NR-11','NR-12','NR-18','NR-23','NR-35','Primeiros Socorros'],
-    nrsStatus:{}, nrsDetalhes:{}},
-  {matricula:'TOP-003', nome:'Silvanio Monteiro', cpf:'345.678.901-23', funcao:'Encarregado de Topografia', obraId:'ld-lagoa-nova', admissao:'01/09/2024', regime:'CLT', docs:'Pendente',
-    nrsExigidas:['NR-6','NR-18','NR-35'],
-    nrsStatus:{}, nrsDetalhes:{}},
-  {matricula:'ACE-004', nome:'Mauricio Ferreira', cpf:'456.789.012-34', funcao:'Encarregado de Acesso', obraId:'ld-lagoa-nova', admissao:'01/09/2024', regime:'CLT', docs:'Pendente',
-    nrsExigidas:['NR-6','NR-18'],
-    nrsStatus:{}, nrsDetalhes:{}},
-  {matricula:'TRA-005', nome:'Thiago Rocha', cpf:'567.890.123-45', funcao:'Motorista Munck', obraId:'ld-lagoa-nova', admissao:'10/09/2024', regime:'CLT', docs:'Pendente',
-    nrsExigidas:['NR-6','NR-11','NR-12','Direção Defensiva'],
-    nrsStatus:{}, nrsDetalhes:{}},
-];
+const FUNCIONARIOS_SEED = []; // Sistema inicia vazio — cadastre os funcionários reais
 
 // ── Persistência local (cache do navegador) ──────────
 const RH_STORAGE_KEY = 'engelinhas_obras_funcionarios_v1';
@@ -6114,31 +6098,38 @@ function rhCarregarFuncionarios(){
     if(raw){
       const parsed = JSON.parse(raw);
       if(Array.isArray(parsed) && parsed.length>0){
-        // MIGRAÇÃO v2: se um funcionário tem nrsStatus com valores 'ok' mas não tem nrsDetalhes
-        // correspondentes, significa que o status foi gerado artificialmente pelo seed antigo.
-        // Nesse caso, limpar o nrsStatus para forçar recalculo pelos certificados reais.
+
+        // MIGRAÇÃO v3: detectar e apagar dados do seed de demonstração antigo.
+        // Se TODOS os registros têm matrículas do seed original, limpar e começar do zero.
+        const SEED_MATRICULAS = ['ENG-001','MON-011','TOP-003','ACE-004','TRA-005'];
+        const todasSaoSeed = parsed.every(f => SEED_MATRICULAS.includes(f.matricula));
+        if(todasSaoSeed){
+          localStorage.removeItem(RH_STORAGE_KEY);
+          localStorage.removeItem(RH_SEQ_STORAGE_KEY);
+          return []; // começar do zero
+        }
+
+        // MIGRAÇÃO v2: limpar nrsStatus 'ok' gerados artificialmente sem nrsDetalhes real.
         let migrado = false;
         parsed.forEach(f=>{
           const det = f.nrsDetalhes || {};
           const st  = f.nrsStatus  || {};
-          // Verificar se algum nr está marcado como 'ok' sem ter nrsDetalhes com dataVencimento
           Object.keys(st).forEach(nr=>{
             if(st[nr]==='ok' && (!det[nr] || !det[nr].dataVencimento)){
-              delete st[nr]; // remover status falso
+              delete st[nr];
               migrado = true;
             }
           });
           if(migrado) f.nrsStatus = st;
         });
         if(migrado){
-          // Salvar imediatamente a versão corrigida
           try{ localStorage.setItem(RH_STORAGE_KEY, JSON.stringify(parsed)); }catch(e){}
         }
         return parsed;
       }
     }
   }catch(e){ console.error('Falha ao carregar funcionários do cache:', e); }
-  return JSON.parse(JSON.stringify(FUNCIONARIOS_SEED)); // cópia profunda do seed
+  return []; // seed vazio — sistema começa limpo
 }
 
 function rhSalvarFuncionarios(){
@@ -6149,18 +6140,18 @@ function rhSalvarFuncionarios(){
 }
 
 let FUNCIONARIOS = rhCarregarFuncionarios();
-let FUNC_SEQ = parseInt(localStorage.getItem(RH_SEQ_STORAGE_KEY)) || FUNCIONARIOS.length;
+let FUNC_SEQ = parseInt(localStorage.getItem(RH_SEQ_STORAGE_KEY)) || 0;
 
-// Utilitário de manutenção: limpa o cache e volta aos dados de fábrica.
+// Utilitário de manutenção: limpa todos os dados de funcionários.
 // Uso (console do navegador): rhResetFuncionarios()
 function rhResetFuncionarios(){
   localStorage.removeItem(RH_STORAGE_KEY);
   localStorage.removeItem(RH_SEQ_STORAGE_KEY);
-  FUNCIONARIOS = JSON.parse(JSON.stringify(FUNCIONARIOS_SEED));
-  FUNC_SEQ = FUNCIONARIOS.length;
+  FUNCIONARIOS = [];
+  FUNC_SEQ = 0;
   rhRenderFuncionarios();
   if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
-  console.log('Funcionários resetados para os dados de fábrica.');
+  console.log('Funcionários removidos. Sistema pronto para cadastro.');
 }
 
 function rhPrefixoMatricula(funcao){
