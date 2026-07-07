@@ -898,7 +898,7 @@ tbody tr:hover td{background:var(--bg3)}
         <div class="page-header">
           <div>
             <div class="page-title">Visão Geral</div>
-            <div class="page-sub">Visão consolidada — semana de 10 a 13/03/2026</div>
+            <div class="page-sub" id="dash-sub">Visão consolidada das obras cadastradas</div>
           </div>
           <div class="btn-group">
             <button class="btn"><i data-lucide="download"></i> Exportar PDF</button>
@@ -907,26 +907,22 @@ tbody tr:hover td{background:var(--bg3)}
         </div>
         <div class="alert alert-red"><i data-lucide="alert-triangle"></i> 8 não conformidades críticas sem tratativa — prazo máximo: 48h</div>
         <div class="kpi-grid kpi-grid-4">
-          <div class="kpi blue"><div class="kpi-label">Obras ativas</div><div class="kpi-value">12</div><div class="kpi-sub">3 em comissionamento</div></div>
+          <div class="kpi blue"><div class="kpi-label">Obras cadastradas</div><div class="kpi-value" id="dash-kpi-obras">—</div><div class="kpi-sub" id="dash-kpi-obras-sub">carregando...</div></div>
           <div class="kpi red"><div class="kpi-label">NC críticas</div><div class="kpi-value">27</div><div class="kpi-sub">8 com prazo vencido</div></div>
-          <div class="kpi amber"><div class="kpi-label">Atas abertas</div><div class="kpi-value">18</div><div class="kpi-sub">5 vencidas esta semana</div></div>
-          <div class="kpi"><div class="kpi-label">Docs em nuvem</div><div class="kpi-value">4.286</div><div class="kpi-sub">↑ 186 na semana</div></div>
+          <div class="kpi amber"><div class="kpi-label">Atas registradas</div><div class="kpi-value" id="dash-kpi-atas">—</div><div class="kpi-sub" id="dash-kpi-atas-sub">0 publicadas</div></div>
+          <div class="kpi"><div class="kpi-label">Usuários ativos</div><div class="kpi-value" id="dash-kpi-users">—</div><div class="kpi-sub">no sistema</div></div>
         </div>
         <div class="two-col">
           <div class="card">
             <div class="card-header"><div><div class="card-title">Carteira de obras</div><div class="card-sub">Progresso físico/documental</div></div><button class="btn btn-sm" onclick="navTo('obras')">Ver todas</button></div>
-            <div>
-              <div class="obra-row"><div class="obra-info"><div class="obra-nome">SE Uberlândia 500kV</div><div class="obra-sub">Execução — MG</div></div><div class="progress-mini"><div class="progress-bar"><div class="progress-fill" style="width:74%"></div></div><div class="pct">74%</div></div><span class="badge badge-red">Alta</span></div>
-              <div class="obra-row"><div class="obra-info"><div class="obra-nome">LT 138kV Trecho Norte</div><div class="obra-sub">Fiscalização — GO</div></div><div class="progress-mini"><div class="progress-bar"><div class="progress-fill" style="width:61%"></div></div><div class="pct">61%</div></div><span class="badge badge-amber">Média</span></div>
-              <div class="obra-row"><div class="obra-info"><div class="obra-nome">Ampliação SE Goiás</div><div class="obra-sub">Comissionamento — GO</div></div><div class="progress-mini"><div class="progress-bar"><div class="progress-fill" style="width:88%"></div></div><div class="pct">88%</div></div><span class="badge badge-red">Alta</span></div>
-              <div class="obra-row"><div class="obra-info"><div class="obra-nome">PRAD Faixa Oeste</div><div class="obra-sub">Ambiental — MG</div></div><div class="progress-mini"><div class="progress-bar"><div class="progress-fill" style="width:46%"></div></div><div class="pct">46%</div></div><span class="badge badge-amber">Média</span></div>
-              <div class="obra-row"><div class="obra-info"><div class="obra-nome">LT 69kV Ramal Sul</div><div class="obra-sub">Projeto — MG</div></div><div class="progress-mini"><div class="progress-bar"><div class="progress-fill" style="width:22%"></div></div><div class="pct">22%</div></div><span class="badge badge-green">Baixa</span></div>
+            <div id="dash-obras-lista">
+              <div style="text-align:center;color:var(--text3);padding:32px;font-size:13px">Carregando...</div>
             </div>
           </div>
           <div class="card">
             <div class="card-header"><div class="card-title">Atividade recente</div></div>
             <div class="card-body">
-              <div class="timeline">
+              <div class="timeline" id="dash-timeline">
                 <div class="tl-item"><div class="tl-dot red"></div><div class="tl-content"><div class="tl-title">NC crítica aberta — Pátio 500kV</div><div class="tl-meta">INS-041 · M. Santos · há 2h</div></div></div>
                 <div class="tl-item"><div class="tl-dot blue"></div><div class="tl-content"><div class="tl-title">RDO #096 enviado para revisão</div><div class="tl-meta">SE Uberlândia · R. Oliveira · há 4h</div></div></div>
                 <div class="tl-item"><div class="tl-dot green"></div><div class="tl-content"><div class="tl-title">Ata de reunião publicada</div><div class="tl-meta">Reunião semanal · F. Lima · ontem</div></div></div>
@@ -3709,6 +3705,23 @@ function selectObra(el,nome){
   document.getElementById('obra-ativa-label').textContent=nome;
   document.querySelectorAll('.obras-menu-item').forEach(i=>i.classList.remove('active'));
   el.classList.add('active');
+  // Propagar obra ativa para window.obraAtiva (usado pelo RDPP e RDO)
+  const obraObj = OBRAS_LISTA.find(o=>o.nome===nome);
+  if(obraObj){
+    window.obraAtiva = obraObj;
+    // Atualizar campo de obra no formulário RDO se estiver visível
+    const rdoDisplay=document.getElementById('rdo-obra-display');
+    const rdoHidden=document.getElementById('rdo-obra');
+    if(rdoDisplay) rdoDisplay.value=obraObj.nome;
+    if(rdoHidden) rdoHidden.value=obraObj.id;
+    // Atualizar campo de obra no formulário RDPP se estiver visível
+    const rdppDisplay=document.getElementById('rdpp-obra-display');
+    const rdppHidden=document.getElementById('rdpp-obra');
+    if(rdppDisplay) rdppDisplay.value=obraObj.nome;
+    if(rdppHidden) rdppHidden.value=obraObj.id;
+    if(document.getElementById('rdpp-cliente')) document.getElementById('rdpp-cliente').value=obraObj.cliente||'';
+    if(document.getElementById('rdpp-contrato')) document.getElementById('rdpp-contrato').value=obraObj.contrato||'';
+  }
   closeObrasMenu();
 }
 document.addEventListener('click',e=>{
@@ -3860,6 +3873,7 @@ function navTo(pageId){
   if(pageId==='usuarios') usuariosRender();
   if(pageId==='acomp-atas'||pageId==='regulatorio') { atasRender(); popularFiltrosObra(); }
   if(pageId==='reg-licencas'||pageId==='comissionamento'||pageId==='comiss-punchlist'||pageId==='asbuilt') popularFiltrosObra();
+  if(pageId==='dashboard') dashboardRender();
   window.scrollTo(0,0);
   setTimeout(()=>lucide.createIcons(),50);
 }
@@ -6936,8 +6950,12 @@ function obrasAtualizarDropdown(){
   });
   // Atualizar label ativa
   const atualLabel=document.getElementById('obra-ativa-label');
-  if(atualLabel && OBRAS_LISTA.length>0 && atualLabel.textContent==='SE Uberlândia 500kV'){
-    // Manter o primeiro como padrão
+  if(atualLabel && OBRAS_LISTA.length>0){
+    if(!window.obraAtiva || !OBRAS_LISTA.find(o=>o.id===window.obraAtiva.id)){
+      // Definir primeira obra como ativa por padrão
+      window.obraAtiva = OBRAS_LISTA[0];
+      atualLabel.textContent = OBRAS_LISTA[0].nome;
+    }
   }
 }
 
@@ -7068,6 +7086,7 @@ document.addEventListener('DOMContentLoaded',function(){
   atasCarregar();
   atasRender();
   popularFiltrosObra();
+  dashboardRender();
 });
 
 // ══════════════════════════════════════════════════════
@@ -7369,6 +7388,73 @@ function popularFiltrosObra(){
     });
     if(valAtual) sel.value=valAtual;
   });
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD — DADOS DINÂMICOS
+// ═══════════════════════════════════════════════════════
+function dashboardRender(){
+  // KPIs
+  const el1=document.getElementById('dash-kpi-obras');
+  const el1s=document.getElementById('dash-kpi-obras-sub');
+  if(el1){ el1.textContent=OBRAS_LISTA.length||0; }
+  if(el1s){
+    const ativas=OBRAS_LISTA.filter(o=>o.status==='Em execução'||o.status==='Em fiscalização'||o.status==='Em comissionamento').length;
+    el1s.textContent=ativas+' em campo';
+  }
+
+  const el2=document.getElementById('dash-kpi-atas');
+  const el2s=document.getElementById('dash-kpi-atas-sub');
+  if(el2){ el2.textContent=ATAS_LISTA.length||0; }
+  if(el2s){
+    const pub=ATAS_LISTA.filter(a=>a.status==='publicado').length;
+    el2s.textContent=pub+' publicadas';
+  }
+
+  const el3=document.getElementById('dash-kpi-users');
+  if(el3){ el3.textContent=USUARIOS_LISTA.filter(u=>u.ativo!==false).length||0; }
+
+  // Carteira de obras
+  const lista=document.getElementById('dash-obras-lista');
+  if(lista){
+    if(OBRAS_LISTA.length===0){
+      lista.innerHTML='<div style="text-align:center;color:var(--text3);padding:32px;font-size:13px">Nenhuma obra cadastrada. <a href="#" onclick="navTo(\'obras\')" style="color:var(--blue)">Cadastrar obra</a></div>';
+    } else {
+      lista.innerHTML = OBRAS_LISTA.slice(0,6).map(o=>{
+        const prog=o.progresso||0;
+        const badgeC=o.criticidade==='Alta'?'badge-red':o.criticidade==='Crítica'?'badge-red':o.criticidade==='Média'?'badge-amber':'badge-green';
+        return `<div class="obra-row">
+          <div class="obra-info">
+            <div class="obra-nome">${o.nome}</div>
+            <div class="obra-sub">${o.fase} — ${o.uf}</div>
+          </div>
+          <div class="progress-mini">
+            <div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div>
+            <div class="pct">${prog}%</div>
+          </div>
+          <span class="badge ${badgeC}">${o.criticidade}</span>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Atualizar timeline com atas recentes
+  if(ATAS_LISTA.length>0){
+    const timeline=document.getElementById('dash-timeline');
+    if(timeline){
+      const recentes=ATAS_LISTA.slice(-3).reverse();
+      const novasEntradas = recentes.map(a=>`
+        <div class="tl-item">
+          <div class="tl-dot green"></div>
+          <div class="tl-content">
+            <div class="tl-title">Ata publicada — ${a.titulo}</div>
+            <div class="tl-meta">${a.obraNome||'—'} · ${atasFmtData(a.data)}</div>
+          </div>
+        </div>`).join('');
+      // Inserir no início da timeline
+      timeline.insertAdjacentHTML('afterbegin', novasEntradas);
+    }
+  }
 }
 
 </script>
