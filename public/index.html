@@ -392,8 +392,10 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
     <button class="login-btn" onclick="doLogin()">Entrar</button>
     <div class="login-error" id="login-error">Credenciais inválidas. Verifique e tente novamente.</div>
-    <div style="text-align:center;margin-top:12px">
+    <div id="login-diag" style="display:none;margin-top:10px;background:#f0f4ff;border:1px solid #c7d2fe;border-radius:8px;padding:10px;font-size:11px;font-family:monospace;color:#1e3a8a;word-break:break-all;max-height:200px;overflow-y:auto"></div>
+    <div style="text-align:center;margin-top:12px;display:flex;gap:12px;justify-content:center">
       <button onclick="toggleDebug()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:monospace">🐛 debug</button>
+      <button onclick="loginDiag()" style="font-size:11px;color:#6366f1;background:none;border:none;cursor:pointer;font-family:monospace">🔍 diagnóstico</button>
     </div>
   </div>
 </div>
@@ -4465,26 +4467,90 @@ function doLogin(){
   const senha   = document.getElementById('inp-senha').value;
   const err     = document.getElementById('login-error');
 
-  // Sempre reler do localStorage para pegar usuários criados em qualquer sessão
+  // Sempre reler do localStorage — fonte única de verdade
   let usuariosList = [];
   try{
     const raw = localStorage.getItem('engelinhas_usuarios_v1');
     if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)&&p.length>0) usuariosList=p; }
-  }catch(e){}
+  }catch(e){ console.error('[doLogin] Erro ao ler storage:', e); }
+
   // Fallback: seed padrão caso o storage esteja vazio
   if(usuariosList.length===0){
     usuariosList = [{email:'guilherme@engelinhas.com.br',senha:'1234',nome:'Guilherme Diniz',perfil:'Admin',empresa:'Engelinhas',ativo:true}];
   }
-  // Sincronizar array em memória para evitar dessincronização
+
+  // Sincronizar array em memória
   if(typeof USUARIOS_LISTA !== 'undefined') USUARIOS_LISTA = usuariosList;
 
-  const user = usuariosList.find(u=>u.email===email&&u.senha===senha&&u.ativo!==false);
+  // Busca: email normalizado, senha exata (sem trim para preservar caracteres especiais)
+  const emailNorm = email.trim().toLowerCase();
+  const user = usuariosList.find(u =>
+    u.email.trim().toLowerCase() === emailNorm &&
+    u.senha === senha &&
+    u.ativo !== false
+  );
+
+  console.log('[doLogin] email digitado:', JSON.stringify(emailNorm));
+  console.log('[doLogin] senha digitada (len):', senha.length);
+  console.log('[doLogin] usuarios no storage:', usuariosList.length);
+  console.log('[doLogin] user encontrado:', !!user);
+
   if(user){
     localStorage.setItem('engelinhas_session', JSON.stringify({email:user.email, nome:user.nome, ts:Date.now()}));
     localStorage.setItem('engelinhas_login_cache', JSON.stringify({empresa: empresa||user.empresa||'', email:user.email}));
     _aplicarLogin(user);
     err.style.display='none';
-  } else { err.style.display='block'; }
+  } else {
+    err.style.display='block';
+    // Diagnóstico automático no console
+    const candidato = usuariosList.find(u => u.email.trim().toLowerCase() === emailNorm);
+    if(candidato){
+      console.warn('[doLogin] Usuário encontrado mas senha não bate.');
+      console.warn('[doLogin] Senha armazenada (len):', candidato.senha.length, '| ativo:', candidato.ativo);
+    } else {
+      console.warn('[doLogin] Nenhum usuário com este e-mail no storage.');
+      console.warn('[doLogin] E-mails cadastrados:', usuariosList.map(u=>u.email));
+    }
+  }
+}
+
+function loginDiag(){
+  const diag = document.getElementById('login-diag');
+  const emailDigitado = document.getElementById('inp-email').value.trim().toLowerCase();
+  const senhaDigitada = document.getElementById('inp-senha').value;
+
+  let raw='', lista=[];
+  try{ raw=localStorage.getItem('engelinhas_usuarios_v1')||''; lista=JSON.parse(raw||'[]'); }catch(e){}
+  if(!Array.isArray(lista)||lista.length===0){
+    lista=[{email:'guilherme@engelinhas.com.br',senha:'1234',nome:'Guilherme Diniz',ativo:true}];
+  }
+
+  const candidato = lista.find(u=>u.email.trim().toLowerCase()===emailDigitado);
+  let html = '<b>Storage key:</b> engelinhas_usuarios_v1<br>';
+  html += '<b>Total usuários:</b> ' + lista.length + '<br>';
+  html += '<b>E-mails salvos:</b> ' + lista.map(u=>u.email).join(', ') + '<br><br>';
+  html += '<b>E-mail digitado:</b> ' + JSON.stringify(emailDigitado) + '<br>';
+  html += '<b>Senha digitada (len):</b> ' + senhaDigitada.length + '<br>';
+
+  if(candidato){
+    const senhaOk = candidato.senha === senhaDigitada;
+    html += '<b>Usuário encontrado:</b> ✅ ' + candidato.nome + '<br>';
+    html += '<b>Senha bate:</b> ' + (senhaOk ? '✅ SIM' : '❌ NÃO') + '<br>';
+    if(!senhaOk){
+      html += '<b>Senha armazenada (len):</b> ' + candidato.senha.length + '<br>';
+      // Mostrar chars para debug (ofuscar meio a meio)
+      const s = candidato.senha;
+      const vis = s.slice(0,2) + '***' + s.slice(-1);
+      html += '<b>Senha armazenada (mascarada):</b> ' + vis + '<br>';
+    }
+    html += '<b>Ativo:</b> ' + candidato.ativo + '<br>';
+  } else {
+    html += '<b>Usuário NÃO encontrado</b> com este e-mail ❌<br>';
+    html += '<b>Dica:</b> Verifique se o e-mail está correto (maiúsculas/espaços)<br>';
+  }
+
+  diag.innerHTML = html;
+  diag.style.display = 'block';
 }
 
 function _aplicarLogin(user){
