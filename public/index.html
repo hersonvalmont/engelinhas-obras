@@ -948,90 +948,67 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <!-- ═══ CONTRATO TÉCNICO ═══ -->
+      <!-- ═══ CONTRATO — ANEXOS TÉCNICOS ═══ -->
       <div class="page" id="page-contrato-tecnico">
         <div class="page-header">
           <div>
-            <div class="page-breadcrumb"><i data-lucide="file-signature"></i> Contrato <i data-lucide="chevron-right"></i> <span>Técnico</span></div>
-            <div class="page-title">Contrato Técnico</div>
-            <div class="page-sub">Escopo técnico, especificações, memoriais descritivos e requisitos de qualidade</div>
+            <div class="page-breadcrumb"><i data-lucide="file-signature"></i> Contrato <i data-lucide="chevron-right"></i> <span>Anexos Técnicos</span></div>
+            <div class="page-title">Anexos Técnicos</div>
+            <div class="page-sub">Memoriais descritivos, especificações, PQOs e documentos técnicos — arraste ou anexe qualquer arquivo</div>
           </div>
-          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('contrato-tecnico')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> CSV</button>
+            <button class="btn btn-primary" onclick="repoOpenModal('contrato-tecnico','Anexo Técnico')"><i data-lucide="plus"></i> Novo Documento</button>
+          </div>
         </div>
         <div class="kpi-grid kpi-grid-3">
-          <div class="kpi blue"><div class="kpi-label">Documentos técnicos</div><div class="kpi-value">34</div></div>
-          <div class="kpi amber"><div class="kpi-label">Pendentes de revisão</div><div class="kpi-value">7</div></div>
-          <div class="kpi green"><div class="kpi-label">Aprovados</div><div class="kpi-value">27</div></div>
+          <div class="kpi blue"><div class="kpi-label">Documentos cadastrados</div><div class="kpi-value" id="kpi-contrato-tecnico-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Com arquivo anexado</div><div class="kpi-value" id="kpi-contrato-tecnico-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Sem arquivo</div><div class="kpi-value" id="kpi-contrato-tecnico-pend">0</div></div>
         </div>
-        <div class="card"><div class="table-wrap"><table>
-          <thead><tr><th>Código</th><th>Título</th><th>Obra</th><th>Tipo</th><th>Revisão</th><th>Data</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            <tr><td style="font-size:11px">CT-TEC-001</td><td style="font-weight:500">Memorial Descritivo — Obras Civis SE Uberlândia</td><td>SE Uberlândia</td><td>Memorial</td><td>Rev. B</td><td>01/03/2026</td><td><span class="badge badge-green">Aprovado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-            <tr><td style="font-size:11px">CT-TEC-002</td><td style="font-weight:500">Especificação Técnica — Equipamentos Primários</td><td>SE Uberlândia</td><td>Especificação</td><td>Rev. C</td><td>28/02/2026</td><td><span class="badge badge-green">Aprovado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-            <tr><td style="font-size:11px">CT-TEC-003</td><td style="font-weight:500">Plano de Qualidade da Obra</td><td>LT 138kV</td><td>PQO</td><td>Rev. A</td><td>20/02/2026</td><td><span class="badge badge-amber">Em revisão</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-            <tr><td style="font-size:11px">CT-TEC-004</td><td style="font-weight:500">Requisitos de Segurança e Saúde</td><td>Todas</td><td>PCMAT</td><td>Rev. D</td><td>15/01/2026</td><td><span class="badge badge-green">Aprovado</span></td><td><button class="btn btn-sm">Ver</button></td></tr>
-          </tbody>
-        </table></div></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Repositório de Anexos Técnicos</div>
+            <input type="text" class="form-input" id="repo-contrato-tecnico-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('contrato-tecnico')">
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-contrato-tecnico">
+              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </div>
 
-      <!-- ═══ CONTRATO COMERCIAL ═══ -->
+      <!-- ═══ CONTRATO — ANEXOS COMERCIAIS ═══ -->
       <div class="page" id="page-contrato-comercial">
         <div class="page-header">
           <div>
-            <div class="page-breadcrumb"><i data-lucide="file-signature"></i> Contrato <i data-lucide="chevron-right"></i> <span>Comercial</span></div>
-            <div class="page-title">Contrato Comercial</div>
-            <div class="page-sub">Escopo financeiro, marcos, aditivos, medições e compliance</div>
+            <div class="page-breadcrumb"><i data-lucide="file-signature"></i> Contrato <i data-lucide="chevron-right"></i> <span>Anexos Comerciais</span></div>
+            <div class="page-title">Anexos Comerciais</div>
+            <div class="page-sub">Contratos, aditivos, boletins de medição, propostas e documentos comerciais — arraste ou anexe qualquer arquivo</div>
           </div>
-          <button class="btn btn-primary" onclick="abrirModalRegistro('novo-contrato','Novo Contrato')"><i data-lucide="plus"></i> Novo Contrato</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('contrato-comercial')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> CSV</button>
+            <button class="btn btn-primary" onclick="repoOpenModal('contrato-comercial','Anexo Comercial')"><i data-lucide="plus"></i> Novo Documento</button>
+          </div>
         </div>
         <div class="kpi-grid kpi-grid-3">
-          <div class="kpi blue"><div class="kpi-label">Contratos ativos</div><div class="kpi-value">8</div></div>
-          <div class="kpi amber"><div class="kpi-label">Aditivos pendentes</div><div class="kpi-value">3</div><div class="kpi-sub">Aguardando assinatura</div></div>
-          <div class="kpi red"><div class="kpi-label">Medições em aprovação</div><div class="kpi-value">5</div></div>
+          <div class="kpi blue"><div class="kpi-label">Documentos cadastrados</div><div class="kpi-value" id="kpi-contrato-comercial-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Com arquivo anexado</div><div class="kpi-value" id="kpi-contrato-comercial-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Sem arquivo</div><div class="kpi-value" id="kpi-contrato-comercial-pend">0</div></div>
         </div>
-        <div class="tabs">
-          <div class="tab active" onclick="switchTabCT(this,'tab-ct-carteira')">Carteira</div>
-          <div class="tab" onclick="switchTabCT(this,'tab-ct-medicoes')">Boletins de medição <span class="notif"></span></div>
-          <div class="tab" onclick="switchTabCT(this,'tab-ct-aditivos')">Aditivos</div>
-        </div>
-        <div id="tab-ct-carteira">
-          <div class="card"><div class="table-wrap"><table>
-            <thead><tr><th>Contrato</th><th>Fornecedor</th><th>Obra</th><th>Escopo</th><th>Valor contratado</th><th>Medido</th><th>% Exec.</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-              <tr><td style="font-size:11px;font-weight:500">CT-2024-041</td><td>Construtora Alpha</td><td>SE Uberlândia</td><td>Obras civis</td><td>R$ 4.200.000</td><td>R$ 2.646.000</td><td><span class="badge badge-amber">63%</span></td><td><span class="status amber">Em execução</span></td><td><button class="btn btn-sm">Medições</button></td></tr>
-              <tr><td style="font-size:11px;font-weight:500">CT-2024-038</td><td>Eletro Beta Ltda</td><td>SE Uberlândia</td><td>Montagem eletromec.</td><td>R$ 7.800.000</td><td>R$ 3.510.000</td><td><span class="badge badge-amber">45%</span></td><td><span class="status amber">Em execução</span></td><td><button class="btn btn-sm">Medições</button></td></tr>
-              <tr><td style="font-size:11px;font-weight:500">CT-2024-035</td><td>Infraline S.A.</td><td>LT 138kV</td><td>Montagem de linha</td><td>R$ 3.100.000</td><td>R$ 1.922.000</td><td><span class="badge badge-blue">62%</span></td><td><span class="status blue">Aditivo em análise</span></td><td><button class="btn btn-sm">Medições</button></td></tr>
-              <tr><td style="font-size:11px;font-weight:500">CT-2025-002</td><td>Ambiental Verde</td><td>PRAD Faixa Oeste</td><td>Recuperação ambiental</td><td>R$ 890.000</td><td>R$ 356.000</td><td><span class="badge badge-amber">40%</span></td><td><span class="status amber">Em execução</span></td><td><button class="btn btn-sm">Medições</button></td></tr>
-            </tbody>
-          </table></div></div>
-        </div>
-        <div id="tab-ct-medicoes" style="display:none">
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">CT-2024-041 · Construtora Alpha</div><div class="card-sub">Boletins de medição</div></div><button class="btn btn-sm btn-primary"><i data-lucide="plus"></i> Novo BM</button></div>
-            <div class="table-wrap"><table>
-              <thead><tr><th>BM</th><th>Período</th><th>Valor bruto</th><th>Retenção 5%</th><th>Glosas</th><th>Valor líquido</th><th>Status</th></tr></thead>
-              <tbody>
-                <tr><td style="font-weight:500">BM-01</td><td>Jan/2026</td><td>R$ 882.000</td><td style="color:var(--text2)">R$ 44.100</td><td style="color:var(--text2)">R$ 0</td><td style="font-weight:500">R$ 837.900</td><td><span class="badge badge-green">Pago</span></td></tr>
-                <tr><td style="font-weight:500">BM-02</td><td>Fev/2026</td><td>R$ 1.050.000</td><td style="color:var(--text2)">R$ 52.500</td><td style="color:var(--red)">R$ 18.000</td><td style="font-weight:500">R$ 979.500</td><td><span class="badge badge-green">Pago</span></td></tr>
-                <tr><td style="font-weight:500">BM-03</td><td>Mar/2026</td><td>R$ 714.000</td><td style="color:var(--text2)">R$ 35.700</td><td style="color:var(--text2)">R$ 0</td><td style="font-weight:500">R$ 678.300</td><td><span class="badge badge-amber">Em aprovação</span></td></tr>
-              </tbody>
-            </table></div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px;border-top:1px solid var(--border)">
-              <div class="kpi" style="margin:0"><div class="kpi-label">Total contratado</div><div class="kpi-value" style="font-size:16px">R$ 4.200.000</div></div>
-              <div class="kpi" style="margin:0"><div class="kpi-label">Total medido</div><div class="kpi-value" style="font-size:16px">R$ 2.646.000</div></div>
-              <div class="kpi" style="margin:0"><div class="kpi-label">Total retido</div><div class="kpi-value" style="font-size:16px;color:var(--amber)">R$ 132.300</div></div>
-              <div class="kpi" style="margin:0"><div class="kpi-label">Saldo a medir</div><div class="kpi-value" style="font-size:16px">R$ 1.554.000</div></div>
-            </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Repositório de Anexos Comerciais</div>
+            <input type="text" class="form-input" id="repo-contrato-comercial-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('contrato-comercial')">
           </div>
-        </div>
-        <div id="tab-ct-aditivos" style="display:none">
-          <div class="card"><div class="table-wrap"><table>
-            <thead><tr><th>Aditivo</th><th>Contrato</th><th>Tipo</th><th>Motivo</th><th>Valor</th><th>Prazo adicional</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:500">AD-035-01</td><td>CT-2024-035</td><td><span class="badge badge-blue">Prazo + Valor</span></td><td>Interferência com rodovia — km 9,4</td><td>R$ 186.000</td><td>+45 dias</td><td><span class="status amber">Em análise</span></td></tr>
-              <tr><td style="font-weight:500">AD-038-01</td><td>CT-2024-038</td><td><span class="badge badge-gray">Prazo</span></td><td>Atraso em fornecimento de equipamentos</td><td>R$ 0</td><td>+30 dias</td><td><span class="status amber">Aguard. assinatura</span></td></tr>
-              <tr><td style="font-weight:500">AD-041-01</td><td>CT-2024-041</td><td><span class="badge badge-gray">Prazo</span></td><td>Chuvas acima da média — jan/fev 2026</td><td>R$ 0</td><td>+15 dias</td><td><span class="badge badge-green">Aprovado</span></td></tr>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-contrato-comercial">
+              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
             </tbody>
-          </table></div></div>
+          </table></div>
         </div>
       </div>
 
@@ -3057,22 +3034,33 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <!-- PÁGINAS NOVAS -->
+      <!-- ═══ CONTRATO — JURÍDICO ═══ -->
       <div class="page" id="page-contrato-juridico">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Contrato</span><i data-lucide="chevron-right"></i><span>Jurídico</span></div><div class="page-title">Contrato Jurídico</div><div class="page-sub">Documentos jurídicos, pareceres e instrumentos legais</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('novo-documento','Novo Documento')"><i data-lucide="plus"></i> Novo Documento</button></div>
-        <div class="kpi-grid kpi-grid-3" id="kpi-novo-documento">
-          <div class="kpi blue"><div class="kpi-label">Total de registros</div><div class="kpi-value" id="kpi-novo-documento-total">0</div></div>
-          <div class="kpi green"><div class="kpi-label">Aprovados / Válidos</div><div class="kpi-value" id="kpi-novo-documento-ok">0</div></div>
-          <div class="kpi amber"><div class="kpi-label">Em elaboração / Revisão</div><div class="kpi-value" id="kpi-novo-documento-pend">0</div></div>
+        <div class="page-header">
+          <div>
+            <div class="page-breadcrumb"><i data-lucide="file-signature"></i> Contrato <i data-lucide="chevron-right"></i> <span>Jurídico</span></div>
+            <div class="page-title">Jurídico</div>
+            <div class="page-sub">Pareceres jurídicos, contratos, instrumentos legais e documentos de conformidade — arraste ou anexe qualquer arquivo</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="exportarCSV('contrato-juridico')" title="Exportar CSV"><i data-lucide="download" style="width:14px;height:14px;margin-right:4px"></i> CSV</button>
+            <button class="btn btn-primary" onclick="repoOpenModal('contrato-juridico','Documento Jurídico')"><i data-lucide="plus"></i> Novo Documento</button>
+          </div>
+        </div>
+        <div class="kpi-grid kpi-grid-3">
+          <div class="kpi blue"><div class="kpi-label">Documentos cadastrados</div><div class="kpi-value" id="kpi-contrato-juridico-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Com arquivo anexado</div><div class="kpi-value" id="kpi-contrato-juridico-ok">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Sem arquivo</div><div class="kpi-value" id="kpi-contrato-juridico-pend">0</div></div>
         </div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Registros — Contrato Jurídico</div>
-            <button class="btn btn-sm btn-primary" onclick="abrirModalRegistro('novo-documento','Contrato Jurídico')"><i data-lucide="plus"></i> Novo</button>
+            <div class="card-title">Repositório Jurídico</div>
+            <input type="text" class="form-input" id="repo-contrato-juridico-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('contrato-juridico')">
           </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Código</th><th>Título</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
-            <tbody id="tbody-novo-documento">
-              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Novo" para adicionar.</td></tr>
+            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tbody-contrato-juridico">
+              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -7697,6 +7685,15 @@ document.addEventListener('DOMContentLoaded', function(){
     if(pageId === 'rh-anexos'){
       repoRender('rh-anexos');
     }
+    if(pageId === 'contrato-tecnico'){
+      repoRender('contrato-tecnico');
+    }
+    if(pageId === 'contrato-comercial'){
+      repoRender('contrato-comercial');
+    }
+    if(pageId === 'contrato-juridico'){
+      repoRender('contrato-juridico');
+    }
     // Atualizar KPIs globais de RH sempre que navegar para qualquer sub-página RH
     if(pageId && pageId.startsWith('rh-') && typeof rhAtualizarKpis==='function'){
       setTimeout(rhAtualizarKpis, 80);
@@ -8706,7 +8703,14 @@ function repoOpenModal(tipo, titulo, id=null){
 
   // Ajustar título do modal
   const isEpi = tipo === 'rh-epi';
-  document.getElementById('repo-modal-titulo').textContent = id ? 'Editar '+titulo : (isEpi ? 'Registrar Entrega de EPI' : 'Novo Anexo Contratual');
+  const titulos = {
+    'rh-epi':             id ? 'Editar EPI' : 'Registrar Entrega de EPI',
+    'rh-anexos':          id ? 'Editar Anexo'              : 'Novo Anexo de Documentação',
+    'contrato-tecnico':   id ? 'Editar Anexo Técnico'      : 'Novo Anexo Técnico',
+    'contrato-comercial': id ? 'Editar Anexo Comercial'    : 'Novo Anexo Comercial',
+    'contrato-juridico':  id ? 'Editar Documento Jurídico' : 'Novo Documento Jurídico',
+  };
+  document.getElementById('repo-modal-titulo').textContent = titulos[tipo] || (id ? 'Editar '+titulo : 'Novo Documento');
 
   // Mostrar/ocultar campos contextuais
   document.getElementById('repo-campo-funcionario').style.display = isEpi ? 'block' : 'none';
@@ -8983,6 +8987,21 @@ function exportarCSV(tipo){
   } else if(tipo==='rh-anexos'){
     const lista=repoCarregar('rh-anexos');
     nome='anexos_engelinhas';
+    linhas.push(['ID','Título','Tipo','Obra','Data','Responsável','Status','Qtd Arquivos','Observações']);
+    lista.forEach(r=>linhas.push([r.id,r.titulo||'',r.tipo||'',r.obraNome||'',r.data||'',r.responsavel||'',r.status||'',(r.arquivos||[]).length,r.obs||'']));
+  } else if(tipo==='contrato-tecnico'){
+    const lista=repoCarregar('contrato-tecnico');
+    nome='contrato_tecnico_engelinhas';
+    linhas.push(['ID','Título','Tipo','Obra','Data','Responsável','Status','Qtd Arquivos','Observações']);
+    lista.forEach(r=>linhas.push([r.id,r.titulo||'',r.tipo||'',r.obraNome||'',r.data||'',r.responsavel||'',r.status||'',(r.arquivos||[]).length,r.obs||'']));
+  } else if(tipo==='contrato-comercial'){
+    const lista=repoCarregar('contrato-comercial');
+    nome='contrato_comercial_engelinhas';
+    linhas.push(['ID','Título','Tipo','Obra','Data','Responsável','Status','Qtd Arquivos','Observações']);
+    lista.forEach(r=>linhas.push([r.id,r.titulo||'',r.tipo||'',r.obraNome||'',r.data||'',r.responsavel||'',r.status||'',(r.arquivos||[]).length,r.obs||'']));
+  } else if(tipo==='contrato-juridico'){
+    const lista=repoCarregar('contrato-juridico');
+    nome='contrato_juridico_engelinhas';
     linhas.push(['ID','Título','Tipo','Obra','Data','Responsável','Status','Qtd Arquivos','Observações']);
     lista.forEach(r=>linhas.push([r.id,r.titulo||'',r.tipo||'',r.obraNome||'',r.data||'',r.responsavel||'',r.status||'',(r.arquivos||[]).length,r.obs||'']));
   } else {
