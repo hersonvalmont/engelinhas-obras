@@ -3215,20 +3215,34 @@ tbody tr:hover td{background:var(--bg3)}
           </div>
         </div>
         <div class="kpi-grid kpi-grid-4">
-          <div class="kpi blue"><div class="kpi-label">Efetivo total ativo</div><div class="kpi-value">74</div><div class="kpi-sub">3 obras em campo</div></div>
-          <div class="kpi amber"><div class="kpi-label">ASOs a vencer (30 dias)</div><div class="kpi-value">9</div><div class="kpi-sub">Ação necessária</div></div>
-          <div class="kpi red"><div class="kpi-label">NRs vencidas</div><div class="kpi-value">4</div><div class="kpi-sub">Regularização urgente</div></div>
-          <div class="kpi green"><div class="kpi-label">Mobilizações ativas</div><div class="kpi-value">3</div><div class="kpi-sub">LD 69kV, SE UDI, LT 138kV</div></div>
+          <div class="kpi blue" style="cursor:pointer" onclick="navTo('rh-documentacao')">
+            <div class="kpi-label">Efetivo total ativo</div>
+            <div class="kpi-value" id="rh-painel-efetivo">0</div>
+            <div class="kpi-sub" id="rh-painel-obras-sub">0 obras em campo</div>
+          </div>
+          <div class="kpi amber" style="cursor:pointer" onclick="navTo('rh-aso')">
+            <div class="kpi-label">ASOs a vencer (30 dias)</div>
+            <div class="kpi-value" id="rh-painel-aso-vencendo">0</div>
+            <div class="kpi-sub" id="rh-painel-aso-sub">Ação necessária</div>
+          </div>
+          <div class="kpi red" style="cursor:pointer" onclick="navTo('rh-treinamentos')">
+            <div class="kpi-label">NRs vencidas</div>
+            <div class="kpi-value" id="rh-painel-nr-vencidas">0</div>
+            <div class="kpi-sub" id="rh-painel-nr-sub">Regularização urgente</div>
+          </div>
+          <div class="kpi green" style="cursor:pointer" onclick="navTo('rh-mobilizacao')">
+            <div class="kpi-label">Mobilizações ativas</div>
+            <div class="kpi-value" id="rh-painel-mob">0</div>
+            <div class="kpi-sub" id="rh-painel-mob-sub">—</div>
+          </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div class="card">
             <div class="card-header"><div class="card-title">Efetivo por obra</div></div>
             <div class="table-wrap"><table>
-              <thead><tr><th>Obra</th><th>M.O. Indireta</th><th>M.O. Direta</th><th>Total</th><th>Status</th></tr></thead>
-              <tbody>
-                <tr><td style="font-weight:500">LD 69kV Lagoa Nova II</td><td>14</td><td>33</td><td style="font-weight:600">47</td><td><span class="badge badge-green">Mobilizado</span></td></tr>
-                <tr><td style="font-weight:500">SE Uberlândia 500kV</td><td>8</td><td>11</td><td style="font-weight:600">19</td><td><span class="badge badge-green">Mobilizado</span></td></tr>
-                <tr><td style="font-weight:500">LT 138kV Trecho Norte</td><td>4</td><td>4</td><td style="font-weight:600">8</td><td><span class="badge badge-amber">Parcial</span></td></tr>
+              <thead><tr><th>Obra</th><th>Funcionários</th><th>Docs OK</th><th>Docs Pend.</th><th>Status</th></tr></thead>
+              <tbody id="rh-painel-efetivo-tbody">
+                <tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px">Nenhum funcionário cadastrado.</td></tr>
               </tbody>
             </table></div>
           </div>
@@ -3236,12 +3250,8 @@ tbody tr:hover td{background:var(--bg3)}
             <div class="card-header"><div class="card-title">Alertas de vencimento</div></div>
             <div class="table-wrap"><table>
               <thead><tr><th>Funcionário</th><th>Documento</th><th>Vencimento</th><th>Situação</th></tr></thead>
-              <tbody>
-                <tr><td style="font-weight:500">Wlisses A.</td><td>ASO Periódico</td><td>20/04/2026</td><td><span class="badge badge-red">Vencido</span></td></tr>
-                <tr><td style="font-weight:500">Silvanio M.</td><td>NR-10</td><td>25/04/2026</td><td><span class="badge badge-red">Vencido</span></td></tr>
-                <tr><td style="font-weight:500">Juan Carlos S.</td><td>ASO Admissional</td><td>10/05/2026</td><td><span class="badge badge-amber">15 dias</span></td></tr>
-                <tr><td style="font-weight:500">Mauricio F.</td><td>NR-35</td><td>18/05/2026</td><td><span class="badge badge-amber">23 dias</span></td></tr>
-                <tr><td style="font-weight:500">Thiago R.</td><td>Habilitação Cat D</td><td>02/06/2026</td><td><span class="badge badge-amber">38 dias</span></td></tr>
+              <tbody id="rh-painel-alertas-tbody">
+                <tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px">Nenhum alerta.</td></tr>
               </tbody>
             </table></div>
           </div>
@@ -3259,9 +3269,9 @@ tbody tr:hover td{background:var(--bg3)}
           <button class="btn btn-primary" onclick="openModalFuncionario()"><i data-lucide="plus"></i> Novo funcionário</button>
         </div>
         <div class="kpi-grid kpi-grid-3">
-          <div class="kpi blue"><div class="kpi-label">Funcionários cadastrados</div><div class="kpi-value" id="rh-kpi-total">74</div></div>
-          <div class="kpi green"><div class="kpi-label">Documentação completa</div><div class="kpi-value" id="rh-kpi-completo">61</div></div>
-          <div class="kpi amber"><div class="kpi-label">Documentação pendente</div><div class="kpi-value" id="rh-kpi-pendente">13</div></div>
+          <div class="kpi blue"><div class="kpi-label">Funcionários cadastrados</div><div class="kpi-value" id="rh-kpi-total">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Documentação completa</div><div class="kpi-value" id="rh-kpi-completo">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Documentação pendente</div><div class="kpi-value" id="rh-kpi-pendente">0</div></div>
         </div>
         <div class="card">
           <div class="card-header">
@@ -4508,6 +4518,7 @@ document.getElementById('inp-senha').addEventListener('keydown',e=>{if(e.key==='
       if(typeof dashboardRender==='function') dashboardRender();
       if(typeof notificacoesAtualizar==='function') notificacoesAtualizar();
       if(typeof rhAtualizarKpis==='function') rhAtualizarKpis();
+      if(typeof rhRenderPainelGeral==='function') rhRenderPainelGeral();
     }, 150);
   }catch(e){ console.warn('Erro ao restaurar sessão:', e); }
 })();
@@ -6137,6 +6148,8 @@ function rhSalvarFuncionarios(){
     localStorage.setItem(RH_STORAGE_KEY, JSON.stringify(FUNCIONARIOS));
     localStorage.setItem(RH_SEQ_STORAGE_KEY, String(FUNC_SEQ));
   }catch(e){ console.error('Falha ao salvar funcionários no cache:', e); }
+  // Atualizar painel geral se estiver montado
+  if(typeof rhRenderPainelGeral==='function') setTimeout(rhRenderPainelGeral, 50);
 }
 
 let FUNCIONARIOS = rhCarregarFuncionarios();
@@ -7688,6 +7701,10 @@ document.addEventListener('DOMContentLoaded', function(){
     if(pageId && pageId.startsWith('rh-') && typeof rhAtualizarKpis==='function'){
       setTimeout(rhAtualizarKpis, 80);
     }
+    // Painel Geral de RH
+    if(pageId === 'rh-quadro' && typeof rhRenderPainelGeral==='function'){
+      setTimeout(rhRenderPainelGeral, 80);
+    }
     // Atualizar notificações ao abrir o app ou navegar para dashboard
     if(pageId==='dashboard' && typeof notificacoesAtualizar==='function'){
       setTimeout(notificacoesAtualizar, 100);
@@ -8073,6 +8090,7 @@ document.addEventListener('DOMContentLoaded',function(){
   dashboardRender();
   notificacoesAtualizar();
   rhAtualizarKpis();
+  rhRenderPainelGeral();
 });
 
 // ══════════════════════════════════════════════════════
@@ -8458,7 +8476,11 @@ function asoCarregar(){
   try{ ASO_LISTA = JSON.parse(localStorage.getItem(ASO_STORAGE_KEY)||'[]'); }
   catch(e){ ASO_LISTA=[]; }
 }
-function asoSalvarStorage(){ localStorage.setItem(ASO_STORAGE_KEY, JSON.stringify(ASO_LISTA)); }
+function asoSalvarStorage(){
+  localStorage.setItem(ASO_STORAGE_KEY, JSON.stringify(ASO_LISTA));
+  // Atualizar painel geral se estiver montado
+  if(typeof rhRenderPainelGeral==='function') setTimeout(rhRenderPainelGeral, 50);
+}
 
 function asoPopularFuncionarioSelect(){
   const sel = document.getElementById('aso-funcionario');
@@ -9220,9 +9242,175 @@ function rhAtualizarKpis(){
     if(elX) elX.textContent=trVencidas;
   }
 }
+
+// ═══════════════════════════════════════════════════════
+// PAINEL GERAL DE RH — render dinâmico
+// ═══════════════════════════════════════════════════════
+function rhRenderPainelGeral(){
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+  const ativos = (FUNCIONARIOS||[]).filter(f=>f.ativo!==false);
+
+  // ── KPI: Efetivo total ───────────────────────────────
+  const obrasComFunc = new Set(ativos.map(f=>f.obraId).filter(Boolean));
+  const elEfetivo = document.getElementById('rh-painel-efetivo');
+  const elObrasSub = document.getElementById('rh-painel-obras-sub');
+  if(elEfetivo) elEfetivo.textContent = ativos.length;
+  if(elObrasSub) elObrasSub.textContent = obrasComFunc.size + ' obra(s) em campo';
+
+  // ── KPI: ASOs a vencer (30 dias) + vencidos ──────────
+  asoCarregar();
+  let asoVencendo=0, asoVencido=0;
+  (ASO_LISTA||[]).forEach(a=>{
+    if(!a.validade) return;
+    const diff = Math.round((new Date(a.validade+'T00:00:00') - hoje) / 86400000);
+    if(diff < 0) asoVencido++;
+    else if(diff <= 30) asoVencendo++;
+  });
+  const elAsoV = document.getElementById('rh-painel-aso-vencendo');
+  const elAsoSub = document.getElementById('rh-painel-aso-sub');
+  if(elAsoV) elAsoV.textContent = asoVencendo + asoVencido;
+  if(elAsoSub) elAsoSub.textContent = asoVencido > 0
+    ? asoVencido+' vencido(s), '+asoVencendo+' vencendo'
+    : (asoVencendo > 0 ? 'Ação necessária' : 'Todos em dia');
+
+  // ── KPI: NRs vencidas ────────────────────────────────
+  let nrVencidas=0, nrVencendo=0;
+  ativos.forEach(f=>{
+    const det = f.nrsDetalhes || {};
+    (f.nrsExigidas||[]).forEach(nr=>{
+      const d = det[nr];
+      if(!d||!d.dataVencimento) return;
+      const temAnexo = (d.arquivosNomes||[]).length>0;
+      const st = trCalcularStatus(d.dataVencimento, temAnexo);
+      if(st==='vencida') nrVencidas++;
+      else if(st==='vencendo') nrVencendo++;
+    });
+  });
+  const elNrV = document.getElementById('rh-painel-nr-vencidas');
+  const elNrSub = document.getElementById('rh-painel-nr-sub');
+  if(elNrV) elNrV.textContent = nrVencidas;
+  if(elNrSub) elNrSub.textContent = nrVencendo > 0
+    ? nrVencendo+' vencendo em breve'
+    : (nrVencidas > 0 ? 'Regularização urgente' : 'Todas em dia');
+
+  // ── KPI: Mobilizações ativas (funcionários ativos com obraId) ──
+  const elMob = document.getElementById('rh-painel-mob');
+  const elMobSub = document.getElementById('rh-painel-mob-sub');
+  if(elMob) elMob.textContent = ativos.length;
+  if(elMobSub){
+    if(obrasComFunc.size===0){ elMobSub.textContent='—'; }
+    else {
+      const nomes = [...obrasComFunc].map(id=>{
+        const o = (OBRAS_LISTA||[]).find(x=>x.id===id);
+        return o ? o.nome.split(' ').slice(0,3).join(' ') : id;
+      });
+      elMobSub.textContent = nomes.slice(0,3).join(', ')+(nomes.length>3?' e mais...':'');
+    }
+  }
+
+  // ── Tabela: Efetivo por obra ──────────────────────────
+  const tbody1 = document.getElementById('rh-painel-efetivo-tbody');
+  if(tbody1){
+    if(!ativos.length){
+      tbody1.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px">Nenhum funcionário cadastrado.</td></tr>';
+    } else {
+      // Agrupar por obraId
+      const porObra = {};
+      ativos.forEach(f=>{
+        const key = f.obraId || '__sem_obra__';
+        if(!porObra[key]) porObra[key] = {total:0,completo:0,pendente:0};
+        porObra[key].total++;
+        if(f.docs==='Completo') porObra[key].completo++;
+        else porObra[key].pendente++;
+      });
+      tbody1.innerHTML = Object.entries(porObra).map(([obraId, d])=>{
+        const obra = (OBRAS_LISTA||[]).find(o=>o.id===obraId);
+        const nomeObra = obra ? obra.nome : (obraId==='__sem_obra__' ? '(Sem obra)' : obraId);
+        const pct = d.total > 0 ? Math.round(d.completo/d.total*100) : 0;
+        const stCls = pct===100 ? 'badge-green' : pct>=50 ? 'badge-amber' : 'badge-red';
+        const stLabel = pct===100 ? 'Docs OK' : pct>=50 ? 'Parcial' : 'Pendente';
+        return `<tr>
+          <td style="font-weight:500">${nomeObra}</td>
+          <td style="text-align:center">${d.total}</td>
+          <td style="text-align:center;color:#16a34a">${d.completo}</td>
+          <td style="text-align:center;color:#d97706">${d.pendente}</td>
+          <td><span class="badge ${stCls}">${stLabel}</span></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // ── Tabela: Alertas de vencimento ────────────────────
+  const tbody2 = document.getElementById('rh-painel-alertas-tbody');
+  if(tbody2){
+    const alertas = [];
+
+    // NRs vencidas/vencendo
+    ativos.forEach(f=>{
+      const det = f.nrsDetalhes || {};
+      (f.nrsExigidas||[]).forEach(nr=>{
+        const d = det[nr];
+        if(!d||!d.dataVencimento) return;
+        const temAnexo = (d.arquivosNomes||[]).length>0;
+        const st = trCalcularStatus(d.dataVencimento, temAnexo);
+        if(st==='vencida'||st==='vencendo'){
+          const diff = Math.round((new Date(d.dataVencimento+'T00:00:00') - hoje) / 86400000);
+          alertas.push({
+            nome: rhPrimeiroNome(f.nome),
+            doc: nr,
+            vencimento: d.dataVencimento,
+            diff,
+            st
+          });
+        }
+      });
+    });
+
+    // ASOs vencidos/vencendo
+    (ASO_LISTA||[]).forEach(a=>{
+      if(!a.validade) return;
+      const diff = Math.round((new Date(a.validade+'T00:00:00') - hoje) / 86400000);
+      if(diff <= 30){
+        alertas.push({
+          nome: (a.nomeFuncionario||a.matricula||'').split(' ').slice(0,2).join(' '),
+          doc: 'ASO '+a.tipo,
+          vencimento: a.validade,
+          diff,
+          st: diff < 0 ? 'vencida' : 'vencendo'
+        });
+      }
+    });
+
+    // Ordenar: vencidos primeiro, depois por proximidade
+    alertas.sort((a,b)=> a.diff - b.diff);
+
+    if(!alertas.length){
+      tbody2.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px">✅ Nenhum alerta — todos os documentos em dia.</td></tr>';
+    } else {
+      tbody2.innerHTML = alertas.slice(0,10).map(a=>{
+        const vencFmt = a.vencimento.split('-').reverse().join('/');
+        let badgeCls, badgeLabel;
+        if(a.diff < 0){
+          badgeCls='badge-red'; badgeLabel='Vencido';
+        } else if(a.diff===0){
+          badgeCls='badge-red'; badgeLabel='Hoje';
+        } else {
+          badgeCls='badge-amber'; badgeLabel=a.diff+' dias';
+        }
+        return `<tr>
+          <td style="font-weight:500">${a.nome}</td>
+          <td style="font-size:12px">${a.doc}</td>
+          <td style="font-size:13px">${vencFmt}</td>
+          <td><span class="badge ${badgeCls}">${badgeLabel}</span></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+}
+
 let uploadFotosContexto = '';
 let uploadFotosTemp = [];
-
 function abrirUploadFotosGlobal(contexto){
   uploadFotosContexto = contexto;
   uploadFotosTemp = [];
