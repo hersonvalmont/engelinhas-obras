@@ -4330,6 +4330,7 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
     <input type="hidden" id="tr-matricula">
     <input type="hidden" id="tr-nr-nome">
+    <input type="hidden" id="tr-func-id"><!-- id numérico do funcionário para upload -->
     <div class="form-grid">
       <div class="form-group full">
         <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:var(--radius)">
@@ -4340,35 +4341,38 @@ tbody tr:hover td{background:var(--bg3)}
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Tipo de treinamento</label>
+        <label class="form-label">Tipo de treinamento *</label>
         <select class="form-select" id="tr-tipo">
+          <option value="">Selecione...</option>
           <option value="Inicial">Inicial</option>
           <option value="Reciclagem">Reciclagem</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Carga horária</label>
+        <label class="form-label">Carga horária *</label>
         <input type="text" class="form-input" id="tr-carga" placeholder="Ex: 40h">
       </div>
       <div class="form-group">
-        <label class="form-label">Data de realização</label>
+        <label class="form-label">Data de realização *</label>
         <input type="date" class="form-input" id="tr-data-realizacao" onchange="trCalcularVencimento()">
       </div>
       <div class="form-group">
-        <label class="form-label">Validade (meses)</label>
+        <label class="form-label">Validade (meses) *</label>
         <input type="number" class="form-input" id="tr-validade-meses" min="1" max="60" onchange="trCalcularVencimento()">
       </div>
       <div class="form-group full">
-        <label class="form-label">Data de vencimento</label>
+        <label class="form-label">Data de vencimento *</label>
         <input type="date" class="form-input" id="tr-data-vencimento">
         <div style="font-size:11px;color:var(--text3);margin-top:4px">Calculada automaticamente a partir da data de realização e validade. Pode ser ajustada manualmente.</div>
       </div>
       <div class="form-group full">
-        <label class="form-label">Instituição / empresa certificadora</label>
+        <label class="form-label">Instituição / empresa certificadora *</label>
         <input type="text" class="form-input" id="tr-instituicao" placeholder="Ex: SENAI, Engehall, instrutor interno...">
       </div>
       <div class="form-group full">
-        <label class="form-label">Certificado (PDF, imagem ou foto)</label>
+        <label class="form-label">Certificado (PDF, imagem ou foto) *
+          <span style="font-size:11px;color:var(--text3);font-weight:400;margin-left:4px">— obrigatório para validar o treinamento</span>
+        </label>
         <div id="tr-upload-area" class="upload-area" onclick="document.getElementById('tr-file-input').click()"
           ondragover="event.preventDefault();this.style.borderColor='var(--blue)'"
           ondragleave="this.style.borderColor=''"
@@ -6319,7 +6323,7 @@ function funcVerDetalhes(matricula){
 }
 
 // ── Registro de treinamento/NR individual ─────────────
-let trArquivosTemp=[];
+let trArquivosTemp = []; // pode conter File objects (novos) ou objetos do servidor {id,nome_orig,mime,...}
 
 function trCalcularStatus(dataVencimentoStr, temAnexo){
   if(!dataVencimentoStr) return 'na';
@@ -6329,7 +6333,6 @@ function trCalcularStatus(dataVencimentoStr, temAnexo){
   const diffDias = Math.round((vencimento - hoje) / 86400000);
   if(diffDias < 0) return 'vencida';
   if(diffDias <= 30) return 'vencendo';
-  // Data em dia, mas sem certificado anexado — não pode ser considerado conforme
   if(!temAnexo) return 'sem_doc';
   return 'ok';
 }
@@ -6344,24 +6347,39 @@ function trCalcularVencimento(){
   document.getElementById('tr-data-vencimento').value = vencimento;
 }
 
-function trVerOuRegistrar(matricula, nrNome){
+// Gera entidade única para identificar arquivos de treinamento: "treinamento_NR-6"
+function trEntidade(nrNome){
+  return 'treinamento_' + nrNome.replace(/\s+/g,'_');
+}
+
+async function trVerOuRegistrar(matricula, nrNome){
   const f = FUNCIONARIOS.find(x=>x.matricula===matricula);
   if(!f){ alert('Funcionário não encontrado.'); return; }
 
   document.getElementById('tr-matricula').value = matricula;
   document.getElementById('tr-nr-nome').value = nrNome;
+  document.getElementById('tr-func-id').value = f.id || '';
   document.getElementById('tr-info-funcionario').textContent = f.nome;
   document.getElementById('tr-info-nr').textContent = nrNome;
   document.getElementById('tr-modal-title').textContent = 'Treinamento — '+nrNome;
 
   const existente = (f.nrsDetalhes||{})[nrNome];
-  document.getElementById('tr-tipo').value = existente?.tipo || 'Inicial';
+  document.getElementById('tr-tipo').value = existente?.tipo || '';
   document.getElementById('tr-carga').value = existente?.cargaHoraria || '';
   document.getElementById('tr-data-realizacao').value = existente?.dataRealizacao || '';
   document.getElementById('tr-validade-meses').value = existente?.validadeMeses || NRS_VALIDADE_MESES[nrNome] || 12;
   document.getElementById('tr-data-vencimento').value = existente?.dataVencimento || '';
   document.getElementById('tr-instituicao').value = existente?.instituicao || '';
-  trArquivosTemp = existente?.arquivosNomes ? existente.arquivosNomes.map(n=>({name:n, size:0, _jaSalvo:true})) : [];
+
+  // Carregar arquivos existentes do servidor se houver funcId
+  trArquivosTemp = [];
+  if(f.id && existente){
+    try{
+      const entidade = trEntidade(nrNome);
+      const arqsServidor = await apiArquivos.listar(entidade, f.id);
+      trArquivosTemp = arqsServidor || [];
+    } catch(e){ trArquivosTemp = []; }
+  }
   trRenderArquivos();
 
   openModal('modal-treinamento');
@@ -6369,74 +6387,136 @@ function trVerOuRegistrar(matricula, nrNome){
 }
 
 function trAdicionarArquivos(files){
-  Array.from(files).forEach(f=>trArquivosTemp.push(f));
+  Array.from(files).forEach(f=>{
+    if(trArquivosTemp.find(a=>(a.name||a.nome_orig)===f.name)) return; // dedup
+    trArquivosTemp.push(f);
+  });
   trRenderArquivos();
 }
 function trRemoverArquivo(idx){
   trArquivosTemp.splice(idx,1);
   trRenderArquivos();
 }
+async function trExcluirArquivoExistente(arqId, idx){
+  if(!confirm('Remover este certificado permanentemente?')) return;
+  try{
+    await apiArquivos.excluir(arqId);
+    trArquivosTemp.splice(idx,1);
+    trRenderArquivos();
+    showToast('Certificado removido.','warn');
+  } catch(e){ showToast('Erro ao remover: '+e.message,'error'); }
+}
+
 function trRenderArquivos(){
-  const el=document.getElementById('tr-arquivos-lista');
+  const el = document.getElementById('tr-arquivos-lista');
   if(!el) return;
-  el.innerHTML = trArquivosTemp.map((f,i)=>`
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg3);border-radius:var(--radius);font-size:12px">
+  if(!trArquivosTemp.length){ el.innerHTML=''; return; }
+
+  function fmtSize(bytes){
+    if(!bytes) return '';
+    if(bytes < 1024*1024) return (bytes/1024).toFixed(0)+'KB';
+    return (bytes/(1024*1024)).toFixed(1)+'MB';
+  }
+
+  el.innerHTML = trArquivosTemp.map((a,i)=>{
+    const isServidor = !!(a.id && a.nome_orig);
+    const nome    = isServidor ? a.nome_orig : (a.name || '(arquivo)');
+    const tamanho = isServidor ? a.tamanho   : (a.size || 0);
+    const mime    = isServidor ? (a.mime||'') : (a.type||'');
+    const tag = isServidor
+      ? `<span style="font-size:10px;color:var(--green);background:var(--green-light,#d1fae5);padding:1px 5px;border-radius:10px;white-space:nowrap">✓ salvo</span>`
+      : `<span style="font-size:10px;color:var(--amber,#d97706);background:#fef3c7;padding:1px 5px;border-radius:10px;white-space:nowrap">⬆ novo</span>`;
+    const btnVer = isServidor
+      ? `<button onclick="arqAbrirPreviewModal(${a.id},'${nome.replace(/'/g,"\\'")}','${mime.replace(/'/g,"\\'")}' )" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:2px 5px;font-size:12px;display:flex;align-items:center;gap:3px" title="Visualizar"><i data-lucide="eye" style="width:13px;height:13px"></i> Ver</button>`
+      : '';
+    const btnBaixar = isServidor
+      ? `<button onclick="apiArquivos.download(${a.id},'${nome.replace(/'/g,"\\'")}' )" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:2px 5px;font-size:12px;display:flex;align-items:center;gap:3px" title="Baixar"><i data-lucide="download" style="width:13px;height:13px"></i> Baixar</button>`
+      : '';
+    const btnExcluir = isServidor
+      ? `<button onclick="trExcluirArquivoExistente(${a.id},${i})" style="background:none;border:none;cursor:pointer;color:#ef4444;padding:2px 4px;display:flex;align-items:center" title="Remover"><i data-lucide="x" style="width:13px;height:13px"></i></button>`
+      : `<button onclick="trRemoverArquivo(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px 4px;display:flex;align-items:center" title="Remover"><i data-lucide="x" style="width:13px;height:13px"></i></button>`;
+    return `
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border-radius:var(--radius);font-size:12px;border:1px solid var(--border)">
       <i data-lucide="file" style="width:14px;height:14px;color:var(--text3);flex-shrink:0"></i>
-      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span>
-      <span style="color:var(--text3);font-size:11px">${f.size ? (f.size/1024).toFixed(0)+' KB' : ''}</span>
-      <button onclick="trRemoverArquivo(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);display:flex" title="Remover"><i data-lucide="x" style="width:13px;height:13px"></i></button>
-    </div>`).join('');
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${nome}">${nome}</span>
+      <span style="color:var(--text3);font-size:11px">${fmtSize(tamanho)}</span>
+      ${tag}${btnVer}${btnBaixar}${btnExcluir}
+    </div>`;
+  }).join('');
   if(window.lucide) lucide.createIcons();
 }
 
-function trSalvar(){
-  const matricula = document.getElementById('tr-matricula').value;
-  const nrNome = document.getElementById('tr-nr-nome').value;
-  const tipo = document.getElementById('tr-tipo').value;
-  const cargaHoraria = document.getElementById('tr-carga').value.trim();
-  const dataRealizacao = document.getElementById('tr-data-realizacao').value;
+async function trSalvar(){
+  const matricula     = document.getElementById('tr-matricula').value;
+  const nrNome        = document.getElementById('tr-nr-nome').value;
+  const funcId        = document.getElementById('tr-func-id').value;
+  const tipo          = document.getElementById('tr-tipo').value;
+  const cargaHoraria  = document.getElementById('tr-carga').value.trim();
+  const dataRealizacao= document.getElementById('tr-data-realizacao').value;
   const validadeMeses = parseInt(document.getElementById('tr-validade-meses').value) || null;
-  const dataVencimento = document.getElementById('tr-data-vencimento').value;
-  const instituicao = document.getElementById('tr-instituicao').value.trim();
+  const dataVencimento= document.getElementById('tr-data-vencimento').value;
+  const instituicao   = document.getElementById('tr-instituicao').value.trim();
 
-  if(!dataRealizacao){ showToast('Informe a data de realização do treinamento.','error'); return; }
-  if(!dataVencimento){ showToast('Calcule ou informe a data de vencimento.','error'); return; }
+  // ── Validação de campos obrigatórios ──────────────────
+  if(!tipo)          { showToast('Selecione o tipo de treinamento.','error'); return; }
+  if(!cargaHoraria)  { showToast('Informe a carga horária.','error'); return; }
+  if(!dataRealizacao){ showToast('Informe a data de realização.','error'); return; }
+  if(!validadeMeses) { showToast('Informe a validade em meses.','error'); return; }
+  if(!dataVencimento){ showToast('Informe ou calcule a data de vencimento.','error'); return; }
+  if(!instituicao)   { showToast('Informe a instituição / empresa certificadora.','error'); return; }
+
+  // ── Certificado obrigatório ───────────────────────────
+  const novosArquivos = trArquivosTemp.filter(a => a instanceof File);
+  const arqsJaSalvos  = trArquivosTemp.filter(a => !!(a.id && a.nome_orig));
+  if(novosArquivos.length === 0 && arqsJaSalvos.length === 0){
+    showToast('Anexe o certificado do treinamento.','error'); return;
+  }
 
   const f = FUNCIONARIOS.find(x=>x.matricula===matricula);
   if(!f){ showToast('Funcionário não encontrado.','error'); return; }
 
   if(!f.nrsDetalhes) f.nrsDetalhes = {};
-  const temAnexo = trArquivosTemp.length > 0;
+  const temAnexo = true; // Validamos acima que há ao menos 1 arquivo
   f.nrsDetalhes[nrNome] = {
     tipo, cargaHoraria, dataRealizacao, validadeMeses, dataVencimento, instituicao,
-    arquivosNomes: trArquivosTemp.map(a=>a.name),
+    arquivosNomes: trArquivosTemp.map(a => a.nome_orig || a.name),
   };
 
-  // Status calculado a partir dos detalhes reais — NÃO setar 'ok' manualmente
   if(!f.nrsStatus) f.nrsStatus = {};
   const novoStatus = trCalcularStatus(dataVencimento, temAnexo);
   f.nrsStatus[nrNome] = novoStatus;
 
   rhSalvarFuncionarios();
-  // Sincronizar com API (persistir nrsDetalhes atualizado)
+
+  // Sincronizar com API
   const fAtualizado = FUNCIONARIOS.find(x=>x.matricula===matricula);
   if(fAtualizado && fAtualizado.id){
     _funcAtualSalvo = fAtualizado;
-    apiFuncionarios.editar(fAtualizado.id, fAtualizado).catch(e=>console.warn('Sync treinamento:', e));
+    try{ await apiFuncionarios.editar(fAtualizado.id, fAtualizado); }
+    catch(e){ console.warn('Sync treinamento:', e); }
     _funcAtualSalvo = null;
   }
+
+  // Upload de novos arquivos (certificado) com entidade = treinamento_NR-6, entidade_id = funcId
+  if(novosArquivos.length > 0 && funcId){
+    const entidade = trEntidade(nrNome);
+    try{
+      await apiArquivos.upload(entidade, funcId, novosArquivos);
+    } catch(e){
+      showToast('Treinamento salvo, mas erro ao enviar certificado: '+e.message,'warn');
+    }
+  }
+
   rhRenderTreinamentos();
   closeModal('modal-treinamento');
 
   const vencFmt = dataVencimento.split('-').reverse().join('/');
-  if(novoStatus==='sem_doc'){
-    showToast('⚠️ Treinamento salvo — mas sem certificado anexado. Anexe o arquivo para validar.','warn');
-  } else if(novoStatus==='ok'){
-    showToast('✅ '+nrNome+' registrado para '+f.nome.split(' ')[0]+'. Validade: '+vencFmt,'success');
-  } else if(novoStatus==='vencendo'){
+  if(novoStatus==='vencendo'){
     showToast('⚠️ '+nrNome+' salvo, mas vence em menos de 30 dias ('+vencFmt+').','warn');
   } else if(novoStatus==='vencida'){
     showToast('❌ '+nrNome+' registrado com data de vencimento vencida ('+vencFmt+').','error');
+  } else {
+    showToast('✅ '+nrNome+' registrado para '+f.nome.split(' ')[0]+'. Validade: '+vencFmt,'success');
   }
 }
 
@@ -6465,7 +6545,11 @@ function rhRenderTreinamentos(){
         // Atualizar cache nrsStatus para manter consistência com KPIs
         if(!f.nrsStatus) f.nrsStatus = {};
         f.nrsStatus[nr] = statusReal;
-        return `<td style="text-align:center;cursor:pointer" title="${nr}: clique para registrar/editar" onclick="trVerOuRegistrar('${f.matricula}','${nr.replace(/'/g,"\\'")}')">${rhBadgeNR(statusReal)}</td>`;
+        const temAnexoDet = det && (det.arquivosNomes||[]).length > 0;
+        const iconAnexo = temAnexoDet
+          ? `<span title="Ver certificado" onclick="event.stopPropagation();arquivosAbrir('${trEntidade(nr)}','${f.id}','Certificado — ${(f.nome||'').replace(/'/g,"\\'")} / ${nr.replace(/'/g,"\\'")}' )" style="cursor:pointer;font-size:10px;color:var(--blue);margin-left:2px">📎</span>`
+          : '';
+        return `<td style="text-align:center;cursor:pointer" title="${nr}: clique para registrar/editar" onclick="trVerOuRegistrar('${f.matricula}','${nr.replace(/'/g,"\\'")}')"><div style="display:inline-flex;align-items:center;justify-content:center;gap:2px">${rhBadgeNR(statusReal)}${iconAnexo}</div></td>`;
       }).join('');
       const obraNome = RDO_OBRAS[f.obraId]?.nome || OBRAS_LISTA.find(o=>o.id===f.obraId)?.nome || f.obraId || '—';
       return `<tr>
