@@ -4539,22 +4539,12 @@ function selectObra(el,nome){
   document.getElementById('obra-ativa-label').textContent=nome;
   document.querySelectorAll('.obras-menu-item').forEach(i=>i.classList.remove('active'));
   el.classList.add('active');
-  // Propagar obra ativa para window.obraAtiva (usado pelo RDPP e RDO)
+  // Propagar obra ativa para window.obraAtiva
   const obraObj = OBRAS_LISTA.find(o=>o.nome===nome);
   if(obraObj){
     window.obraAtiva = obraObj;
-    // Atualizar campo de obra no formulário RDO se estiver visível
-    const rdoDisplay=document.getElementById('rdo-obra-display');
-    const rdoHidden=document.getElementById('rdo-obra');
-    if(rdoDisplay) rdoDisplay.value=obraObj.nome;
-    if(rdoHidden) rdoHidden.value=obraObj.id;
-    // Atualizar campo de obra no formulário RDPP se estiver visível
-    const rdppDisplay=document.getElementById('rdpp-obra-display');
-    const rdppHidden=document.getElementById('rdpp-obra');
-    if(rdppDisplay) rdppDisplay.value=obraObj.nome;
-    if(rdppHidden) rdppHidden.value=obraObj.id;
-    if(document.getElementById('rdpp-cliente')) document.getElementById('rdpp-cliente').value=obraObj.cliente||'';
-    if(document.getElementById('rdpp-contrato')) document.getElementById('rdpp-contrato').value=obraObj.contrato||'';
+    // Propagar para TODOS os selects e inputs de obra do sistema
+    propagarObraAtivaTodos();
   }
   closeObrasMenu();
 }
@@ -6748,6 +6738,8 @@ function openModalFuncionario(){
   funcFecharDropdown();
   funcRenderNRs('');
   funcRenderArquivos();
+  // Auto-selecionar obra ativa
+  obraAtivaAutoSelect('func-obra');
   openModal('modal-funcionario');
 }
 
@@ -8090,6 +8082,10 @@ function obrasAtualizarDropdown(){
       window.obraAtiva = OBRAS_LISTA[0];
       atualLabel.textContent = OBRAS_LISTA[0].nome;
     }
+    // Marcar item ativo no menu
+    document.querySelectorAll('.obras-menu-item').forEach((el,i)=>{
+      el.classList.toggle('active', OBRAS_LISTA[i] && OBRAS_LISTA[i].id === window.obraAtiva.id);
+    });
   }
 }
 
@@ -8116,6 +8112,8 @@ function obrasAtualizarSelects(){
   }
   // Atualizar todos os selects de filtro de obra (classe obra-filtro-select)
   if(typeof popularFiltrosObra === 'function') popularFiltrosObra();
+  // Propagar obra ativa para todos os selects de formulário
+  if(typeof propagarObraAtivaTodos === 'function') propagarObraAtivaTodos();
 }
 
 function obrasOpenModal(id){
@@ -8806,14 +8804,16 @@ function repoPopularObrasSelect(selId){
   const sel = document.getElementById(selId);
   if(!sel) return;
   const atual = sel.value;
-  sel.innerHTML = '<option value="">Todas as obras</option>';
+  sel.innerHTML = '<option value="">Selecione a obra...</option>';
   (OBRAS_LISTA||[]).forEach(o=>{
     const opt = document.createElement('option');
     opt.value = o.id||o.nome;
     opt.textContent = o.nome;
     sel.appendChild(opt);
   });
+  // Manter valor anterior se existia, senão aplicar obra ativa
   if(atual) sel.value = atual;
+  else if(window.obraAtiva) sel.value = window.obraAtiva.id||'';
 }
 
 async function repoOpenModal(tipo, titulo, id=null){
@@ -8850,6 +8850,9 @@ async function repoOpenModal(tipo, titulo, id=null){
   document.getElementById('repo-arquivos-lista').innerHTML = '';
   const fi = document.getElementById('repo-file-input');
   if(fi) fi.value='';
+
+  // Auto-selecionar obra ativa quando criando novo documento
+  if(!id) obraAtivaAutoSelect('repo-obra');
 
   // Preencher se editando
   if(id){
@@ -9878,6 +9881,8 @@ function openModalAta(){
       op.value=o.id; op.textContent=o.nome;
       sel.appendChild(op);
     });
+    // Auto-selecionar obra ativa
+    obraAtivaAutoSelect('ata-obra');
   }
   // Data padrão = hoje
   const hoje = new Date();
@@ -9929,8 +9934,43 @@ function popularFiltrosObra(){
       op.value=o.id; op.textContent=o.nome;
       sel.appendChild(op);
     });
+    // Auto-selecionar obra ativa se o select não tinha valor definido
     if(valAtual) sel.value=valAtual;
+    else if(window.obraAtiva) sel.value = window.obraAtiva.id||'';
   });
+}
+
+// ── Utilitário: aplica obra ativa a qualquer select de obra ──
+// Uso: obraAtivaAutoSelect('ata-obra') — só aplica se select estiver vazio
+function obraAtivaAutoSelect(selId){
+  if(!window.obraAtiva) return;
+  const sel = document.getElementById(selId);
+  if(!sel) return;
+  // Só auto-seleciona se o select não tiver valor já definido
+  if(!sel.value) sel.value = window.obraAtiva.id || '';
+}
+
+// ── Propagar obra ativa para TODOS os selects de obra do sistema ──
+function propagarObraAtivaTodos(){
+  if(!window.obraAtiva) return;
+  const id = window.obraAtiva.id || '';
+  // Selects de formulário/modal (não filtros — esses ficam com "Todas")
+  const SELECTS_OBRA = ['ata-obra','repo-obra','func-obra','reg-obra'];
+  SELECTS_OBRA.forEach(selId=>{
+    const sel = document.getElementById(selId);
+    if(sel && sel.options.length > 1) sel.value = id;
+  });
+  // RDO e RDPP (display + hidden)
+  const rdoDisplay = document.getElementById('rdo-obra-display');
+  const rdoHidden  = document.getElementById('rdo-obra');
+  if(rdoDisplay) rdoDisplay.value = window.obraAtiva.nome||'';
+  if(rdoHidden)  rdoHidden.value  = id;
+  const rdppDisplay = document.getElementById('rdpp-obra-display');
+  const rdppHidden  = document.getElementById('rdpp-obra');
+  if(rdppDisplay) rdppDisplay.value = window.obraAtiva.nome||'';
+  if(rdppHidden)  rdppHidden.value  = id;
+  if(document.getElementById('rdpp-cliente'))  document.getElementById('rdpp-cliente').value  = window.obraAtiva.cliente||'';
+  if(document.getElementById('rdpp-contrato')) document.getElementById('rdpp-contrato').value = window.obraAtiva.contrato||'';
 }
 
 // ═══════════════════════════════════════════════════════
