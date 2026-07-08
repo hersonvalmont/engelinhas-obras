@@ -125,14 +125,22 @@ const apiArquivos = {
   upload: async (entidade, entidade_id, files) => {
     const fd = new FormData();
     fd.append('entidade', entidade);
-    fd.append('entidade_id', entidade_id);
+    fd.append('entidade_id', String(entidade_id));
     for (const f of files) fd.append('files', f);
     return apiFetch('POST', '/arquivos/upload', fd, true);
   },
 
+  // URL para visualização inline (PDF / imagem abre no browser)
+  // Inclui token na query string pois é usada em <iframe src> / <img src>
+  viewUrl: (id) => API_BASE + '/api/arquivos/' + id + '/view?token=' + encodeURIComponent(_token),
+
+  // URL de download forçado (também inclui token)
+  downloadUrl: (id) => API_BASE + '/api/arquivos/' + id + '/download?token=' + encodeURIComponent(_token),
+
+  // Dispara download forçado via <a>
   download: (id, nomeOrig) => {
     const a = document.createElement('a');
-    a.href = API_BASE + '/api/arquivos/' + id + '/download';
+    a.href = API_BASE + '/api/arquivos/' + id + '/download?token=' + encodeURIComponent(_token);
     a.download = nomeOrig || 'arquivo';
     a.target = '_blank';
     document.body.appendChild(a);

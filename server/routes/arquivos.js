@@ -46,13 +46,28 @@ router.get('/', (req, res) => {
   res.json(lista);
 });
 
-// GET /api/arquivos/:id/download
+// GET /api/arquivos/:id/download  — força download com nome original
 router.get('/:id/download', (req, res) => {
   const arq = db.prepare('SELECT * FROM arquivos WHERE id=?').get(req.params.id);
   if (!arq) return res.status(404).json({ erro: 'Arquivo não encontrado.' });
   const filePath = path.join(UPLOADS_DIR, arq.nome_salvo);
   if (!fs.existsSync(filePath)) return res.status(404).json({ erro: 'Arquivo físico não encontrado.' });
-  res.download(filePath, arq.nome_orig);
+  res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(arq.nome_orig)}`);
+  res.setHeader('Content-Type', arq.mime || 'application/octet-stream');
+  res.sendFile(filePath);
+});
+
+// GET /api/arquivos/:id/view  — visualização inline (PDF, imagens, etc.)
+router.get('/:id/view', (req, res) => {
+  const arq = db.prepare('SELECT * FROM arquivos WHERE id=?').get(req.params.id);
+  if (!arq) return res.status(404).json({ erro: 'Arquivo não encontrado.' });
+  const filePath = path.join(UPLOADS_DIR, arq.nome_salvo);
+  if (!fs.existsSync(filePath)) return res.status(404).json({ erro: 'Arquivo físico não encontrado.' });
+  res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(arq.nome_orig)}`);
+  res.setHeader('Content-Type', arq.mime || 'application/octet-stream');
+  // Permite que iframes e object tags carreguem o arquivo
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.sendFile(filePath);
 });
 
 // DELETE /api/arquivos/:id

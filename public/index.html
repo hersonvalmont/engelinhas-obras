@@ -6230,6 +6230,7 @@ function rhRenderFuncionarios(){
         <td>
           <div style="display:flex;gap:4px">
             <button class="btn btn-sm" onclick="funcEditar('${f.matricula}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+            ${f.id ? `<button class="btn btn-sm" onclick="arquivosAbrir('funcionarios','${f.id}','Documentos — ${(f.nome||'').replace(/'/g,"\\'")}')" title="Ver documentos" style="color:var(--blue)"><i data-lucide="paperclip" style="width:12px;height:12px"></i></button>` : ''}
             <button class="btn btn-sm ${ativo?'':'btn-primary'}" onclick="funcToggleAtivo('${f.matricula}')" title="${ativo?'Desativar':'Ativar'}">
               ${ativo?'<i data-lucide="user-x" style="width:12px;height:12px"></i>':'<i data-lucide="user-check" style="width:12px;height:12px"></i>'}
             </button>
@@ -6595,14 +6596,56 @@ function funcRemoverArquivo(idx){
 function funcRenderArquivos(){
   const el=document.getElementById('func-arquivos-lista');
   if(!el) return;
-  el.innerHTML = funcArquivosTemp.map((f,i)=>`
+  if(!funcArquivosTemp.length){ el.innerHTML=''; return; }
+  el.innerHTML = funcArquivosTemp.map((f,i)=>{
+    const isServidor = !!(f.id && f.nome_orig);
+    const nome     = isServidor ? f.nome_orig : (f.name || '(arquivo)');
+    const tamanho  = isServidor ? f.tamanho   : (f.size || 0);
+    const tag      = isServidor
+      ? `<span style="font-size:10px;color:var(--green);background:var(--green-light,#d1fae5);padding:1px 5px;border-radius:10px">✓ salvo</span>`
+      : `<span style="font-size:10px;color:var(--amber,#d97706);background:#fef3c7;padding:1px 5px;border-radius:10px">⬆ novo</span>`;
+    const btnVer = isServidor
+      ? `<button onclick="arqAbrirPreviewModal(${f.id},'${nome.replace(/'/g,'\\\'')}')" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:2px 5px;font-size:12px;display:flex;align-items:center" title="Visualizar"><i data-lucide="eye" style="width:13px;height:13px"></i></button>`
+      : '';
+    const btnBaixar = isServidor
+      ? `<button onclick="apiArquivos.download(${f.id},'${nome.replace(/'/g,'\\\'')}')" style="background:none;border:none;cursor:pointer;color:var(--blue);padding:2px 5px;font-size:12px;display:flex;align-items:center" title="Baixar"><i data-lucide="download" style="width:13px;height:13px"></i></button>`
+      : '';
+    const btnExcluir = isServidor
+      ? `<button onclick="funcExcluirArquivoExistente(${f.id},${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);display:flex" title="Remover"><i data-lucide="x" style="width:13px;height:13px"></i></button>`
+      : `<button onclick="funcRemoverArquivo(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);display:flex" title="Remover"><i data-lucide="x" style="width:13px;height:13px"></i></button>`;
+    return `
     <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg3);border-radius:var(--radius);font-size:12px">
       <i data-lucide="file" style="width:14px;height:14px;color:var(--text3);flex-shrink:0"></i>
-      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span>
-      <span style="color:var(--text3);font-size:11px">${(f.size/1024).toFixed(0)} KB</span>
-      <button onclick="funcRemoverArquivo(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);display:flex" title="Remover"><i data-lucide="x" style="width:13px;height:13px"></i></button>
-    </div>`).join('');
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${nome}">${nome}</span>
+      <span style="color:var(--text3);font-size:11px">${tamanho>0?(tamanho/1024).toFixed(0)+' KB':''}</span>
+      ${tag}${btnVer}${btnBaixar}${btnExcluir}
+    </div>`;
+  }).join('');
   if(window.lucide) lucide.createIcons();
+}
+
+async function funcExcluirArquivoExistente(arqId, idx){
+  if(!confirm('Remover este arquivo permanentemente?')) return;
+  try{
+    await apiArquivos.excluir(arqId);
+    funcArquivosTemp.splice(idx,1);
+    funcRenderArquivos();
+    showToast('Arquivo removido.','warn');
+  } catch(e){ showToast('Erro ao remover: '+e.message,'error'); }
+}
+
+// Abre o visualizador para um arquivo específico (a partir da lista de arquivos no modal de funcionário)
+function arqAbrirPreviewModal(id, nome){
+  // Buscar mime pelo id se possível, senão deixar null (vai tentar iframe)
+  document.getElementById('arq-viewer-titulo').textContent = nome || 'Visualizar arquivo';
+  document.getElementById('arq-viewer-subtitulo').textContent = '';
+  document.getElementById('arq-lista-itens').innerHTML = '';
+  document.getElementById('arq-lista-loading').style.display = 'none';
+  document.getElementById('arq-lista-vazia').style.display = 'none';
+  arqFecharPreview();
+  openModal('modal-arquivos-viewer');
+  // Abre o preview diretamente
+  arqAbrirPreview(id, nome, null);
 }
 
 let funcEditandoMatricula = null; // null = novo, matricula = editando
@@ -6625,7 +6668,7 @@ function openModalFuncionario(){
   openModal('modal-funcionario');
 }
 
-function funcEditar(matricula){
+async function funcEditar(matricula){
   const f = FUNCIONARIOS.find(x=>x.matricula===matricula);
   if(!f){ showToast('Funcionário não encontrado.','error'); return; }
   funcEditandoMatricula = matricula;
@@ -6646,6 +6689,13 @@ function funcEditar(matricula){
   document.querySelectorAll('#func-nrs-lista input[type=checkbox]').forEach(c=>{
     if(nrsExigidas.includes(c.value)) c.checked=true;
   });
+  // Carregar arquivos existentes do servidor
+  if(f.id){
+    try{
+      const arqsExistentes = await apiArquivos.listar('funcionarios', f.id);
+      funcArquivosTemp = arqsExistentes || [];
+    } catch(e){ funcArquivosTemp = []; }
+  }
   funcRenderArquivos();
   openModal('modal-funcionario');
 }
@@ -6684,9 +6734,14 @@ function funcSalvar(){
     Object.keys(nrsStatus).forEach(nr=>{ if(!nrsExigidas.includes(nr)) delete nrsStatus[nr]; });
     const nrsDetalhes = {...(f.nrsDetalhes||{})};
     Object.keys(nrsDetalhes).forEach(nr=>{ if(!nrsExigidas.includes(nr)) delete nrsDetalhes[nr]; });
+    const novosArquivos = funcArquivosTemp.filter(a => a instanceof File);
     const dados = { nome, cpf, funcao, obraId, regime, nrsExigidas, nrsStatus, nrsDetalhes,
-      docs: (funcArquivosTemp.length>0||f.docs==='Completo') ? 'Completo' : 'Pendente' };
-    apiFuncionarios.editar(f.id, dados).then(()=>{
+      docs: (novosArquivos.length>0||f.docs==='Completo') ? 'Completo' : 'Pendente' };
+    apiFuncionarios.editar(f.id, dados).then(async ()=>{
+      if(novosArquivos.length > 0){
+        try{ await apiArquivos.upload('funcionarios', f.id, novosArquivos); }
+        catch(e){ showToast('Funcionário salvo, mas erro ao enviar arquivo(s): '+e.message,'warn'); }
+      }
       closeModal('modal-funcionario');
       showToast('Funcionário "'+nome+'" atualizado com sucesso.','success');
       rhCarregarFuncionarios();
@@ -6695,12 +6750,17 @@ function funcSalvar(){
     // NOVO via API
     const hoje = new Date();
     const admissao = String(hoje.getDate()).padStart(2,'0')+'/'+String(hoje.getMonth()+1).padStart(2,'0')+'/'+hoje.getFullYear();
+    const novosArquivos = funcArquivosTemp.filter(a => a instanceof File);
     const dados = {
       nome, cpf, funcao, obraId, admissao, regime,
-      docs: funcArquivosTemp.length>0 ? 'Completo' : 'Pendente',
+      docs: novosArquivos.length>0 ? 'Completo' : 'Pendente',
       nrsExigidas, nrsStatus: {}, nrsDetalhes: {}, ativo: true
     };
-    apiFuncionarios.criar(dados).then(novo=>{
+    apiFuncionarios.criar(dados).then(async novo=>{
+      if(novosArquivos.length > 0 && novo && novo.id){
+        try{ await apiArquivos.upload('funcionarios', novo.id, novosArquivos); }
+        catch(e){ showToast('Funcionário cadastrado, mas erro ao enviar arquivo(s): '+e.message,'warn'); }
+      }
       closeModal('modal-funcionario');
       showToast('Funcionário "'+nome+'" cadastrado. Matrícula: '+(novo.matricula||''),'success');
       rhCarregarFuncionarios();
@@ -8490,7 +8550,11 @@ async function asoOpenModal(id=null){
     document.getElementById('aso-data-emissao').value = aso.dataEmissao||'';
     document.getElementById('aso-validade').value = aso.validade||'';
     document.getElementById('aso-obs').value = aso.obs||'';
-    asoArquivosTemp = aso.arquivos ? [...aso.arquivos] : [];
+    // Carregar arquivos existentes do servidor
+    try{
+      const arqsExistentes = await apiArquivos.listar('asos', id);
+      asoArquivosTemp = arqsExistentes || [];
+    } catch(e){ asoArquivosTemp = []; }
     repoRenderArquivos('aso');
   } else {
     document.getElementById('aso-modal-titulo').textContent = 'Registrar ASO';
@@ -8520,8 +8584,20 @@ function asoSalvar(){
   const nomeFuncionario = func ? func.nome : matricula;
   const dados = { matricula, nomeFuncionario, tipo, resultado, medico, crm, dataEmissao, validade, obs };
 
+  // Filtrar apenas File objects novos (não objetos do servidor)
+  const novosArquivos = asoArquivosTemp.filter(a => a instanceof File);
+
   const op = asoEditandoId ? apiAsos.editar(asoEditandoId, dados) : apiAsos.criar(dados);
-  op.then(()=>{
+  op.then(async (salvo)=>{
+    const asoId = asoEditandoId || (salvo && salvo.id);
+    // Upload de novos arquivos, se houver
+    if(novosArquivos.length > 0 && asoId){
+      try{
+        await apiArquivos.upload('asos', asoId, novosArquivos);
+      } catch(e){
+        showToast('ASO salvo, mas erro ao enviar arquivo(s): '+e.message,'warn');
+      }
+    }
     showToast(asoEditandoId?'ASO atualizado com sucesso.':'ASO registrado com sucesso.','success');
     closeModal('modal-aso');
     asoCarregar().then(()=>asoRender());
@@ -8572,7 +8648,9 @@ function asoRender(){
       <td><span class="badge ${st.cls}">${st.label}</span></td>
       <td>
         <div style="display:flex;gap:4px;align-items:center">
-          ${qtdArq>0?`<span title="${qtdArq} arquivo(s)" style="font-size:11px;color:var(--text3);margin-right:2px"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</span>`:''}
+          ${qtdArq>0
+            ? `<button class="btn btn-sm" onclick="arquivosAbrir('asos','${a.id}','ASO — ${(a.nomeFuncionario||'').replace(/'/g,"\\'")} / ${(a.tipo||'').replace(/'/g,"\\'")}','${qtdArq} arquivo(s)')" title="${qtdArq} arquivo(s)" style="display:flex;align-items:center;gap:3px;color:var(--blue)"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</button>`
+            : ''}
           <button class="btn btn-sm" onclick="asoOpenModal('${a.id}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
           <button class="btn btn-sm" onclick="asoExcluir('${a.id}')" title="Excluir" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
         </div>
@@ -8653,7 +8731,7 @@ function repoPopularObrasSelect(selId){
   if(atual) sel.value = atual;
 }
 
-function repoOpenModal(tipo, titulo, id=null){
+async function repoOpenModal(tipo, titulo, id=null){
   repoContextoAtual = tipo;
   repoEditandoId = id;
   repoArquivosTemp = [];
@@ -8690,8 +8768,9 @@ function repoOpenModal(tipo, titulo, id=null){
 
   // Preencher se editando
   if(id){
-    const lista = repoCarregar(tipo);
-    const reg = lista.find(r=>r.id===id);
+    let lista = [];
+    try{ lista = await repoCarregar(tipo); } catch(e){ lista=[]; }
+    const reg = lista.find(r=>String(r.id)===String(id));
     if(!reg){ showToast('Registro não encontrado.','error'); return; }
     document.getElementById('repo-funcionario').value = reg.matricula||'';
     document.getElementById('repo-titulo').value = reg.titulo||'';
@@ -8702,7 +8781,11 @@ function repoOpenModal(tipo, titulo, id=null){
     document.getElementById('repo-responsavel').value = reg.responsavel||'';
     document.getElementById('repo-status').value = reg.status||'Vigente';
     document.getElementById('repo-obs').value = reg.obs||'';
-    repoArquivosTemp = reg.arquivos ? [...reg.arquivos] : [];
+    // Carregar arquivos existentes do servidor
+    try{
+      const arqsExistentes = await apiArquivos.listar('documentos', id);
+      repoArquivosTemp = arqsExistentes || [];
+    } catch(e){ repoArquivosTemp = []; }
     repoRenderArquivos('repo');
   }
 
@@ -8731,9 +8814,21 @@ function repoSalvar(){
   const obra = (OBRAS_LISTA||[]).find(o=>(o.id||o.nome)===obraId);
   const obraNome = obra ? obra.nome : '';
 
+  // Filtrar apenas File objects novos
+  const novosArquivos = repoArquivosTemp.filter(a => a instanceof File);
+
   const dados = { tipo_doc: tipo, matricula, nomeFuncionario, titulo, ca, tipo:tipoDoc, data, obraId, obraNome, responsavel, status, obs };
   const op = repoEditandoId ? apiDocumentos.editar(repoEditandoId, dados) : apiDocumentos.criar(dados);
-  op.then(()=>{
+  op.then(async (salvo)=>{
+    const docId = repoEditandoId || (salvo && salvo.id);
+    // Upload de novos arquivos, se houver
+    if(novosArquivos.length > 0 && docId){
+      try{
+        await apiArquivos.upload('documentos', docId, novosArquivos);
+      } catch(e){
+        showToast('Registro salvo, mas erro ao enviar arquivo(s): '+e.message,'warn');
+      }
+    }
     showToast(repoEditandoId?'Registro atualizado com sucesso.':'Registro salvo com sucesso.','success');
     closeModal('modal-repo');
     repoRender(tipo);
@@ -8783,7 +8878,7 @@ function _repoRenderCom(tipo, lista, tbody, buscaId, isEpi){
         <td style="font-size:12px">${r.obraNome||'—'}</td>
         <td style="text-align:center">
           ${qtdArq>0
-            ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--blue);cursor:pointer" onclick="repoVerArquivos('${tipo}','${r.id}')" title="Ver arquivos"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</span>`
+            ? `<button class="btn btn-sm" onclick="arquivosAbrir('documentos','${r.id}','EPI — ${(r.titulo||'').replace(/'/g,"\\'")}','${qtdArq} arquivo(s)')" style="display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--blue)" title="Ver arquivos"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</button>`
             : `<span style="font-size:11px;color:var(--text3)">—</span>`}
         </td>
         <td><span class="badge ${badgeSt}">${r.status||'—'}</span></td>
@@ -8803,7 +8898,7 @@ function _repoRenderCom(tipo, lista, tbody, buscaId, isEpi){
         <td style="font-size:12px">${r.responsavel||'—'}</td>
         <td style="text-align:center">
           ${qtdArq>0
-            ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--blue);cursor:pointer" onclick="repoVerArquivos('${tipo}','${r.id}')" title="Ver arquivos"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</span>`
+            ? `<button class="btn btn-sm" onclick="arquivosAbrir('documentos','${r.id}','${(r.titulo||'').replace(/'/g,"\\'")}','${qtdArq} arquivo(s)')" style="display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--blue)" title="Ver arquivos"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</button>`
             : `<span style="font-size:11px;color:var(--text3)">—</span>`}
         </td>
         <td><span class="badge ${badgeSt}">${r.status||'—'}</span></td>
@@ -8837,25 +8932,145 @@ function repoExcluir(tipo, id){
   apiDocumentos.excluir(id).then(()=>{ repoRender(tipo); showToast('Registro excluído.','warn'); }).catch(e=>showToast(e.message,'error'));
 }
 
-function repoVerArquivos(tipo, id){
-  showToast('Visualização de arquivos disponível em breve.','info'); return;
-  const lista = [];
-  const reg = lista.find(r=>r.id===id);
-  if(!reg || !(reg.arquivos||[]).length){ showToast('Nenhum arquivo anexado.','info'); return; }
-  const nomes = reg.arquivos.map(a=>a.nome||a.name||'(arquivo)').join('\n');
-  alert('Arquivos anexados:\n\n'+nomes+'\n\n(Os arquivos são armazenados como referência. Para visualizar, re-abra o registro e os arquivos serão listados.)');
+// ── ARQUIVOS — VIEWER MODAL ─────────────────────────────────────
+// Abre o modal de visualização/download de arquivos de um registro
+async function arquivosAbrir(entidade, entidadeId, titulo, subtitulo){
+  document.getElementById('arq-viewer-titulo').textContent = titulo || 'Arquivos';
+  document.getElementById('arq-viewer-subtitulo').textContent = subtitulo || '';
+  document.getElementById('arq-lista-itens').innerHTML = '';
+  document.getElementById('arq-lista-loading').style.display = '';
+  document.getElementById('arq-lista-vazia').style.display = 'none';
+  arqFecharPreview();
+  openModal('modal-arquivos-viewer');
+
+  try{
+    const lista = await apiArquivos.listar(entidade, entidadeId);
+    document.getElementById('arq-lista-loading').style.display = 'none';
+    if(!lista || !lista.length){
+      document.getElementById('arq-lista-vazia').style.display = '';
+      return;
+    }
+    document.getElementById('arq-lista-itens').innerHTML = lista.map(arq=>{
+      const icon = arqIcone(arq.mime||'');
+      const tamanho = arqFmtSize(arq.tamanho);
+      return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px">
+        <span style="font-size:20px;flex-shrink:0">${icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${arq.nome_orig}">${arq.nome_orig}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px">${tamanho}${arq.mime?' · '+arq.mime:''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-sm" onclick="arqAbrirPreview(${arq.id},'${(arq.nome_orig||'').replace(/'/g,"\\'")}','${(arq.mime||'').replace(/'/g,"\\'")}' )" title="Visualizar" style="display:flex;align-items:center;gap:4px">
+            <i data-lucide="eye" style="width:13px;height:13px"></i> Ver
+          </button>
+          <button class="btn btn-sm btn-primary" onclick="apiArquivos.download(${arq.id},'${(arq.nome_orig||'').replace(/'/g,"\\'")}' )" title="Baixar" style="display:flex;align-items:center;gap:4px">
+            <i data-lucide="download" style="width:13px;height:13px"></i> Baixar
+          </button>
+          <button class="btn btn-sm" onclick="arqExcluirDoViewer(${arq.id},this)" title="Excluir" style="color:#ef4444;display:flex;align-items:center;gap:4px">
+            <i data-lucide="trash-2" style="width:13px;height:13px"></i>
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+    if(typeof lucide !== 'undefined') lucide.createIcons();
+  } catch(e){
+    document.getElementById('arq-lista-loading').style.display = 'none';
+    document.getElementById('arq-lista-itens').innerHTML = `<div style="padding:24px;text-align:center;color:#ef4444">Erro ao carregar arquivos: ${e.message}</div>`;
+  }
 }
 
-// ═══════════════════════════════════════════════════════
-// ARQUIVO — HANDLER COMPARTILHADO (ASO + REPO)
-// ═══════════════════════════════════════════════════════
+function arqIcone(mime){
+  if(!mime) return '📄';
+  if(mime.includes('pdf')) return '📕';
+  if(mime.startsWith('image/')) return '🖼️';
+  if(mime.includes('word')||mime.includes('document')) return '📝';
+  if(mime.includes('sheet')||mime.includes('excel')||mime.includes('csv')) return '📊';
+  if(mime.includes('zip')||mime.includes('compressed')||mime.includes('rar')) return '🗜️';
+  if(mime.includes('video')) return '🎬';
+  if(mime.includes('audio')) return '🎵';
+  return '📄';
+}
+
+function arqFmtSize(bytes){
+  if(!bytes) return '';
+  if(bytes < 1024) return bytes+'B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+'KB';
+  return (bytes/(1024*1024)).toFixed(1)+'MB';
+}
+
+function arqAbrirPreview(id, nome, mime){
+  // apiArquivos.viewUrl() e downloadUrl() já incluem ?token= automaticamente
+  const viewUrl = apiArquivos.viewUrl(id);
+  const dlUrl   = apiArquivos.downloadUrl(id);
+
+  document.getElementById('arq-preview-nome').textContent = nome || 'Arquivo';
+  document.getElementById('arq-preview-download-btn').href = dlUrl;
+  document.getElementById('arq-preview-download-btn').download = nome || 'arquivo';
+  document.getElementById('arq-fallback-download-btn').href = dlUrl;
+  document.getElementById('arq-fallback-download-btn').download = nome || 'arquivo';
+
+  const iframe    = document.getElementById('arq-preview-iframe');
+  const img       = document.getElementById('arq-preview-img');
+  const fallback  = document.getElementById('arq-preview-fallback');
+  iframe.style.display = 'none';
+  img.style.display    = 'none';
+  fallback.style.display = 'none';
+  iframe.src = '';
+  img.src = '';
+
+  if(mime && mime.startsWith('image/')){
+    img.src = viewUrl;
+    img.style.display = 'block';
+  } else if(!mime || mime === 'application/pdf'){
+    iframe.src = viewUrl;
+    iframe.style.display = 'block';
+  } else {
+    // Para outros tipos (Word, Excel, etc.) — mostrar fallback com download
+    fallback.style.display = '';
+  }
+
+  document.getElementById('arq-preview-wrap').style.display = '';
+  document.getElementById('arq-lista-wrap').style.display = 'none';
+  if(typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function arqFecharPreview(){
+  const iframe = document.getElementById('arq-preview-iframe');
+  if(iframe) iframe.src = '';
+  const img = document.getElementById('arq-preview-img');
+  if(img) img.src = '';
+  const pw = document.getElementById('arq-preview-wrap');
+  if(pw) pw.style.display = 'none';
+  const lw = document.getElementById('arq-lista-wrap');
+  if(lw) lw.style.display = '';
+}
+
+async function arqExcluirDoViewer(id, btnEl){
+  if(!confirm('Remover este arquivo permanentemente?')) return;
+  try{
+    await apiArquivos.excluir(id);
+    showToast('Arquivo removido.','warn');
+    // Remover a linha do DOM
+    const linha = btnEl.closest('div[style*="border-radius:8px"]');
+    if(linha) linha.remove();
+    // Verificar se ficou vazio
+    const itens = document.getElementById('arq-lista-itens');
+    if(itens && !itens.children.length){
+      document.getElementById('arq-lista-vazia').style.display = '';
+    }
+  } catch(e){ showToast('Erro ao remover: '+e.message,'error'); }
+}
+
+// ── ARQUIVOS — FUNCIONÁRIO ───────────────────────────────────────
+// (Mantém a lógica já existente de funcArquivosTemp com File objects reais)
 function repoAdicionarArquivos(ctx, files){
   if(!files || !files.length) return;
   const arr = ctx === 'aso' ? asoArquivosTemp : repoArquivosTemp;
   Array.from(files).forEach(file=>{
-    // Verificar duplicata por nome
-    if(arr.find(a=>(a.nome||a.name)===file.name)) return;
-    arr.push({ nome: file.name, tamanho: file.size, tipo: file.type, adicionadoEm: new Date().toISOString() });
+    // Verificar duplicata por nome (apenas arquivos novos — File objects têm .name)
+    if(arr.find(a=>(a.name||a.nome_orig||a.nome)===file.name)) return;
+    arr.push(file); // Armazena o File object real para poder fazer upload
   });
   repoRenderArquivos(ctx);
 }
@@ -8883,19 +9098,50 @@ function repoRenderArquivos(ctx){
     return '📄';
   }
 
-  lista.innerHTML = arr.map((a,i)=>`
+  lista.innerHTML = arr.map((a,i)=>{
+    // Suporta File object (novo) e objeto do servidor (existente: {id, nome_orig, mime, tamanho})
+    const isServidor = !!(a.id && a.nome_orig);
+    const nome    = isServidor ? a.nome_orig : (a.name || a.nome || '(arquivo)');
+    const tamanho = isServidor ? a.tamanho   : (a.size  || a.tamanho || 0);
+    const tipo    = isServidor ? (a.mime||'')  : (a.type  || a.tipo   || '');
+    const tag     = isServidor
+      ? `<span style="font-size:10px;color:var(--green);background:var(--green-light,#d1fae5);padding:1px 5px;border-radius:10px">✓ salvo</span>`
+      : `<span style="font-size:10px;color:var(--amber,#d97706);background:#fef3c7;padding:1px 5px;border-radius:10px">⬆ novo</span>`;
+    const btnVer = isServidor
+      ? `<button style="background:none;border:none;cursor:pointer;color:var(--blue);padding:2px 5px;font-size:12px;font-weight:500" onclick="arqAbrirPreview(${a.id},'${nome.replace(/'/g,'\\\'')}')" title="Visualizar">👁</button>`
+      : '';
+    const btnBaixar = isServidor
+      ? `<button style="background:none;border:none;cursor:pointer;color:var(--blue);padding:2px 5px;font-size:12px" onclick="apiArquivos.download(${a.id},'${nome.replace(/'/g,'\\\'')}')" title="Baixar">⬇</button>`
+      : '';
+    const btnExcluir = isServidor
+      ? `<button style="background:none;border:none;cursor:pointer;color:#ef4444;padding:2px 4px;font-size:14px;line-height:1" onclick="repoExcluirArquivoExistente('${ctx}',${a.id},${i})" title="Remover do servidor">×</button>`
+      : `<button style="background:none;border:none;cursor:pointer;color:#ef4444;padding:2px 4px;font-size:14px;line-height:1" onclick="repoRemoverArquivo('${ctx}',${i})" title="Remover">×</button>`;
+    return `
     <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)">
-      <span style="font-size:16px">${fileIcon(a.tipo)}</span>
-      <span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.nome}">${a.nome}</span>
-      <span style="font-size:11px;color:var(--text3);min-width:40px;text-align:right">${fmtSize(a.tamanho)}</span>
-      <button style="background:none;border:none;cursor:pointer;color:#ef4444;padding:2px 4px;font-size:14px;line-height:1" onclick="repoRemoverArquivo('${ctx}',${i})" title="Remover">×</button>
-    </div>`).join('');
+      <span style="font-size:16px">${fileIcon(tipo)}</span>
+      <span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${nome}">${nome}</span>
+      <span style="font-size:11px;color:var(--text3);min-width:40px;text-align:right">${fmtSize(tamanho)}</span>
+      ${tag}
+      ${btnVer}${btnBaixar}${btnExcluir}
+    </div>`;
+  }).join('');
 }
 
 function repoRemoverArquivo(ctx, idx){
   const arr = ctx === 'aso' ? asoArquivosTemp : repoArquivosTemp;
   arr.splice(idx, 1);
   repoRenderArquivos(ctx);
+}
+
+async function repoExcluirArquivoExistente(ctx, arqId, idx){
+  if(!confirm('Remover este arquivo permanentemente?')) return;
+  try{
+    await apiArquivos.excluir(arqId);
+    const arr = ctx === 'aso' ? asoArquivosTemp : repoArquivosTemp;
+    arr.splice(idx, 1);
+    repoRenderArquivos(ctx);
+    showToast('Arquivo removido.','warn');
+  } catch(e){ showToast('Erro ao remover arquivo: '+e.message,'error'); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -9685,6 +9931,63 @@ function dashboardRender(){
   </div>
   <div class="debug-log" id="debug-log">
     <div class="debug-entry"><span class="de-time">--:--</span><span class="de-type info">INFO</span><span class="de-msg">Debug console pronto. Erros JS aparecerão aqui.</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODAL — VISUALIZADOR / GERENCIADOR DE ARQUIVOS
+     Usado por: ASO, EPI, Anexos Contratuais, Func Documentação
+════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-arquivos-viewer">
+  <div class="modal" style="max-width:760px;max-height:90vh;display:flex;flex-direction:column">
+    <div class="modal-header" style="flex-shrink:0">
+      <div>
+        <div class="modal-title" id="arq-viewer-titulo">Arquivos</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="arq-viewer-subtitulo"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-arquivos-viewer')"><i data-lucide="x"></i></button>
+    </div>
+
+    <!-- Área de preview inline (PDF / imagem) -->
+    <div id="arq-preview-wrap" style="display:none;flex:1;min-height:0;background:var(--bg3);border-bottom:1px solid var(--border);overflow:hidden">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border)">
+        <button onclick="arqFecharPreview()" class="btn btn-sm" style="display:flex;align-items:center;gap:4px">
+          <i data-lucide="arrow-left" style="width:13px;height:13px"></i> Voltar à lista
+        </button>
+        <span id="arq-preview-nome" style="font-size:12px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <a id="arq-preview-download-btn" href="#" download class="btn btn-sm btn-primary" style="display:flex;align-items:center;gap:4px">
+          <i data-lucide="download" style="width:13px;height:13px"></i> Baixar
+        </a>
+      </div>
+      <div style="height:calc(100% - 46px);overflow:hidden">
+        <iframe id="arq-preview-iframe" style="width:100%;height:100%;border:none;display:none"></iframe>
+        <img  id="arq-preview-img"    style="max-width:100%;max-height:100%;display:none;margin:auto;padding:16px;object-fit:contain" alt="preview">
+        <div  id="arq-preview-fallback" style="display:none;padding:32px;text-align:center;color:var(--text3)">
+          <i data-lucide="file-x" style="width:48px;height:48px;margin-bottom:12px;opacity:.4"></i>
+          <div style="font-size:14px;margin-bottom:16px">Pré-visualização não disponível para este tipo de arquivo.</div>
+          <a id="arq-fallback-download-btn" href="#" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:6px">
+            <i data-lucide="download" style="width:14px;height:14px"></i> Baixar arquivo
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de arquivos -->
+    <div id="arq-lista-wrap" style="flex:1;overflow-y:auto;padding:12px 16px;min-height:120px">
+      <div id="arq-lista-loading" style="text-align:center;padding:32px;color:var(--text3)">
+        <i data-lucide="loader" style="width:24px;height:24px;margin-bottom:8px;opacity:.5"></i>
+        <div style="font-size:13px">Carregando arquivos...</div>
+      </div>
+      <div id="arq-lista-vazia" style="display:none;text-align:center;padding:32px;color:var(--text3)">
+        <i data-lucide="paperclip" style="width:32px;height:32px;margin-bottom:10px;opacity:.3"></i>
+        <div style="font-size:13px">Nenhum arquivo anexado a este registro.</div>
+      </div>
+      <div id="arq-lista-itens" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
+    <div class="modal-footer" style="flex-shrink:0">
+      <button class="btn btn-secondary" onclick="closeModal('modal-arquivos-viewer')">Fechar</button>
+    </div>
   </div>
 </div>
 
