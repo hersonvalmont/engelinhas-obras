@@ -343,6 +343,7 @@ tbody tr:hover td{background:var(--bg3)}
 </style>
 </head>
 <body>
+<script src="/static/api.js"></script>
 
 <!-- ══ LOGO SVG TEMPLATE (reutilizado via JS) ════════ -->
 <template id="tpl-logo-lg">
@@ -4455,143 +4456,77 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 // ── AUTH ──────────────────────────────────────────────
-const USUARIO = {email:'guilherme@engelinhas.com.br',senha:'1234',nome:'Guilherme'};
+// ── AUTH (via API) ─────────────────────────────────────────────
 function doLogin(){
   const empresa = document.getElementById('inp-empresa').value.trim();
   const email   = document.getElementById('inp-email').value.trim().toLowerCase();
   const senha   = document.getElementById('inp-senha').value;
   const err     = document.getElementById('login-error');
-
-  // Sempre reler do localStorage — fonte única de verdade
-  let usuariosList = [];
-  try{
-    const raw = localStorage.getItem('engelinhas_usuarios_v1');
-    if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)&&p.length>0) usuariosList=p; }
-  }catch(e){ console.error('[doLogin] Erro ao ler storage:', e); }
-
-  // Fallback: seed padrão caso o storage esteja vazio
-  if(usuariosList.length===0){
-    usuariosList = [{email:'guilherme@engelinhas.com.br',senha:'1234',nome:'Guilherme Diniz',perfil:'Admin',empresa:'Engelinhas',ativo:true}];
-  }
-
-  // Sincronizar array em memória
-  if(typeof USUARIOS_LISTA !== 'undefined') USUARIOS_LISTA = usuariosList;
-
-  // Busca: email normalizado, senha exata (sem trim para preservar caracteres especiais)
-  const emailNorm = email.trim().toLowerCase();
-  const user = usuariosList.find(u =>
-    u.email.trim().toLowerCase() === emailNorm &&
-    u.senha === senha &&
-    u.ativo !== false
-  );
-
-  console.log('[doLogin] email digitado:', JSON.stringify(emailNorm));
-  console.log('[doLogin] senha digitada (len):', senha.length);
-  console.log('[doLogin] usuarios no storage:', usuariosList.length);
-  console.log('[doLogin] user encontrado:', !!user);
-
-  if(user){
-    localStorage.setItem('engelinhas_session', JSON.stringify({email:user.email, nome:user.nome, ts:Date.now()}));
-    localStorage.setItem('engelinhas_login_cache', JSON.stringify({empresa: empresa||user.empresa||'', email:user.email}));
-    _aplicarLogin(user);
-    err.style.display='none';
-  } else {
-    err.style.display='block';
-    // Diagnóstico automático no console
-    const candidato = usuariosList.find(u => u.email.trim().toLowerCase() === emailNorm);
-    if(candidato){
-      console.warn('[doLogin] Usuário encontrado mas senha não bate.');
-      console.warn('[doLogin] Senha armazenada (len):', candidato.senha.length, '| ativo:', candidato.ativo);
-    } else {
-      console.warn('[doLogin] Nenhum usuário com este e-mail no storage.');
-      console.warn('[doLogin] E-mails cadastrados:', usuariosList.map(u=>u.email));
-    }
-  }
+  const btn     = document.querySelector('.login-btn');
+  if (!email || !senha) { err.style.display='block'; err.textContent='Preencha e-mail e senha.'; return; }
+  err.style.display='none';
+  if(btn){ btn.disabled=true; btn.textContent='Entrando...'; }
+  apiLogin(email, senha)
+    .then(user => {
+      localStorage.setItem('engelinhas_login_cache', JSON.stringify({ empresa: empresa||user.empresa||'', email: user.email }));
+      _aplicarLogin(user);
+      _recarregarModulos();
+    })
+    .catch(e => {
+      err.style.display='block';
+      err.textContent = e.message || 'Credenciais inválidas.';
+    })
+    .finally(() => { if(btn){ btn.disabled=false; btn.textContent='Entrar'; } });
 }
 
 function loginDiag(){
   const diag = document.getElementById('login-diag');
-  const emailDigitado = document.getElementById('inp-email').value.trim().toLowerCase();
-  const senhaDigitada = document.getElementById('inp-senha').value;
-
-  let raw='', lista=[];
-  try{ raw=localStorage.getItem('engelinhas_usuarios_v1')||''; lista=JSON.parse(raw||'[]'); }catch(e){}
-  if(!Array.isArray(lista)||lista.length===0){
-    lista=[{email:'guilherme@engelinhas.com.br',senha:'1234',nome:'Guilherme Diniz',ativo:true}];
-  }
-
-  const candidato = lista.find(u=>u.email.trim().toLowerCase()===emailDigitado);
-  let html = '<b>Storage key:</b> engelinhas_usuarios_v1<br>';
-  html += '<b>Total usuários:</b> ' + lista.length + '<br>';
-  html += '<b>E-mails salvos:</b> ' + lista.map(u=>u.email).join(', ') + '<br><br>';
-  html += '<b>E-mail digitado:</b> ' + JSON.stringify(emailDigitado) + '<br>';
-  html += '<b>Senha digitada (len):</b> ' + senhaDigitada.length + '<br>';
-
-  if(candidato){
-    const senhaOk = candidato.senha === senhaDigitada;
-    html += '<b>Usuário encontrado:</b> ✅ ' + candidato.nome + '<br>';
-    html += '<b>Senha bate:</b> ' + (senhaOk ? '✅ SIM' : '❌ NÃO') + '<br>';
-    if(!senhaOk){
-      html += '<b>Senha armazenada (len):</b> ' + candidato.senha.length + '<br>';
-      // Mostrar chars para debug (ofuscar meio a meio)
-      const s = candidato.senha;
-      const vis = s.slice(0,2) + '***' + s.slice(-1);
-      html += '<b>Senha armazenada (mascarada):</b> ' + vis + '<br>';
-    }
-    html += '<b>Ativo:</b> ' + candidato.ativo + '<br>';
-  } else {
-    html += '<b>Usuário NÃO encontrado</b> com este e-mail ❌<br>';
-    html += '<b>Dica:</b> Verifique se o e-mail está correto (maiúsculas/espaços)<br>';
-  }
-
-  diag.innerHTML = html;
+  diag.innerHTML = '<b>Modo API:</b> autenticação via servidor.<br>Use o botão Entrar para verificar as credenciais.<br>Erros aparecem diretamente na tela.';
   diag.style.display = 'block';
 }
 
 function _aplicarLogin(user){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  document.getElementById('user-name').textContent=(user.nome||USUARIO.nome).split(' ')[0];
+  document.getElementById('user-name').textContent=(user.nome||'').split(' ')[0];
   usuarioLogadoEmail = user.email;
+  // Sincronizar USUARIOS_LISTA com dados do usuário logado
+  if(typeof USUARIOS_LISTA !== 'undefined'){
+    const idx = USUARIOS_LISTA.findIndex(u=>u.email===user.email);
+    if(idx===-1) USUARIOS_LISTA.push({...user, ativo:true});
+  }
   lucide.createIcons();
 }
 
 function doLogout(){
-  localStorage.removeItem('engelinhas_session');
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('login-screen').style.display='flex';
-  // Restaurar empresa+email do cache (preenchimento conveniente, sem expor senha)
-  const cache = JSON.parse(localStorage.getItem('engelinhas_login_cache')||'null');
-  document.getElementById('inp-empresa').value = cache ? (cache.empresa||'') : '';
-  document.getElementById('inp-email').value   = cache ? (cache.email||'')   : '';
-  document.getElementById('inp-senha').value   = '';
+  apiLogout();
+}
+
+function _recarregarModulos(){
+  setTimeout(()=>{
+    if(typeof obrasCarregar==='function') obrasCarregar();
+    if(typeof obrasRender==='function') obrasRender();
+    if(typeof atasCarregar==='function') atasCarregar();
+    if(typeof atasRender==='function') atasRender();
+    if(typeof popularFiltrosObra==='function') popularFiltrosObra();
+    if(typeof dashboardRender==='function') dashboardRender();
+    if(typeof notificacoesAtualizar==='function') notificacoesAtualizar();
+    if(typeof rhAtualizarKpis==='function') rhAtualizarKpis();
+    if(typeof rhRenderPainelGeral==='function') rhRenderPainelGeral();
+  }, 200);
 }
 
 // Enter no campo senha → submete login
 document.getElementById('inp-senha').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
-// ── Auto-login por sessão salva (refresh da página) ────
-(function verificarSessaoSalva(){
+// ── Auto-login por JWT salvo (refresh da página) ───────────────
+(async function verificarSessaoSalva(){
   try{
-    const sess = JSON.parse(localStorage.getItem('engelinhas_session')||'null');
-    if(!sess) return;
-    // Sessão expira em 8 horas
-    if(Date.now() - sess.ts > 8*60*60*1000){ localStorage.removeItem('engelinhas_session'); return; }
-    const usuariosList = typeof USUARIOS_LISTA !== 'undefined' ? USUARIOS_LISTA : [];
-    const user = usuariosList.find(u=>u.email===sess.email&&u.ativo!==false)
-               || {email:sess.email, nome:sess.nome||USUARIO.nome};
+    const user = await apiVerificarSessao();
+    if(!user) return;
     _aplicarLogin(user);
-    // Re-renderizar módulos após login automático
-    setTimeout(()=>{
-      if(typeof obrasRender==='function') obrasRender();
-      if(typeof atasRender==='function'){ atasCarregar(); atasRender(); }
-      if(typeof popularFiltrosObra==='function') popularFiltrosObra();
-      if(typeof dashboardRender==='function') dashboardRender();
-      if(typeof notificacoesAtualizar==='function') notificacoesAtualizar();
-      if(typeof rhAtualizarKpis==='function') rhAtualizarKpis();
-      if(typeof rhRenderPainelGeral==='function') rhRenderPainelGeral();
-    }, 150);
-  }catch(e){ console.warn('Erro ao restaurar sessão:', e); }
+    _recarregarModulos();
+  }catch(e){ console.warn('Sessão inválida:', e); }
 })();
 function toggleObrasMenu(){
   const menu=document.getElementById('obras-menu');
@@ -4769,9 +4704,9 @@ function navTo(pageId){
   }
   if(SUB_MAP[pageId])openSubNavGroup(SUB_MAP[pageId]);
   closeObrasMenu();
-  if(pageId==='rh-documentacao' && typeof rhRenderFuncionarios==='function') rhRenderFuncionarios();
-  if(pageId==='rh-treinamentos' && typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
-  if(pageId==='obras') obrasRender();
+  if(pageId==='rh-documentacao' && typeof rhCarregarFuncionarios==='function') rhCarregarFuncionarios();
+  if(pageId==='rh-treinamentos' && typeof rhCarregarFuncionarios==='function') rhCarregarFuncionarios();
+  if(pageId==='obras') obrasCarregar();
   if(pageId==='usuarios') usuariosRender();
   if(pageId==='acomp-atas'||pageId==='regulatorio') { atasRender(); popularFiltrosObra(); }
   if(pageId==='reg-licencas'||pageId==='comissionamento'||pageId==='comiss-punchlist'||pageId==='asbuilt') popularFiltrosObra();
@@ -6174,68 +6109,42 @@ const FUNCIONARIOS_SEED = []; // Sistema inicia vazio — cadastre os funcionár
 const RH_STORAGE_KEY = 'engelinhas_obras_funcionarios_v1';
 const RH_SEQ_STORAGE_KEY = 'engelinhas_obras_func_seq_v1';
 
-function rhCarregarFuncionarios(){
+// ── Registro de funcionários (estado em memória — via API) ─
+let FUNCIONARIOS = [];
+let FUNC_SEQ = 0;
+let _funcAtualSalvo = null;
+
+async function rhCarregarFuncionarios(){
   try{
-    const raw = localStorage.getItem(RH_STORAGE_KEY);
-    if(raw){
-      const parsed = JSON.parse(raw);
-      if(Array.isArray(parsed) && parsed.length>0){
-
-        // MIGRAÇÃO v3: detectar e apagar dados do seed de demonstração antigo.
-        // Se TODOS os registros têm matrículas do seed original, limpar e começar do zero.
-        const SEED_MATRICULAS = ['ENG-001','MON-011','TOP-003','ACE-004','TRA-005'];
-        const todasSaoSeed = parsed.every(f => SEED_MATRICULAS.includes(f.matricula));
-        if(todasSaoSeed){
-          localStorage.removeItem(RH_STORAGE_KEY);
-          localStorage.removeItem(RH_SEQ_STORAGE_KEY);
-          return []; // começar do zero
-        }
-
-        // MIGRAÇÃO v2: limpar nrsStatus 'ok' gerados artificialmente sem nrsDetalhes real.
-        let migrado = false;
-        parsed.forEach(f=>{
-          const det = f.nrsDetalhes || {};
-          const st  = f.nrsStatus  || {};
-          Object.keys(st).forEach(nr=>{
-            if(st[nr]==='ok' && (!det[nr] || !det[nr].dataVencimento)){
-              delete st[nr];
-              migrado = true;
-            }
-          });
-          if(migrado) f.nrsStatus = st;
-        });
-        if(migrado){
-          try{ localStorage.setItem(RH_STORAGE_KEY, JSON.stringify(parsed)); }catch(e){}
-        }
-        return parsed;
-      }
-    }
-  }catch(e){ console.error('Falha ao carregar funcionários do cache:', e); }
-  return []; // seed vazio — sistema começa limpo
+    FUNCIONARIOS = await apiFuncionarios.listar();
+    // Derivar seq do maior número já usado
+    FUNCIONARIOS.forEach(f=>{
+      const n = parseInt((f.matricula||'').split('-')[1])||0;
+      if(n > FUNC_SEQ) FUNC_SEQ = n;
+    });
+    rhRenderFuncionarios();
+    if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
+    if(typeof rhRenderPainelGeral==='function') setTimeout(rhRenderPainelGeral, 50);
+  }catch(e){ console.warn('Erro ao carregar funcionários:', e); }
 }
 
-function rhSalvarFuncionarios(){
-  try{
-    localStorage.setItem(RH_STORAGE_KEY, JSON.stringify(FUNCIONARIOS));
-    localStorage.setItem(RH_SEQ_STORAGE_KEY, String(FUNC_SEQ));
-  }catch(e){ console.error('Falha ao salvar funcionários no cache:', e); }
-  // Atualizar painel geral se estiver montado
+// rhSalvarFuncionarios — chamada após mutações locais rápidas (treinamentos/NRs)
+// Para mutations via API (funcSalvar, funcToggleAtivo, funcExcluir) usamos apiFunc diretamente.
+async function rhSalvarFuncionarios(){
+  // Após trSalvar() o objeto f já foi mutado em memória.
+  // Precisamos persistir via API: reenviamos o funcionário alterado.
+  // Identificamos qual funcionário foi alterado pelo contexto de trSalvar.
+  if(typeof _funcAtualSalvo !== 'undefined' && _funcAtualSalvo){
+    try{
+      await apiFuncionarios.editar(_funcAtualSalvo.id, _funcAtualSalvo);
+    }catch(e){ console.warn('Erro ao sincronizar funcionário via API:', e); }
+  }
   if(typeof rhRenderPainelGeral==='function') setTimeout(rhRenderPainelGeral, 50);
 }
 
-let FUNCIONARIOS = rhCarregarFuncionarios();
-let FUNC_SEQ = parseInt(localStorage.getItem(RH_SEQ_STORAGE_KEY)) || 0;
-
-// Utilitário de manutenção: limpa todos os dados de funcionários.
-// Uso (console do navegador): rhResetFuncionarios()
+// Utilitário de manutenção — acessível pelo console do navegador
 function rhResetFuncionarios(){
-  localStorage.removeItem(RH_STORAGE_KEY);
-  localStorage.removeItem(RH_SEQ_STORAGE_KEY);
-  FUNCIONARIOS = [];
-  FUNC_SEQ = 0;
-  rhRenderFuncionarios();
-  if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
-  console.log('Funcionários removidos. Sistema pronto para cadastro.');
+  console.warn('rhResetFuncionarios() desativado — use o backend para excluir dados.');
 }
 
 function rhPrefixoMatricula(funcao){
@@ -6508,6 +6417,13 @@ function trSalvar(){
   f.nrsStatus[nrNome] = novoStatus;
 
   rhSalvarFuncionarios();
+  // Sincronizar com API (persistir nrsDetalhes atualizado)
+  const fAtualizado = FUNCIONARIOS.find(x=>x.matricula===matricula);
+  if(fAtualizado && fAtualizado.id){
+    _funcAtualSalvo = fAtualizado;
+    apiFuncionarios.editar(fAtualizado.id, fAtualizado).catch(e=>console.warn('Sync treinamento:', e));
+    _funcAtualSalvo = null;
+  }
   rhRenderTreinamentos();
   closeModal('modal-treinamento');
 
@@ -6735,15 +6651,15 @@ function funcEditar(matricula){
 }
 
 function funcToggleAtivo(matricula){
-  const idx = FUNCIONARIOS.findIndex(x=>x.matricula===matricula);
-  if(idx<0) return;
-  const ativo = FUNCIONARIOS[idx].ativo !== false;
+  const f = FUNCIONARIOS.find(x=>x.matricula===matricula);
+  if(!f) return;
+  const ativo = f.ativo !== false;
   const acao = ativo ? 'desativar' : 'reativar';
-  if(!confirm(`Deseja ${acao} o funcionário "${FUNCIONARIOS[idx].nome}"?`)) return;
-  FUNCIONARIOS[idx].ativo = !ativo;
-  rhSalvarFuncionarios();
-  rhRenderFuncionarios();
-  showToast(`Funcionário ${!ativo?'ativado':'desativado'} com sucesso.`, !ativo?'success':'warn');
+  if(!confirm(`Deseja ${acao} o funcionário "${f.nome}"?`)) return;
+  apiFuncionarios.toggle(f.id).then(()=>{
+    showToast(`Funcionário ${ativo?'desativado':'ativado'} com sucesso.`, ativo?'warn':'success');
+    rhCarregarFuncionarios();
+  }).catch(e=>showToast(e.message,'error'));
 }
 
 function funcSalvar(){
@@ -6761,43 +6677,34 @@ function funcSalvar(){
   const nrsExigidas = funcColetarNRs();
 
   if(funcEditandoMatricula){
-    // EDIÇÃO
-    const idx = FUNCIONARIOS.findIndex(x=>x.matricula===funcEditandoMatricula);
-    if(idx<0){ showToast('Funcionário não encontrado.','error'); return; }
-    const f = FUNCIONARIOS[idx];
-    // Manter nrsStatus existente (calculado pelos certificados anexados em nrsDetalhes)
-    // NÃO inicializar novas NRs como 'ok' — status vem exclusivamente dos certificados reais
-    const nrsStatus = f.nrsStatus || {};
-    // Remover status de NRs que foram desmarcadas (não são mais exigidas)
+    // EDIÇÃO via API
+    const f = FUNCIONARIOS.find(x=>x.matricula===funcEditandoMatricula);
+    if(!f){ showToast('Funcionário não encontrado.','error'); return; }
+    const nrsStatus = {...(f.nrsStatus||{})};
     Object.keys(nrsStatus).forEach(nr=>{ if(!nrsExigidas.includes(nr)) delete nrsStatus[nr]; });
-    const nrsDetalhes = f.nrsDetalhes || {};
-    // Remover detalhes de NRs desmarcadas
+    const nrsDetalhes = {...(f.nrsDetalhes||{})};
     Object.keys(nrsDetalhes).forEach(nr=>{ if(!nrsExigidas.includes(nr)) delete nrsDetalhes[nr]; });
-    FUNCIONARIOS[idx] = { ...f, nome, cpf, funcao, obraId, regime, nrsExigidas, nrsStatus, nrsDetalhes,
+    const dados = { nome, cpf, funcao, obraId, regime, nrsExigidas, nrsStatus, nrsDetalhes,
       docs: (funcArquivosTemp.length>0||f.docs==='Completo') ? 'Completo' : 'Pendente' };
-    rhSalvarFuncionarios();
-    rhRenderFuncionarios();
-    if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
-    closeModal('modal-funcionario');
-    showToast('Funcionário "'+nome+'" atualizado com sucesso.','success');
+    apiFuncionarios.editar(f.id, dados).then(()=>{
+      closeModal('modal-funcionario');
+      showToast('Funcionário "'+nome+'" atualizado com sucesso.','success');
+      rhCarregarFuncionarios();
+    }).catch(e=>showToast(e.message,'error'));
   } else {
-    // NOVO — status começa vazio, será preenchido ao registrar cada treinamento com certificado
-    const nrsStatus = {};
-    const nrsDetalhes = {};
+    // NOVO via API
     const hoje = new Date();
     const admissao = String(hoje.getDate()).padStart(2,'0')+'/'+String(hoje.getMonth()+1).padStart(2,'0')+'/'+hoje.getFullYear();
-    const novoFuncionario = {
-      matricula: rhGerarMatricula(funcao),
+    const dados = {
       nome, cpf, funcao, obraId, admissao, regime,
       docs: funcArquivosTemp.length>0 ? 'Completo' : 'Pendente',
-      nrsExigidas, nrsStatus, nrsDetalhes, ativo: true,
+      nrsExigidas, nrsStatus: {}, nrsDetalhes: {}, ativo: true
     };
-    FUNCIONARIOS.push(novoFuncionario);
-    rhSalvarFuncionarios();
-    rhRenderFuncionarios();
-    if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
-    closeModal('modal-funcionario');
-    showToast('Funcionário "'+nome+'" cadastrado. Matrícula: '+novoFuncionario.matricula,'success');
+    apiFuncionarios.criar(dados).then(novo=>{
+      closeModal('modal-funcionario');
+      showToast('Funcionário "'+nome+'" cadastrado. Matrícula: '+(novo.matricula||''),'success');
+      rhCarregarFuncionarios();
+    }).catch(e=>showToast(e.message,'error'));
   }
 }
 
@@ -7749,8 +7656,7 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   }
   diagInit();
-  if(typeof rhRenderFuncionarios==='function') rhRenderFuncionarios();
-  if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
+  if(typeof rhCarregarFuncionarios==='function') rhCarregarFuncionarios();
   // Seed RDPP já roda via IIFE — garantir render ao navegar para a página
   const _navToOrig = navTo;
   window.navTo = function(pageId){
@@ -7776,6 +7682,9 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     if(pageId === 'contrato-juridico'){
       repoRender('contrato-juridico');
+    }
+    if(pageId === 'usuarios'){
+      usuariosCarregar();
     }
     // Atualizar KPIs globais de RH sempre que navegar para qualquer sub-página RH
     if(pageId && pageId.startsWith('rh-') && typeof rhAtualizarKpis==='function'){
@@ -7945,17 +7854,16 @@ const OBRAS_SEED = [
   {id:'ob-005', nome:'LT 69kV Ramal Sul', uf:'MG', fase:'Projeto', criticidade:'Baixa', fiscal:'R. Oliveira', prazo:'2026-10-31', progresso:22, status:'Proj. em andamento', descricao:''},
 ];
 
-function obrasCarregar(){
-  try{
-    const raw=localStorage.getItem(OBRAS_STORAGE_KEY);
-    if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)&&p.length>0) return p; }
-  }catch(e){ console.error(e); }
-  return JSON.parse(JSON.stringify(OBRAS_SEED));
-}
-function obrasSalvarStorage(arr){ localStorage.setItem(OBRAS_STORAGE_KEY, JSON.stringify(arr)); }
-
-let OBRAS_LISTA = obrasCarregar();
+// ── Obras: estado em memória (preenchido via API) ─────
+let OBRAS_LISTA = [];
 let obrasAtualId = null;
+
+async function obrasCarregar(){
+  try{
+    OBRAS_LISTA = await apiObras.listar();
+    obrasRender();
+  }catch(e){ console.warn('Erro ao carregar obras:', e); }
+}
 
 function obrasStatusColor(s){
   if(s==='Em execução') return 'amber';
@@ -8115,17 +8023,13 @@ function obrasSalvar(){
   if(!nome){ alert('Informe o nome da obra.'); return; }
   if(!uf){ alert('Selecione a UF.'); return; }
 
-  if(editId){
-    const idx=OBRAS_LISTA.findIndex(x=>x.id===editId);
-    if(idx>=0) OBRAS_LISTA[idx]={...OBRAS_LISTA[idx], nome, uf, fase, criticidade, fiscal, prazo, progresso, status, descricao};
-  } else {
-    const newId='ob-'+Date.now();
-    OBRAS_LISTA.push({id:newId, nome, uf, fase, criticidade, fiscal, prazo, progresso, status, descricao});
-  }
-  obrasSalvarStorage(OBRAS_LISTA);
-  obrasRender();
-  closeModal('modal-nova-obra');
-  alert(editId?'Obra atualizada com sucesso!':'Obra "'+nome+'" cadastrada com sucesso!');
+  const dados = { nome, uf, fase, criticidade, fiscal, prazo, progresso, status, descricao };
+  const op = editId ? apiObras.editar(editId, dados) : apiObras.criar(dados);
+  op.then(()=>{
+    closeModal('modal-nova-obra');
+    showToast(editId?'Obra atualizada com sucesso!':'Obra "'+nome+'" cadastrada com sucesso!','success');
+    obrasCarregar();
+  }).catch(e=>showToast(e.message,'error'));
 }
 
 function obrasVerDetalhes(id){
@@ -8154,11 +8058,12 @@ function obrasExcluirAtual(){
   const o=OBRAS_LISTA.find(x=>x.id===obrasAtualId);
   if(!o) return;
   if(!confirm('Excluir a obra "'+o.nome+'"? Esta ação não pode ser desfeita.')) return;
-  OBRAS_LISTA=OBRAS_LISTA.filter(x=>x.id!==obrasAtualId);
-  obrasSalvarStorage(OBRAS_LISTA);
-  obrasRender();
-  closeModal('modal-ver-obra');
-  obrasAtualId=null;
+  apiObras.excluir(obrasAtualId).then(()=>{
+    closeModal('modal-ver-obra');
+    obrasAtualId=null;
+    showToast('Obra excluída.','success');
+    obrasCarregar();
+  }).catch(e=>showToast(e.message,'error'));
 }
 
 // Inicializar obras ao carregar
@@ -8174,23 +8079,16 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 // ══════════════════════════════════════════════════════
-// GESTÃO DE USUÁRIOS
+// GESTÃO DE USUÁRIOS (via API)
 // ══════════════════════════════════════════════════════
-const USUARIOS_STORAGE_KEY = 'engelinhas_usuarios_v1';
-const USUARIOS_SEED = [
-  {nome:'Guilherme Diniz', email:'guilherme@engelinhas.com.br', senha:'1234', perfil:'Admin', empresa:'Engelinhas', criadoEm:'01/01/2026', ativo:true},
-];
+let USUARIOS_LISTA = [];
 
-function usuariosCarregar(){
+async function usuariosCarregar(){
   try{
-    const raw=localStorage.getItem(USUARIOS_STORAGE_KEY);
-    if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)&&p.length>0) return p; }
-  }catch(e){}
-  return JSON.parse(JSON.stringify(USUARIOS_SEED));
+    USUARIOS_LISTA = await apiUsuarios.listar();
+    usuariosRender();
+  }catch(e){ console.warn('Erro ao carregar usuários:', e); }
 }
-function usuariosSalvarStorage(arr){ localStorage.setItem(USUARIOS_STORAGE_KEY, JSON.stringify(arr)); }
-
-let USUARIOS_LISTA=usuariosCarregar();
 
 function usuariosRender(){
   const tbody=document.getElementById('usuarios-tbody');
@@ -8198,12 +8096,11 @@ function usuariosRender(){
   const busca=(document.getElementById('usr-busca')?.value||'').trim().toLowerCase();
   const lista=USUARIOS_LISTA.filter(u=>!busca||u.nome.toLowerCase().includes(busca)||u.email.toLowerCase().includes(busca));
 
-  // KPIs
   const kpiTotal=document.getElementById('usr-kpi-total');
   const kpiAtivos=document.getElementById('usr-kpi-ativos');
   const kpiAdmins=document.getElementById('usr-kpi-admins');
   if(kpiTotal) kpiTotal.textContent=USUARIOS_LISTA.length;
-  if(kpiAtivos) kpiAtivos.textContent=USUARIOS_LISTA.filter(u=>u.ativo!==false).length;
+  if(kpiAtivos) kpiAtivos.textContent=USUARIOS_LISTA.filter(u=>u.ativo!==0&&u.ativo!==false).length;
   if(kpiAdmins) kpiAdmins.textContent=USUARIOS_LISTA.filter(u=>u.perfil==='Admin').length;
 
   const perfilBadge=(p)=>{
@@ -8219,11 +8116,11 @@ function usuariosRender(){
       <td style="color:var(--text2)">${u.email}</td>
       <td>${perfilBadge(u.perfil)}</td>
       <td>${u.empresa||'—'}</td>
-      <td>${u.criadoEm||'—'}</td>
-      <td><span class="status ${u.ativo!==false?'green':'red'}">${u.ativo!==false?'Ativo':'Inativo'}</span></td>
+      <td>${u.criado_em||u.criadoEm||'—'}</td>
+      <td><span class="status ${(u.ativo!==0&&u.ativo!==false)?'green':'red'}">${(u.ativo!==0&&u.ativo!==false)?'Ativo':'Inativo'}</span></td>
       <td style="white-space:nowrap">
-        <button class="btn btn-sm" onclick="usuariosToggleAtivo('${u.email}')">${u.ativo!==false?'Desativar':'Ativar'}</button>
-        <button class="btn btn-sm" onclick="usuariosExcluir('${u.email}')" style="margin-left:4px">Excluir</button>
+        <button class="btn btn-sm" onclick="usuariosToggleAtivo(${u.id},'${u.email}')">${(u.ativo!==0&&u.ativo!==false)?'Desativar':'Ativar'}</button>
+        <button class="btn btn-sm" onclick="usuariosExcluir(${u.id},'${u.nome}')" style="margin-left:4px">Excluir</button>
       </td>
     </tr>`).join('');
   setTimeout(()=>lucide.createIcons(),50);
@@ -8242,45 +8139,36 @@ function usuariosOpenModal(){
 }
 
 function usuariosSalvar(){
-  const nome=document.getElementById('usr-nome').value.trim();
-  const email=document.getElementById('usr-email').value.trim().toLowerCase();
-  const senha=document.getElementById('usr-senha').value;
-  const perfil=document.getElementById('usr-perfil').value;
-  const empresa=document.getElementById('usr-empresa').value.trim();
+  const nome   = document.getElementById('usr-nome').value.trim();
+  const email  = document.getElementById('usr-email').value.trim().toLowerCase();
+  const senha  = document.getElementById('usr-senha').value;
+  const perfil = document.getElementById('usr-perfil').value;
+  const empresa= document.getElementById('usr-empresa').value.trim();
 
-  if(!nome){ alert('Informe o nome.'); return; }
-  if(!email||!email.includes('@')){ alert('Informe um e-mail válido.'); return; }
-  if(!senha||senha.length<4){ alert('A senha deve ter no mínimo 4 caracteres.'); return; }
+  if(!nome){ showToast('Informe o nome.','warn'); return; }
+  if(!email||!email.includes('@')){ showToast('Informe um e-mail válido.','warn'); return; }
+  if(!senha||senha.length<4){ showToast('Senha mínima de 4 caracteres.','warn'); return; }
 
-  const existente=USUARIOS_LISTA.find(u=>u.email===email);
-  if(existente){ alert('Já existe um usuário com este e-mail.'); return; }
-
-  const hoje=new Date();
-  const criadoEm=String(hoje.getDate()).padStart(2,'0')+'/'+String(hoje.getMonth()+1).padStart(2,'0')+'/'+hoje.getFullYear();
-  USUARIOS_LISTA.push({nome, email, senha, perfil, empresa, criadoEm, ativo:true});
-  usuariosSalvarStorage(USUARIOS_LISTA);
-  usuariosRender();
-  closeModal('modal-novo-usuario');
-  alert('Usuário "'+nome+'" criado com sucesso!\nE-mail: '+email+'\nPerfil: '+perfil);
+  apiUsuarios.criar({ nome, email, senha, perfil, empresa })
+    .then(() => {
+      showToast('Usuário "'+nome+'" criado com sucesso!','success');
+      closeModal('modal-novo-usuario');
+      usuariosCarregar();
+    })
+    .catch(e => showToast(e.message,'error'));
 }
 
-function usuariosToggleAtivo(email){
-  const u=USUARIOS_LISTA.find(x=>x.email===email);
-  if(!u) return;
-  if(email==='guilherme@engelinhas.com.br'&&u.ativo!==false){ alert('Não é possível desativar o usuário administrador padrão.'); return; }
-  u.ativo=!u.ativo;
-  usuariosSalvarStorage(USUARIOS_LISTA);
-  usuariosRender();
+function usuariosToggleAtivo(id, email){
+  apiUsuarios.toggle(id)
+    .then(() => usuariosCarregar())
+    .catch(e => showToast(e.message,'error'));
 }
 
-function usuariosExcluir(email){
-  if(email==='guilherme@engelinhas.com.br'){ alert('Não é possível excluir o usuário administrador padrão.'); return; }
-  const u=USUARIOS_LISTA.find(x=>x.email===email);
-  if(!u) return;
-  if(!confirm('Excluir o usuário "'+u.nome+'"?')) return;
-  USUARIOS_LISTA=USUARIOS_LISTA.filter(x=>x.email!==email);
-  usuariosSalvarStorage(USUARIOS_LISTA);
-  usuariosRender();
+function usuariosExcluir(id, nome){
+  if(!confirm('Excluir o usuário "'+nome+'"?')) return;
+  apiUsuarios.excluir(id)
+    .then(() => { showToast('Usuário excluído.','success'); usuariosCarregar(); })
+    .catch(e => showToast(e.message,'error'));
 }
 
 // ═══════════════════════════════════════════════════════
@@ -8545,21 +8433,16 @@ function buscaGlobalRenderResultados(todos, termo){
 }
 
 // ═══════════════════════════════════════════════════════
-// ASO — CRUD COMPLETO
+// ASO — CRUD COMPLETO (via API)
 // ═══════════════════════════════════════════════════════
-const ASO_STORAGE_KEY = 'engelinhas_rh_asos';
+const ASO_STORAGE_KEY = 'engelinhas_rh_asos'; // mantido apenas por compatibilidade
 let ASO_LISTA = [];
 let asoEditandoId = null;
 let asoArquivosTemp = [];
 
-function asoCarregar(){
-  try{ ASO_LISTA = JSON.parse(localStorage.getItem(ASO_STORAGE_KEY)||'[]'); }
-  catch(e){ ASO_LISTA=[]; }
-}
-function asoSalvarStorage(){
-  localStorage.setItem(ASO_STORAGE_KEY, JSON.stringify(ASO_LISTA));
-  // Atualizar painel geral se estiver montado
-  if(typeof rhRenderPainelGeral==='function') setTimeout(rhRenderPainelGeral, 50);
+async function asoCarregar(){
+  try{ ASO_LISTA = await apiAsos.listar(); }
+  catch(e){ console.warn('Erro ao carregar ASOs:', e); ASO_LISTA=[]; }
 }
 
 function asoPopularFuncionarioSelect(){
@@ -8577,8 +8460,8 @@ function asoPopularFuncionarioSelect(){
   if(atual) sel.value = atual;
 }
 
-function asoOpenModal(id=null){
-  asoCarregar();
+async function asoOpenModal(id=null){
+  await asoCarregar();
   asoEditandoId = id;
   asoArquivosTemp = [];
   asoPopularFuncionarioSelect();
@@ -8614,7 +8497,6 @@ function asoOpenModal(id=null){
 }
 
 function asoSalvar(){
-  asoCarregar();
   const matricula = document.getElementById('aso-funcionario').value;
   const tipo      = document.getElementById('aso-tipo').value;
   const resultado = document.getElementById('aso-resultado').value;
@@ -8632,24 +8514,14 @@ function asoSalvar(){
 
   const func = (FUNCIONARIOS||[]).find(f=>f.matricula===matricula);
   const nomeFuncionario = func ? func.nome : matricula;
+  const dados = { matricula, nomeFuncionario, tipo, resultado, medico, crm, dataEmissao, validade, obs };
 
-  if(asoEditandoId){
-    const idx = ASO_LISTA.findIndex(a=>a.id===asoEditandoId);
-    if(idx<0){ showToast('ASO não encontrado.','error'); return; }
-    ASO_LISTA[idx] = { ...ASO_LISTA[idx], matricula, nomeFuncionario, tipo, resultado, medico, crm, dataEmissao, validade, obs, arquivos:[...asoArquivosTemp] };
-    showToast('ASO atualizado com sucesso.','success');
-  } else {
-    const novo = {
-      id: 'aso_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-      matricula, nomeFuncionario, tipo, resultado, medico, crm, dataEmissao, validade, obs,
-      arquivos:[...asoArquivosTemp], criadoEm: new Date().toISOString()
-    };
-    ASO_LISTA.push(novo);
-    showToast('ASO registrado com sucesso.','success');
-  }
-  asoSalvarStorage();
-  closeModal('modal-aso');
-  asoRender();
+  const op = asoEditandoId ? apiAsos.editar(asoEditandoId, dados) : apiAsos.criar(dados);
+  op.then(()=>{
+    showToast(asoEditandoId?'ASO atualizado com sucesso.':'ASO registrado com sucesso.','success');
+    closeModal('modal-aso');
+    asoCarregar().then(()=>asoRender());
+  }).catch(e=>showToast(e.message,'error'));
 }
 
 function asoStatusCalc(validade, resultado){
@@ -8662,7 +8534,6 @@ function asoStatusCalc(validade, resultado){
 }
 
 function asoRender(){
-  asoCarregar();
   const tbody = document.getElementById('aso-tbody');
   if(!tbody) return;
   const q = (document.getElementById('aso-busca')||{value:''}).value.toLowerCase();
@@ -8710,7 +8581,6 @@ function asoRender(){
 }
 
 function asoRenderKpis(){
-  asoCarregar();
   let total=0, aptos=0, vencendo=0, vencidos=0;
   ASO_LISTA.forEach(a=>{
     total++;
@@ -8728,11 +8598,10 @@ function asoRenderKpis(){
 
 function asoExcluir(id){
   if(!confirm('Deseja excluir este ASO?')) return;
-  asoCarregar();
-  ASO_LISTA = ASO_LISTA.filter(a=>a.id!==id);
-  asoSalvarStorage();
-  asoRender();
-  showToast('ASO excluído.','warn');
+  apiAsos.excluir(id).then(()=>{
+    showToast('ASO excluído.','warn');
+    asoCarregar().then(()=>asoRender());
+  }).catch(e=>showToast(e.message,'error'));
 }
 
 // ═══════════════════════════════════════════════════════
