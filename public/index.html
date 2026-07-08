@@ -8611,13 +8611,14 @@ let repoContextoAtual = ''; // 'rh-epi' | 'rh-anexos'
 let repoArquivosTemp = [];
 let repoEditandoId = null;
 
-function repoKey(tipo){ return 'engelinhas_repo_'+tipo; }
+function repoKey(tipo){ return 'engelinhas_repo_'+tipo; } // mantido para compatibilidade
 
-function repoCarregar(tipo){
-  try{ return JSON.parse(localStorage.getItem(repoKey(tipo))||'[]'); }
-  catch(e){ return []; }
+// repoCarregar agora é async — retorna Promise<array>
+async function repoCarregar(tipo){
+  try{ return await apiDocumentos.listar(tipo); }
+  catch(e){ console.warn('repoCarregar:', e); return []; }
 }
-function repoSalvarLista(tipo, lista){ localStorage.setItem(repoKey(tipo), JSON.stringify(lista)); }
+function repoSalvarLista(tipo, lista){ /* descontinuado — usar apiDocumentos */ }
 
 function repoPopularFuncionarioSelect(selId){
   const sel = document.getElementById(selId);
@@ -8726,26 +8727,13 @@ function repoSalvar(){
   const obra = (OBRAS_LISTA||[]).find(o=>(o.id||o.nome)===obraId);
   const obraNome = obra ? obra.nome : '';
 
-  let lista = repoCarregar(tipo);
-
-  if(repoEditandoId){
-    const idx = lista.findIndex(r=>r.id===repoEditandoId);
-    if(idx<0){ showToast('Registro não encontrado.','error'); return; }
-    lista[idx] = { ...lista[idx], matricula, nomeFuncionario, titulo, ca, tipo:tipoDoc, data, obraId, obraNome, responsavel, status, obs, arquivos:[...repoArquivosTemp] };
-    showToast('Registro atualizado com sucesso.','success');
-  } else {
-    const novo = {
-      id: 'repo_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-      matricula, nomeFuncionario, titulo, ca, tipo:tipoDoc, data, obraId, obraNome, responsavel, status, obs,
-      arquivos:[...repoArquivosTemp], criadoEm: new Date().toISOString()
-    };
-    lista.push(novo);
-    showToast('Registro salvo com sucesso.','success');
-  }
-
-  repoSalvarLista(tipo, lista);
-  closeModal('modal-repo');
-  repoRender(tipo);
+  const dados = { tipo_doc: tipo, matricula, nomeFuncionario, titulo, ca, tipo:tipoDoc, data, obraId, obraNome, responsavel, status, obs };
+  const op = repoEditandoId ? apiDocumentos.editar(repoEditandoId, dados) : apiDocumentos.criar(dados);
+  op.then(()=>{
+    showToast(repoEditandoId?'Registro atualizado com sucesso.':'Registro salvo com sucesso.','success');
+    closeModal('modal-repo');
+    repoRender(tipo);
+  }).catch(e=>showToast(e.message,'error'));
 }
 
 function repoRender(tipo){
@@ -8754,8 +8742,11 @@ function repoRender(tipo){
   const buscaId = 'repo-'+tipo+'-busca';
   const tbody = document.getElementById(tbodyId);
   if(!tbody) return;
-
-  const lista = repoCarregar(tipo);
+  // Mostrar loading enquanto carrega
+  tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:24px">Carregando...</td></tr>`;
+  repoCarregar(tipo).then(lista=>{ _repoRenderCom(tipo, lista, tbody, buscaId, isEpi); }).catch(()=>{ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#ef4444;padding:24px">Erro ao carregar registros.</td></tr>'; });
+}
+function _repoRenderCom(tipo, lista, tbody, buscaId, isEpi){
   const q = (document.getElementById(buscaId)||{value:''}).value.toLowerCase();
   let filtrada = lista.filter(r=>{
     if(!q) return true;
@@ -8827,7 +8818,7 @@ function repoRender(tipo){
 }
 
 function repoRenderKpis(tipo, lista){
-  if(!lista) lista = repoCarregar(tipo);
+  if(!lista) lista = [];
   const total = lista.length;
   const comArq = lista.filter(r=>(r.arquivos||[]).length>0).length;
   const semArq = total - comArq;
@@ -8839,15 +8830,12 @@ function repoRenderKpis(tipo, lista){
 
 function repoExcluir(tipo, id){
   if(!confirm('Deseja excluir este registro?')) return;
-  let lista = repoCarregar(tipo);
-  lista = lista.filter(r=>r.id!==id);
-  repoSalvarLista(tipo, lista);
-  repoRender(tipo);
-  showToast('Registro excluído.','warn');
+  apiDocumentos.excluir(id).then(()=>{ repoRender(tipo); showToast('Registro excluído.','warn'); }).catch(e=>showToast(e.message,'error'));
 }
 
 function repoVerArquivos(tipo, id){
-  const lista = repoCarregar(tipo);
+  showToast('Visualização de arquivos disponível em breve.','info'); return;
+  const lista = [];
   const reg = lista.find(r=>r.id===id);
   if(!reg || !(reg.arquivos||[]).length){ showToast('Nenhum arquivo anexado.','info'); return; }
   const nomes = reg.arquivos.map(a=>a.nome||a.name||'(arquivo)').join('\n');
