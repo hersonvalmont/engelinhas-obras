@@ -8625,7 +8625,7 @@ async function asoOpenModal(id=null){
   if(fi) fi.value='';
 
   if(id){
-    const aso = ASO_LISTA.find(a=>a.id===id);
+    const aso = ASO_LISTA.find(a=> String(a.id) === String(id));
     if(!aso){ showToast('ASO não encontrado.','error'); return; }
     document.getElementById('aso-modal-titulo').textContent = 'Editar ASO';
     document.getElementById('aso-funcionario').value = aso.matricula||'';
