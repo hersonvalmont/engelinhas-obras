@@ -483,7 +483,7 @@ tbody tr:hover td{background:var(--bg3)}
               </div>
             </div>
           </div>
-          <div class="notif-footer"><a onclick="closeNotif()">Ver central de alertas</a></div>
+          <div class="notif-footer"><a onclick="navTo('rh-quadro');closeNotif()">Ver central de alertas</a></div>
         </div>
       </div>
 
@@ -3947,11 +3947,11 @@ tbody tr:hover td{background:var(--bg3)}
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Médico responsável</label>
+        <label class="form-label">Médico responsável *</label>
         <input type="text" class="form-input" id="aso-medico" placeholder="Dr. Nome do Médico">
       </div>
       <div class="form-group">
-        <label class="form-label">CRM</label>
+        <label class="form-label">CRM *</label>
         <input type="text" class="form-input" id="aso-crm" placeholder="CRM/UF 000000">
       </div>
       <div class="form-group">
@@ -7837,6 +7837,8 @@ document.addEventListener('DOMContentLoaded', function(){
     // Painel Geral de RH
     if(pageId === 'rh-quadro' && typeof rhRenderPainelGeral==='function'){
       setTimeout(rhRenderPainelGeral, 80);
+      // Atualizar notificações também ao entrar na central de alertas
+      if(typeof notificacoesAtualizar==='function') setTimeout(notificacoesAtualizar, 120);
     }
     // Atualizar notificações ao abrir o app ou navegar para dashboard
     if(pageId==='dashboard' && typeof notificacoesAtualizar==='function'){
@@ -8658,11 +8660,13 @@ function asoSalvar(){
   const validade  = document.getElementById('aso-validade').value;
   const obs       = document.getElementById('aso-obs').value.trim();
 
-  if(!matricula){ showToast('Selecione o funcionário.','error'); return; }
-  if(!tipo)     { showToast('Selecione o tipo de ASO.','error'); return; }
-  if(!resultado){ showToast('Selecione o resultado.','error'); return; }
+  if(!matricula)  { showToast('Selecione o funcionário.','error'); return; }
+  if(!tipo)       { showToast('Selecione o tipo de ASO.','error'); return; }
+  if(!resultado)  { showToast('Selecione o resultado.','error'); return; }
+  if(!medico)     { showToast('Informe o médico responsável.','error'); return; }
+  if(!crm)        { showToast('Informe o CRM do médico.','error'); return; }
   if(!dataEmissao){ showToast('Informe a data de emissão.','error'); return; }
-  if(!validade)  { showToast('Informe a data de validade.','error'); return; }
+  if(!validade)   { showToast('Informe a data de validade.','error'); return; }
 
   const func = (FUNCIONARIOS||[]).find(f=>f.matricula===matricula);
   const nomeFuncionario = func ? func.nome : matricula;
@@ -9374,8 +9378,10 @@ function salvarPerfil(){
 // ═══════════════════════════════════════════════════════
 // NOTIFICAÇÕES DINÂMICAS
 // ═══════════════════════════════════════════════════════
-function notificacoesAtualizar(){
+async function notificacoesAtualizar(){
   atasCarregar();
+  // Garante que ASO_LISTA está atualizado antes de processar
+  try{ await asoCarregar(); }catch(e){}
   let notifs=[];
   const hoje=new Date();
   hoje.setHours(0,0,0,0);
@@ -9436,12 +9442,12 @@ function notificacoesAtualizar(){
 
   // ── ASOs vencidos ou vencendo ────────────────────────
   try{
-    const asos = JSON.parse(localStorage.getItem('engelinhas_rh_asos')||'[]');
+    const asos = ASO_LISTA || [];
     let asoVencendo=[], asoVencidas=[];
     asos.forEach(a=>{
       if(!a.validade) return;
       const diff = Math.round((new Date(a.validade+'T00:00:00') - hoje) / 86400000);
-      if(diff<0)      asoVencidas.push(a.nomeFuncionario||a.matricula);
+      if(diff<0)        asoVencidas.push(a.nomeFuncionario||a.matricula);
       else if(diff<=30) asoVencendo.push(a.nomeFuncionario||a.matricula);
     });
     if(asoVencidas.length>0){
