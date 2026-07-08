@@ -89,6 +89,7 @@ const apiFuncionarios = {
   listar:  ()       => apiGet('/funcionarios'),
   criar:   (body)   => apiPost('/funcionarios', body),
   editar:  (id, b)  => apiPut('/funcionarios/' + id, b),
+  toggle:  (id)     => apiPatch('/funcionarios/' + id + '/toggle'),
   excluir: (id)     => apiDelete('/funcionarios/' + id),
 };
 

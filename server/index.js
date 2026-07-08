@@ -22,6 +22,9 @@ app.use('/api/', rateLimit({ windowMs: 15*60*1000, max: 500, standardHeaders: tr
 // Rate limit mais apertado no login
 app.use('/api/auth/login', rateLimit({ windowMs: 15*60*1000, max: 20, message: { erro: 'Muitas tentativas. Aguarde 15 minutos.' } }));
 
+// ── Health check (antes de qualquer outro handler) ──
+app.get('/api/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
+
 // ── Rotas da API ──────────────────────────────────
 app.use('/api/auth',        require('./routes/auth'));
 app.use('/api/usuarios',    require('./routes/usuarios'));
@@ -41,9 +44,6 @@ app.use(express.static(PUBLIC_DIR));
 app.get('*', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
-
-// ── Health check ──────────────────────────────────
-app.get('/api/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
 // ── Inicializar banco antes de ouvir ─────────────
 require('./database'); // cria tabelas + seed admin
