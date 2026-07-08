@@ -8066,11 +8066,15 @@ function obrasExcluirAtual(){
   }).catch(e=>showToast(e.message,'error'));
 }
 
-// Inicializar obras ao carregar
-document.addEventListener('DOMContentLoaded',function(){
-  obrasRender();
-  atasCarregar();
-  atasRender();
+// Inicializar ao carregar — usar carregadores async via API
+document.addEventListener('DOMContentLoaded', async function(){
+  // Carregar dados do backend em paralelo
+  await Promise.all([
+    obrasCarregar(),
+    atasCarregar().then(()=>atasRender()),
+    rhCarregarFuncionarios(),
+    asoCarregar().then(()=>asoRender()),
+  ]);
   popularFiltrosObra();
   dashboardRender();
   notificacoesAtualizar();
