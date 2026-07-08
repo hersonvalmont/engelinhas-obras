@@ -970,9 +970,9 @@ tbody tr:hover td{background:var(--bg3)}
             <input type="text" class="form-input" id="repo-contrato-tecnico-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('contrato-tecnico')">
           </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
             <tbody id="tbody-contrato-tecnico">
-              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -1002,9 +1002,9 @@ tbody tr:hover td{background:var(--bg3)}
             <input type="text" class="form-input" id="repo-contrato-comercial-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('contrato-comercial')">
           </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
             <tbody id="tbody-contrato-comercial">
-              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -3056,9 +3056,9 @@ tbody tr:hover td{background:var(--bg3)}
             <input type="text" class="form-input" id="repo-contrato-juridico-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('contrato-juridico')">
           </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
             <tbody id="tbody-contrato-juridico">
-              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum documento. Clique em "+ Novo Documento" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -3369,9 +3369,9 @@ tbody tr:hover td{background:var(--bg3)}
             <input type="text" class="form-input" id="repo-rh-epi-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('rh-epi')">
           </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Funcionário</th><th>EPI / Descrição</th><th>CA nº</th><th>Data entrega</th><th>Obra</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Funcionário</th><th>EPI / Descrição</th><th>CA nº</th><th>Data entrega</th><th>Obra</th><th>Status</th><th></th></tr></thead>
             <tbody id="tbody-rh-epi">
-              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Registrar Entrega" para adicionar.</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro. Clique em "+ Registrar Entrega" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -3433,9 +3433,9 @@ tbody tr:hover td{background:var(--bg3)}
             <input type="text" class="form-input" id="repo-rh-anexos-busca" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="repoRender('rh-anexos')">
           </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Arquivos</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Documento / Título</th><th>Tipo</th><th>Obra</th><th>Data</th><th>Responsável</th><th>Status</th><th></th></tr></thead>
             <tbody id="tbody-rh-anexos">
-              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum anexo cadastrado. Clique em "+ Novo Anexo" para adicionar.</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum anexo cadastrado. Clique em "+ Novo Anexo" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -8648,10 +8648,8 @@ function asoRender(){
       <td><span class="badge ${st.cls}">${st.label}</span></td>
       <td>
         <div style="display:flex;gap:4px;align-items:center">
-          ${qtdArq>0
-            ? `<button class="btn btn-sm" onclick="arquivosAbrir('asos','${a.id}','ASO — ${(a.nomeFuncionario||'').replace(/'/g,"\\'")} / ${(a.tipo||'').replace(/'/g,"\\'")}','${qtdArq} arquivo(s)')" title="${qtdArq} arquivo(s)" style="display:flex;align-items:center;gap:3px;color:var(--blue)"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</button>`
-            : ''}
           <button class="btn btn-sm" onclick="asoOpenModal('${a.id}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+          <button class="btn btn-sm" onclick="arquivosAbrir('asos','${a.id}','ASO — ${(a.nomeFuncionario||'').replace(/'/g,"\\'")} / ${(a.tipo||'').replace(/'/g,"\\'")}' )" title="Ver/Anexar arquivos" style="color:var(--blue)"><i data-lucide="paperclip" style="width:12px;height:12px"></i></button>
           <button class="btn btn-sm" onclick="asoExcluir('${a.id}')" title="Excluir" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
         </div>
       </td>
@@ -8856,7 +8854,7 @@ function _repoRenderCom(tipo, lista, tbody, buscaId, isEpi){
   });
   filtrada = filtrada.slice().sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
 
-  const colSpan = 8;
+  const colSpan = 7;
 
   if(!filtrada.length){
     tbody.innerHTML=`<tr><td colspan="${colSpan}" style="text-align:center;color:var(--text3);padding:32px">Nenhum registro encontrado.</td></tr>`;
@@ -8876,15 +8874,11 @@ function _repoRenderCom(tipo, lista, tbody, buscaId, isEpi){
         <td style="font-size:12px;color:var(--text3)">${r.ca||'—'}</td>
         <td style="font-size:13px">${dataFmt}</td>
         <td style="font-size:12px">${r.obraNome||'—'}</td>
-        <td style="text-align:center">
-          ${qtdArq>0
-            ? `<button class="btn btn-sm" onclick="arquivosAbrir('documentos','${r.id}','EPI — ${(r.titulo||'').replace(/'/g,"\\'")}','${qtdArq} arquivo(s)')" style="display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--blue)" title="Ver arquivos"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</button>`
-            : `<span style="font-size:11px;color:var(--text3)">—</span>`}
-        </td>
         <td><span class="badge ${badgeSt}">${r.status||'—'}</span></td>
         <td>
           <div style="display:flex;gap:4px">
             <button class="btn btn-sm" onclick="repoOpenModal('${tipo}','EPI','${r.id}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+            <button class="btn btn-sm" onclick="arquivosAbrir('documentos','${r.id}','EPI — ${(r.titulo||'').replace(/'/g,"\\'")}' )" title="Ver/Anexar arquivos" style="color:var(--blue)"><i data-lucide="paperclip" style="width:12px;height:12px"></i></button>
             <button class="btn btn-sm" onclick="repoExcluir('${tipo}','${r.id}')" title="Excluir" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
           </div>
         </td>
@@ -8896,15 +8890,11 @@ function _repoRenderCom(tipo, lista, tbody, buscaId, isEpi){
         <td style="font-size:12px">${r.obraNome||'—'}</td>
         <td style="font-size:13px">${dataFmt}</td>
         <td style="font-size:12px">${r.responsavel||'—'}</td>
-        <td style="text-align:center">
-          ${qtdArq>0
-            ? `<button class="btn btn-sm" onclick="arquivosAbrir('documentos','${r.id}','${(r.titulo||'').replace(/'/g,"\\'")}','${qtdArq} arquivo(s)')" style="display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--blue)" title="Ver arquivos"><i data-lucide="paperclip" style="width:12px;height:12px"></i> ${qtdArq}</button>`
-            : `<span style="font-size:11px;color:var(--text3)">—</span>`}
-        </td>
         <td><span class="badge ${badgeSt}">${r.status||'—'}</span></td>
         <td>
           <div style="display:flex;gap:4px">
             <button class="btn btn-sm" onclick="repoOpenModal('${tipo}','Anexo Contratual','${r.id}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
+            <button class="btn btn-sm" onclick="arquivosAbrir('documentos','${r.id}','${(r.titulo||'').replace(/'/g,"\\'")}' )" title="Ver/Anexar arquivos" style="color:var(--blue)"><i data-lucide="paperclip" style="width:12px;height:12px"></i></button>
             <button class="btn btn-sm" onclick="repoExcluir('${tipo}','${r.id}')" title="Excluir" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
           </div>
         </td>
