@@ -9444,13 +9444,11 @@ function uploadFotosSalvar(){
 // ═══════════════════════════════════════════════════════
 var ATAS_LISTA = [];
 
-function atasCarregar(){
-  try{ ATAS_LISTA = JSON.parse(localStorage.getItem('engelinhas_atas')||'[]'); }catch(e){ ATAS_LISTA=[]; }
+async function atasCarregar(){
+  try{ ATAS_LISTA = await apiAtas.listar(); }catch(e){ console.warn('Erro ao carregar atas:', e); ATAS_LISTA=[]; }
 }
 
-function atasSalvarStorage(lista){
-  localStorage.setItem('engelinhas_atas', JSON.stringify(lista));
-}
+function atasSalvarStorage(lista){ /* descontinuado — usar apiAtas */ }
 
 function atasStatusColor(s){
   if(s==='publicado') return 'blue';
@@ -9474,7 +9472,6 @@ function atasFmtData(d){
 }
 
 function atasRender(){
-  atasCarregar();
   // Tabela principal (acomp-atas)
   const tbody = document.getElementById('atas-tbody');
   if(tbody){
@@ -9579,7 +9576,6 @@ function openModalAta(){
 }
 
 function ataSalvar(status){
-  atasCarregar();
   const titulo=(document.getElementById('ata-titulo')||{}).value||'';
   const obraId=(document.getElementById('ata-obra')||{}).value||'';
   const data=(document.getElementById('ata-data')||{}).value||'';
@@ -9594,21 +9590,14 @@ function ataSalvar(status){
   const obraObj = OBRAS_LISTA.find(o=>o.id===obraId);
   const obraNome = obraObj ? obraObj.nome : obraId;
 
-  const ata = {
-    id: 'ata-'+Date.now(),
-    titulo: titulo.trim(),
-    obraId, obraNome,
-    data, participantes, pauta, decisoes, acoes,
-    status,
-    criadoEm: new Date().toISOString()
-  };
-  ATAS_LISTA.push(ata);
-  atasSalvarStorage(ATAS_LISTA);
-  atasRender();
-  closeModal('modal-ata');
-  alert(status==='publicado'
-    ? '✅ Ata "'+titulo+'" publicada com sucesso!'
-    : '💾 Rascunho da ata "'+titulo+'" salvo!');
+  const dados = { titulo: titulo.trim(), obraId, obraNome, data, participantes, pauta, decisoes, acoes, status };
+  apiAtas.criar(dados).then(()=>{
+    atasCarregar().then(()=>{ atasRender(); });
+    closeModal('modal-ata');
+    showToast(status==='publicado'
+      ? '✅ Ata "'+titulo+'" publicada com sucesso!'
+      : '💾 Rascunho da ata "'+titulo+'" salvo!', 'success');
+  }).catch(e=>showToast(e.message,'error'));
 }
 
 // ═══════════════════════════════════════════════════════
