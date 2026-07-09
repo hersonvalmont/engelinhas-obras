@@ -4411,7 +4411,7 @@ function buildLogo(size){
     el.appendChild(entry);
     el.scrollTop=el.scrollHeight;
     // Auto-open on error
-    if(type==='err'){ document.getElementById('debug-panel').classList.add('open'); }
+    // console só abre manualmente via botão 🐛
   }
   const _error=console.error.bind(console);
   const _warn=console.warn.bind(console);
