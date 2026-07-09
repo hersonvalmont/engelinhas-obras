@@ -4482,12 +4482,17 @@ function _aplicarLogin(user){
   document.getElementById('app').classList.add('visible');
   document.getElementById('user-name').textContent=(user.nome||'').split(' ')[0];
   usuarioLogadoEmail = user.email;
+  usuarioLogadoPerfil = user.perfil || 'Fiscal';
   // Sincronizar USUARIOS_LISTA com dados do usuário logado
   if(typeof USUARIOS_LISTA !== 'undefined'){
     const idx = USUARIOS_LISTA.findIndex(u=>u.email===user.email);
     if(idx===-1) USUARIOS_LISTA.push({...user, ativo:true});
   }
   lucide.createIcons();
+}
+
+function isAdmin(){
+  return usuarioLogadoPerfil === 'Admin';
 }
 
 function doLogout(){
@@ -7927,6 +7932,7 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
       <div class="modal-title" id="usr-modal-title">Novo Usuário</div>
       <button class="modal-close" onclick="closeModal('modal-novo-usuario')"><i data-lucide="x"></i></button>
     </div>
+    <input type="hidden" id="usr-edit-id">
     <input type="hidden" id="usr-edit-email">
     <div class="form-grid">
       <div class="form-group full">
@@ -7937,8 +7943,8 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
         <label class="form-label">E-mail *</label>
         <input type="email" class="form-input" id="usr-email" placeholder="usuario@engelinhas.com.br">
       </div>
-      <div class="form-group">
-        <label class="form-label">Senha *</label>
+      <div class="form-group" id="usr-senha-group">
+        <label class="form-label" id="usr-senha-label">Senha *</label>
         <input type="password" class="form-input" id="usr-senha" placeholder="Mínimo 4 caracteres">
       </div>
       <div class="form-group">
@@ -8257,7 +8263,15 @@ function usuariosRender(){
     return '<span class="badge badge-gray">Visualizador</span>';
   };
 
-  tbody.innerHTML=lista.map(u=>`
+  tbody.innerHTML=lista.map(u=>{
+    const admin = isAdmin();
+    const btnEditar = admin
+      ? `<button class="btn btn-sm" onclick="usuariosOpenModalEditar(${u.id})" title="Editar usuário" style="margin-left:4px"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>`
+      : '';
+    const btnReset = admin
+      ? `<button class="btn btn-sm" onclick="usuariosRedefinirSenha(${u.id},'${u.nome.replace(/'/g,"\\'")}')" title="Redefinir senha para 123456" style="margin-left:4px"><i data-lucide="key-round" style="width:12px;height:12px"></i></button>`
+      : '';
+    return `
     <tr>
       <td style="font-weight:500">${u.nome}</td>
       <td style="color:var(--text2)">${u.email}</td>
@@ -8267,25 +8281,58 @@ function usuariosRender(){
       <td><span class="status ${(u.ativo!==0&&u.ativo!==false)?'green':'red'}">${(u.ativo!==0&&u.ativo!==false)?'Ativo':'Inativo'}</span></td>
       <td style="white-space:nowrap">
         <button class="btn btn-sm" onclick="usuariosToggleAtivo(${u.id},'${u.email}')">${(u.ativo!==0&&u.ativo!==false)?'Desativar':'Ativar'}</button>
-        <button class="btn btn-sm" onclick="usuariosExcluir(${u.id},'${u.nome}')" style="margin-left:4px">Excluir</button>
+        ${btnEditar}
+        ${btnReset}
+        <button class="btn btn-sm" onclick="usuariosExcluir(${u.id},'${u.nome.replace(/'/g,"\\'")}' )" style="margin-left:4px">Excluir</button>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
   setTimeout(()=>lucide.createIcons(),50);
 }
 
 function usuariosOpenModal(){
+  document.getElementById('usr-edit-id').value='';
   document.getElementById('usr-edit-email').value='';
   document.getElementById('usr-modal-title').textContent='Novo Usuário';
   document.getElementById('usr-nome').value='';
   document.getElementById('usr-email').value='';
+  document.getElementById('usr-email').disabled=false;
   document.getElementById('usr-senha').value='';
+  document.getElementById('usr-senha-label').textContent='Senha *';
   document.getElementById('usr-perfil').value='Fiscal';
   document.getElementById('usr-empresa').value='Engelinhas';
   openModal('modal-novo-usuario');
   setTimeout(()=>lucide.createIcons(),50);
 }
 
+function usuariosOpenModalEditar(id){
+  if(!isAdmin()){ showToast('Apenas administradores podem editar usuários.','error'); return; }
+  const u = USUARIOS_LISTA.find(u=> String(u.id)===String(id));
+  if(!u){ showToast('Usuário não encontrado.','error'); return; }
+  document.getElementById('usr-edit-id').value = u.id;
+  document.getElementById('usr-edit-email').value = u.email;
+  document.getElementById('usr-modal-title').textContent = 'Editar Usuário';
+  document.getElementById('usr-nome').value = u.nome||'';
+  document.getElementById('usr-email').value = u.email||'';
+  document.getElementById('usr-email').disabled = true; // e-mail não pode ser alterado
+  document.getElementById('usr-senha').value = '';
+  document.getElementById('usr-senha-label').textContent = 'Nova senha (deixe em branco para manter)';
+  document.getElementById('usr-perfil').value = u.perfil||'Fiscal';
+  document.getElementById('usr-empresa').value = u.empresa||'Engelinhas';
+  openModal('modal-novo-usuario');
+  setTimeout(()=>lucide.createIcons(),50);
+}
+
+function usuariosRedefinirSenha(id, nome){
+  if(!isAdmin()){ showToast('Apenas administradores podem redefinir senhas.','error'); return; }
+  if(!confirm(`Redefinir a senha de "${nome}" para 123456?`)) return;
+  apiUsuarios.editar(id, { senha: '123456' })
+    .then(()=>{ showToast(`Senha de "${nome}" redefinida para 123456.`,'success'); })
+    .catch(e=>showToast(e.message,'error'));
+}
+
 function usuariosSalvar(){
+  const editId = document.getElementById('usr-edit-id').value;
   const nome   = document.getElementById('usr-nome').value.trim();
   const email  = document.getElementById('usr-email').value.trim().toLowerCase();
   const senha  = document.getElementById('usr-senha').value;
@@ -8293,6 +8340,23 @@ function usuariosSalvar(){
   const empresa= document.getElementById('usr-empresa').value.trim();
 
   if(!nome){ showToast('Informe o nome.','warn'); return; }
+
+  // ── EDIÇÃO ──
+  if(editId){
+    if(senha && senha.length < 4){ showToast('Nova senha mínima de 4 caracteres.','warn'); return; }
+    const body = { nome, perfil, empresa };
+    if(senha) body.senha = senha;
+    apiUsuarios.editar(editId, body)
+      .then(()=>{
+        showToast('Usuário atualizado com sucesso!','success');
+        closeModal('modal-novo-usuario');
+        usuariosCarregar();
+      })
+      .catch(e=>showToast(e.message,'error'));
+    return;
+  }
+
+  // ── CRIAÇÃO ──
   if(!email||!email.includes('@')){ showToast('Informe um e-mail válido.','warn'); return; }
   if(!senha||senha.length<4){ showToast('Senha mínima de 4 caracteres.','warn'); return; }
 
@@ -9318,6 +9382,7 @@ function showToast(msg, tipo='info'){
 // PERFIL DE USUÁRIO LOGADO
 // ═══════════════════════════════════════════════════════
 let usuarioLogadoEmail = '';
+let usuarioLogadoPerfil = 'Fiscal';
 
 function abrirPerfil(){
   // Detectar usuário logado pelo nome exibido
