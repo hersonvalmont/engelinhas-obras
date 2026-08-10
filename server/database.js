@@ -113,6 +113,17 @@ db.exec(`
     tamanho      INTEGER,
     criado_em    TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
   );
+
+  CREATE TABLE IF NOT EXISTS audit_log (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    entidade     TEXT    NOT NULL,
+    entidade_id  INTEGER,
+    acao         TEXT    NOT NULL,
+    detalhe      TEXT,
+    usuario_nome TEXT,
+    usuario_email TEXT,
+    criado_em    TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
+  );
 `);
 
 // ══════════════════════════════════════════════════

@@ -34,6 +34,7 @@ app.use('/api/asos',        require('./routes/asos'));
 app.use('/api/atas',        require('./routes/atas'));
 app.use('/api/documentos',  require('./routes/documentos'));
 app.use('/api/arquivos',    require('./routes/arquivos'));
+app.use('/api/audit',       require('./routes/audit'));
 
 // ── Arquivos enviados (downloads protegidos via rota /api/arquivos/:id/download) ──
 // Pasta de uploads NÃO exposta diretamente por segurança

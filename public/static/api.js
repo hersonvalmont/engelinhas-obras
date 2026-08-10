@@ -151,6 +151,18 @@ const apiArquivos = {
   excluir: (id) => apiDelete('/arquivos/' + id),
 };
 
+// ── AUDIT LOG ─────────────────────────────────────────────────
+const apiAudit = {
+  registrar: (entidade, entidade_id, acao, detalhe) =>
+    apiPost('/audit', { entidade, entidade_id, acao, detalhe }),
+  listar: (entidade, entidade_id) =>
+    apiGet('/audit?' + new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ entidade, entidade_id }).filter(([,v]) => v != null)
+      )
+    )),
+};
+
 // ── Verificar sessão salva ao carregar ────────────────────────
 async function apiVerificarSessao() {
   if (!_token) return null;

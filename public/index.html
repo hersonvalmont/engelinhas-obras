@@ -322,6 +322,17 @@ tbody tr:hover td{background:var(--bg3)}
 .foto-card.nc svg{color:var(--red)}
 .foto-card.nc .foto-card-label{color:var(--red)}
 /* ── DEBUG PANEL ────────────────────────────────────── */
+.hist-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.hist-item:last-child{border-bottom:none}
+.hist-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.hist-icon.create{background:#dcfce7;color:#16a34a}
+.hist-icon.update{background:#dbeafe;color:#2563eb}
+.hist-icon.delete{background:#fee2e2;color:#dc2626}
+.hist-icon.view{background:#f3f4f6;color:#6b7280}
+.hist-body{flex:1}
+.hist-acao{font-size:13px;font-weight:500;color:var(--text)}
+.hist-detalhe{font-size:12px;color:var(--text2);margin-top:2px;white-space:pre-wrap;word-break:break-word}
+.hist-meta{font-size:11px;color:var(--text3);margin-top:4px}
 .debug-btn{position:fixed;bottom:16px;right:16px;z-index:9999;background:#1A1A1A;color:#00FF88;border:1px solid #333;padding:5px 10px;border-radius:var(--radius);font-size:11px;font-weight:600;font-family:monospace;cursor:pointer;opacity:.7;transition:opacity .15s}
 .debug-btn:hover{opacity:1}
 .debug-panel{position:fixed;bottom:52px;right:16px;z-index:9998;width:480px;max-height:300px;background:#1A1A1A;border:1px solid #333;border-radius:var(--radius-lg);overflow:hidden;display:none;flex-direction:column;font-family:monospace;font-size:11px}
@@ -3283,7 +3294,7 @@ tbody tr:hover td{background:var(--bg3)}
         <div class="card">
           <div class="card-header"><div class="card-title">Matriz de treinamentos</div></div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Funcionário</th><th>NR-6</th><th>NR-10</th><th>NR-11</th><th>NR-12</th><th>NR-18</th><th>NR-23</th><th>NR-33</th><th>NR-35</th><th>Trabalho em Altura</th><th>Direção Defensiva</th><th>Primeiros Socorros</th></tr></thead>
+            <thead><tr><th>Funcionário</th><th>NR-6</th><th>NR-10</th><th>NR-10 SEP</th><th>NR-11</th><th>NR-12</th><th>NR-18</th><th>NR-23</th><th>NR-33</th><th>NR-35</th><th>Trabalho em Altura</th><th>Direção Defensiva</th><th>Primeiros Socorros</th></tr></thead>
             <tbody id="rh-treinamentos-tbody">
             </tbody>
           </table></div>
@@ -3935,20 +3946,17 @@ tbody tr:hover td{background:var(--bg3)}
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Médico responsável *</label>
-        <input type="text" class="form-input" id="aso-medico" placeholder="Dr. Nome do Médico">
-      </div>
-      <div class="form-group">
-        <label class="form-label">CRM *</label>
-        <input type="text" class="form-input" id="aso-crm" placeholder="CRM/UF 000000">
-      </div>
-      <div class="form-group">
         <label class="form-label">Data de emissão *</label>
-        <input type="date" class="form-input" id="aso-data-emissao">
+        <input type="date" class="form-input" id="aso-data-emissao" onchange="asoCalcularValidade()">
       </div>
       <div class="form-group">
-        <label class="form-label">Validade *</label>
+        <label class="form-label">Validade (meses) *</label>
+        <input type="number" class="form-input" id="aso-validade-meses" min="1" max="60" value="12" onchange="asoCalcularValidade()" placeholder="Ex: 12">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Data de vencimento *</label>
         <input type="date" class="form-input" id="aso-validade">
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Calculada automaticamente. Pode ser ajustada manualmente.</div>
       </div>
       <div class="form-group full">
         <label class="form-label">Observações</label>
@@ -4336,10 +4344,7 @@ tbody tr:hover td{background:var(--bg3)}
           <option value="Reciclagem">Reciclagem</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Carga horária *</label>
-        <input type="text" class="form-input" id="tr-carga" placeholder="Ex: 40h">
-      </div>
+
       <div class="form-group">
         <label class="form-label">Data de realização *</label>
         <input type="date" class="form-input" id="tr-data-realizacao" onchange="trCalcularVencimento()">
@@ -4427,6 +4432,61 @@ function buildLogo(size){
     debugLog('err',['Unhandled Promise:', e.reason||e]);
   };
 })();
+
+// ══════════════════════════════════════════════════════
+// HISTÓRICO DE ALTERAÇÕES — auditoria reutilizável
+// ══════════════════════════════════════════════════════
+async function abrirHistorico(entidade, entidade_id, titulo){
+  document.getElementById('hist-subtitulo').textContent = titulo || '';
+  document.getElementById('hist-corpo').innerHTML =
+    `<div style="text-align:center;padding:32px;color:var(--text3)">
+       <i data-lucide="loader" style="width:24px;height:24px;margin-bottom:8px;opacity:.5"></i>
+       <div style="font-size:13px">Carregando histórico...</div>
+     </div>`;
+  openModal('modal-historico');
+  setTimeout(()=>lucide.createIcons(),50);
+  try {
+    const lista = await apiAudit.listar(entidade, entidade_id);
+    const corpo = document.getElementById('hist-corpo');
+    if(!lista.length){
+      corpo.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text3)">
+        <i data-lucide="clock" style="width:32px;height:32px;margin-bottom:10px;opacity:.3"></i>
+        <div style="font-size:13px">Nenhuma movimentação registrada ainda.</div>
+      </div>`;
+    } else {
+      const acaoIcone = (acao) => {
+        if(acao==='CRIADO'||acao==='REGISTRADO') return {cls:'create', icon:'plus'};
+        if(acao==='EDITADO'||acao==='ATUALIZADO') return {cls:'update', icon:'pencil'};
+        if(acao==='EXCLUIDO'||acao==='REMOVIDO') return {cls:'delete', icon:'trash-2'};
+        return {cls:'view', icon:'activity'};
+      };
+      corpo.innerHTML = lista.map(h => {
+        const {cls, icon} = acaoIcone(h.acao);
+        return `<div class="hist-item">
+          <div class="hist-icon ${cls}"><i data-lucide="${icon}" style="width:14px;height:14px"></i></div>
+          <div class="hist-body">
+            <div class="hist-acao">${h.acao}</div>
+            ${h.detalhe ? `<div class="hist-detalhe">${h.detalhe}</div>` : ''}
+            <div class="hist-meta">
+              <strong>${h.usuario_nome||'Sistema'}</strong>
+              ${h.usuario_email ? `· ${h.usuario_email}` : ''}
+              · ${h.criado_em||''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    setTimeout(()=>lucide.createIcons(),50);
+  } catch(e) {
+    document.getElementById('hist-corpo').innerHTML =
+      `<div style="padding:24px;color:var(--red);text-align:center">Erro ao carregar histórico.</div>`;
+  }
+}
+
+// Helper: registrar evento de auditoria sem bloquear UI
+function auditLog(entidade, entidade_id, acao, detalhe){
+  apiAudit.registrar(entidade, entidade_id, acao, detalhe).catch(()=>{});
+}
 
 function toggleDebug(){
   document.getElementById('debug-panel').classList.toggle('open');
@@ -6232,6 +6292,8 @@ function rhRenderFuncionarios(){
             <button class="btn btn-sm ${ativo?'':'btn-primary'}" onclick="funcToggleAtivo('${f.matricula}')" title="${ativo?'Desativar':'Ativar'}">
               ${ativo?'<i data-lucide="user-x" style="width:12px;height:12px"></i>':'<i data-lucide="user-check" style="width:12px;height:12px"></i>'}
             </button>
+            ${f.id ? `<button class="btn btn-sm" onclick="funcExcluirFuncionario(${f.id},'${(f.nome||'').replace(/'/g,"\\'")}')" title="Excluir funcionário" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>` : ''}
+            ${f.id ? `<button class="btn btn-sm" onclick="abrirHistorico('funcionarios',${f.id},'${(f.nome||'').replace(/'/g,"\\'")}')" title="Histórico" style="color:var(--text3)"><i data-lucide="history" style="width:12px;height:12px"></i></button>` : ''}
           </div>
         </td>
       </tr>`;
@@ -6242,14 +6304,14 @@ function rhRenderFuncionarios(){
 }
 
 // ── Matriz de Treinamentos e NRs (espelha FUNCIONARIOS) ──
-const NRS_COLUNAS = ['NR-6','NR-10','NR-11','NR-12','NR-18','NR-23','NR-33','NR-35','Trabalho em Altura','Direção Defensiva','Primeiros Socorros'];
+const NRS_COLUNAS = ['NR-6','NR-10','NR-10 SEP','NR-11','NR-12','NR-18','NR-23','NR-33','NR-35','Trabalho em Altura','Direção Defensiva','Primeiros Socorros'];
 
 // Validade padrão em meses por NR/treinamento — usada para sugerir
 // automaticamente a data de vencimento a partir da data de realização.
 // NR-10 e NR-35 têm validade de 2 anos confirmada em norma; demais seguem
 // prática usual de mercado (1 a 2 anos), editável pelo usuário.
 const NRS_VALIDADE_MESES = {
-  'NR-6': 12, 'NR-10': 24, 'NR-11': 12, 'NR-12': 24, 'NR-18': 12,
+  'NR-6': 12, 'NR-10': 24, 'NR-10 SEP': 24, 'NR-11': 12, 'NR-12': 24, 'NR-18': 12,
   'NR-23': 12, 'NR-33': 12, 'NR-35': 24, 'Trabalho em Altura': 24,
   'Direção Defensiva': 12, 'Primeiros Socorros': 12,
 };
@@ -6359,7 +6421,7 @@ async function trVerOuRegistrar(matricula, nrNome){
 
   const existente = (f.nrsDetalhes||{})[nrNome];
   document.getElementById('tr-tipo').value = existente?.tipo || '';
-  document.getElementById('tr-carga').value = existente?.cargaHoraria || '';
+
   document.getElementById('tr-data-realizacao').value = existente?.dataRealizacao || '';
   document.getElementById('tr-validade-meses').value = existente?.validadeMeses || NRS_VALIDADE_MESES[nrNome] || 12;
   document.getElementById('tr-data-vencimento').value = existente?.dataVencimento || '';
@@ -6445,7 +6507,6 @@ async function trSalvar(){
   const nrNome        = document.getElementById('tr-nr-nome').value;
   const funcId        = document.getElementById('tr-func-id').value;
   const tipo          = document.getElementById('tr-tipo').value;
-  const cargaHoraria  = document.getElementById('tr-carga').value.trim();
   const dataRealizacao= document.getElementById('tr-data-realizacao').value;
   const validadeMeses = parseInt(document.getElementById('tr-validade-meses').value) || null;
   const dataVencimento= document.getElementById('tr-data-vencimento').value;
@@ -6453,7 +6514,6 @@ async function trSalvar(){
 
   // ── Validação de campos obrigatórios ──────────────────
   if(!tipo)          { showToast('Selecione o tipo de treinamento.','error'); return; }
-  if(!cargaHoraria)  { showToast('Informe a carga horária.','error'); return; }
   if(!dataRealizacao){ showToast('Informe a data de realização.','error'); return; }
   if(!validadeMeses) { showToast('Informe a validade em meses.','error'); return; }
   if(!dataVencimento){ showToast('Informe ou calcule a data de vencimento.','error'); return; }
@@ -6472,7 +6532,7 @@ async function trSalvar(){
   if(!f.nrsDetalhes) f.nrsDetalhes = {};
   const temAnexo = true; // Validamos acima que há ao menos 1 arquivo
   f.nrsDetalhes[nrNome] = {
-    tipo, cargaHoraria, dataRealizacao, validadeMeses, dataVencimento, instituicao,
+    tipo, dataRealizacao, validadeMeses, dataVencimento, instituicao,
     arquivosNomes: trArquivosTemp.map(a => a.nome_orig || a.name),
   };
 
@@ -6778,6 +6838,17 @@ async function funcEditar(matricula){
   }
   funcRenderArquivos();
   openModal('modal-funcionario');
+}
+
+function funcExcluirFuncionario(id, nome){
+  if(!confirm(`⚠️ Excluir permanentemente o funcionário "${nome}"?\n\nEsta ação remove todos os dados vinculados (ASOs, treinamentos, documentos). Esta ação não pode ser desfeita.`)) return;
+  apiFuncionarios.excluir(id)
+    .then(()=>{
+      auditLog('funcionarios', id, 'EXCLUIDO', `Funcionário "${nome}" excluído permanentemente.`);
+      showToast(`Funcionário "${nome}" excluído.`, 'success');
+      rhCarregarFuncionarios();
+    })
+    .catch(e=>showToast(e.message,'error'));
 }
 
 function funcToggleAtivo(matricula){
@@ -8678,8 +8749,9 @@ async function asoOpenModal(id=null){
   asoPopularFuncionarioSelect();
   // Limpar campos
   ['aso-funcionario','aso-tipo','aso-resultado'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
-  ['aso-medico','aso-crm','aso-obs'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
+  ['aso-obs'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
   ['aso-data-emissao','aso-validade'].forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
+  const asoValMeses = document.getElementById('aso-validade-meses'); if(asoValMeses) asoValMeses.value='12';
   const lista = document.getElementById('aso-arquivos-lista');
   if(lista) lista.innerHTML='';
   const fi = document.getElementById('aso-file-input');
@@ -8692,10 +8764,14 @@ async function asoOpenModal(id=null){
     document.getElementById('aso-funcionario').value = aso.matricula||'';
     document.getElementById('aso-tipo').value = aso.tipo||'';
     document.getElementById('aso-resultado').value = aso.resultado||'';
-    document.getElementById('aso-medico').value = aso.medico||'';
-    document.getElementById('aso-crm').value = aso.crm||'';
     document.getElementById('aso-data-emissao').value = aso.dataEmissao||'';
     document.getElementById('aso-validade').value = aso.validade||'';
+    // Calcular validade em meses a partir das datas salvas
+    if(aso.dataEmissao && aso.validade){
+      const d1=new Date(aso.dataEmissao+'T00:00:00'), d2=new Date(aso.validade+'T00:00:00');
+      const meses=Math.round((d2-d1)/(1000*60*60*24*30.44));
+      const el=document.getElementById('aso-validade-meses'); if(el) el.value=meses>0?meses:12;
+    }
     document.getElementById('aso-obs').value = aso.obs||'';
     // Carregar arquivos existentes do servidor
     try{
@@ -8705,18 +8781,26 @@ async function asoOpenModal(id=null){
     repoRenderArquivos('aso');
   } else {
     document.getElementById('aso-modal-titulo').textContent = 'Registrar ASO';
-    // data emissão default = hoje
+    // data emissão default = hoje + validade 12 meses
     document.getElementById('aso-data-emissao').value = new Date().toISOString().slice(0,10);
+    asoCalcularValidade();
   }
   openModal('modal-aso');
+}
+
+function asoCalcularValidade(){
+  const dataEmissao = document.getElementById('aso-data-emissao').value;
+  const meses = parseInt(document.getElementById('aso-validade-meses').value) || 0;
+  if(!dataEmissao || !meses) return;
+  const d = new Date(dataEmissao+'T00:00:00');
+  d.setMonth(d.getMonth()+meses);
+  document.getElementById('aso-validade').value = d.toISOString().slice(0,10);
 }
 
 function asoSalvar(){
   const matricula = document.getElementById('aso-funcionario').value;
   const tipo      = document.getElementById('aso-tipo').value;
   const resultado = document.getElementById('aso-resultado').value;
-  const medico    = document.getElementById('aso-medico').value.trim();
-  const crm       = document.getElementById('aso-crm').value.trim();
   const dataEmissao = document.getElementById('aso-data-emissao').value;
   const validade  = document.getElementById('aso-validade').value;
   const obs       = document.getElementById('aso-obs').value.trim();
@@ -8724,14 +8808,12 @@ function asoSalvar(){
   if(!matricula)  { showToast('Selecione o funcionário.','error'); return; }
   if(!tipo)       { showToast('Selecione o tipo de ASO.','error'); return; }
   if(!resultado)  { showToast('Selecione o resultado.','error'); return; }
-  if(!medico)     { showToast('Informe o médico responsável.','error'); return; }
-  if(!crm)        { showToast('Informe o CRM do médico.','error'); return; }
   if(!dataEmissao){ showToast('Informe a data de emissão.','error'); return; }
   if(!validade)   { showToast('Informe a data de validade.','error'); return; }
 
   const func = (FUNCIONARIOS||[]).find(f=>f.matricula===matricula);
   const nomeFuncionario = func ? func.nome : matricula;
-  const dados = { matricula, nomeFuncionario, tipo, resultado, medico, crm, dataEmissao, validade, obs };
+  const dados = { matricula, nomeFuncionario, tipo, resultado, dataEmissao, validade, obs };
 
   // Filtrar apenas File objects novos (não objetos do servidor)
   const novosArquivos = asoArquivosTemp.filter(a => a instanceof File);
@@ -8748,6 +8830,8 @@ function asoSalvar(){
       }
     }
     showToast(asoEditandoId?'ASO atualizado com sucesso.':'ASO registrado com sucesso.','success');
+    const detalhe = `Tipo: ${dados.tipo} | Resultado: ${dados.resultado} | Emissão: ${dados.dataEmissao} | Validade: ${dados.validade}`;
+    auditLog('asos', asoId, asoEditandoId?'EDITADO':'REGISTRADO', detalhe);
     closeModal('modal-aso');
     asoCarregar().then(()=>asoRender());
   }).catch(e=>showToast(e.message,'error'));
@@ -8799,6 +8883,7 @@ function asoRender(){
         <div style="display:flex;gap:4px;align-items:center">
           <button class="btn btn-sm" onclick="asoOpenModal('${a.id}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
           <button class="btn btn-sm" onclick="arquivosAbrir('asos','${a.id}','ASO — ${(a.nomeFuncionario||'').replace(/'/g,"\\'")} / ${(a.tipo||'').replace(/'/g,"\\'")}' )" title="Ver/Anexar arquivos" style="color:var(--blue)"><i data-lucide="paperclip" style="width:12px;height:12px"></i></button>
+          <button class="btn btn-sm" onclick="abrirHistorico('asos',${a.id},'ASO — ${(a.nomeFuncionario||'').replace(/'/g,"\\'")}')" title="Histórico" style="color:var(--text3)"><i data-lucide="history" style="width:12px;height:12px"></i></button>
           <button class="btn btn-sm" onclick="asoExcluir('${a.id}')" title="Excluir" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>
         </div>
       </td>
@@ -9078,7 +9163,22 @@ function repoExcluir(tipo, id){
 
 // ── ARQUIVOS — VIEWER MODAL ─────────────────────────────────────
 // Abre o modal de visualização/download de arquivos de um registro
+// Variáveis para rastreamento do contexto atual do viewer
+let _arqViewerEntidade   = '';
+let _arqViewerEntidadeId = null;
+let _arqViewerTituloHist = '';
+
+function arqAbrirHistorico(){
+  if(_arqViewerEntidade) abrirHistorico(_arqViewerEntidade, _arqViewerEntidadeId, _arqViewerTituloHist);
+}
+
 async function arquivosAbrir(entidade, entidadeId, titulo, subtitulo){
+  _arqViewerEntidade   = entidade;
+  _arqViewerEntidadeId = entidadeId;
+  _arqViewerTituloHist = titulo || '';
+  // Mostrar botão Histórico
+  const histBtn = document.getElementById('arq-viewer-hist-btn');
+  if(histBtn) histBtn.style.display = entidade ? '' : 'none';
   document.getElementById('arq-viewer-titulo').textContent = titulo || 'Arquivos';
   document.getElementById('arq-viewer-subtitulo').textContent = subtitulo || '';
   document.getElementById('arq-lista-itens').innerHTML = '';
@@ -10304,8 +10404,8 @@ function dashboardRender(){
      MODAL — VISUALIZADOR / GERENCIADOR DE ARQUIVOS
      Usado por: ASO, EPI, Anexos Contratuais, Func Documentação
 ════════════════════════════════════════════════════════════════ -->
-<div class="modal-overlay" id="modal-arquivos-viewer">
-  <div class="modal" style="max-width:760px;max-height:90vh;display:flex;flex-direction:column">
+<div class="modal-overlay" id="modal-arquivos-viewer" style="padding:0">
+  <div class="modal" style="width:100vw;max-width:100vw;height:100vh;max-height:100vh;margin:0;border-radius:0;display:flex;flex-direction:column">
     <div class="modal-header" style="flex-shrink:0">
       <div>
         <div class="modal-title" id="arq-viewer-titulo">Arquivos</div>
@@ -10352,7 +10452,34 @@ function dashboardRender(){
     </div>
 
     <div class="modal-footer" style="flex-shrink:0">
+      <button class="btn btn-secondary" id="arq-viewer-hist-btn" onclick="arqAbrirHistorico()" style="display:none">
+        <i data-lucide="history" style="width:13px;height:13px;margin-right:4px"></i> Histórico
+      </button>
       <button class="btn btn-secondary" onclick="closeModal('modal-arquivos-viewer')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODAL — HISTÓRICO DE ALTERAÇÕES (auditoria)
+════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-historico">
+  <div class="modal" style="max-width:640px;max-height:90vh;display:flex;flex-direction:column">
+    <div class="modal-header" style="flex-shrink:0">
+      <div>
+        <div class="modal-title"><i data-lucide="history" style="width:15px;height:15px;vertical-align:middle;margin-right:6px"></i> Histórico de alterações</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="hist-subtitulo"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-historico')"><i data-lucide="x"></i></button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px" id="hist-corpo">
+      <div style="text-align:center;padding:32px;color:var(--text3)">
+        <i data-lucide="loader" style="width:24px;height:24px;margin-bottom:8px;opacity:.5"></i>
+        <div style="font-size:13px">Carregando histórico...</div>
+      </div>
+    </div>
+    <div class="modal-footer" style="flex-shrink:0">
+      <button class="btn btn-secondary" onclick="closeModal('modal-historico')">Fechar</button>
     </div>
   </div>
 </div>
