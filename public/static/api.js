@@ -155,12 +155,14 @@ const apiArquivos = {
 const apiAudit = {
   registrar: (entidade, entidade_id, acao, detalhe) =>
     apiPost('/audit', { entidade, entidade_id, acao, detalhe }),
-  listar: (entidade, entidade_id) =>
-    apiGet('/audit?' + new URLSearchParams(
+  listar: (entidade, entidade_id, extraParams) => {
+    const base = { entidade, entidade_id, ...(extraParams||{}) };
+    return apiGet('/audit?' + new URLSearchParams(
       Object.fromEntries(
-        Object.entries({ entidade, entidade_id }).filter(([,v]) => v != null)
+        Object.entries(base).filter(([,v]) => v != null && v !== '')
       )
-    )),
+    ));
+  },
 };
 
 // ── Verificar sessão salva ao carregar ────────────────────────

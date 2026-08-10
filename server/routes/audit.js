@@ -17,14 +17,16 @@ router.post('/', (req, res) => {
   res.json({ ok: true });
 });
 
-// GET /api/audit?entidade=asos&entidade_id=5 — listar histórico
+// GET /api/audit?entidade=asos&entidade_id=5&de=2025-01-01&ate=2025-12-31 — listar histórico
 router.get('/', (req, res) => {
-  const { entidade, entidade_id } = req.query;
+  const { entidade, entidade_id, de, ate } = req.query;
   let sql  = 'SELECT * FROM audit_log WHERE 1=1';
   const params = [];
   if (entidade)    { sql += ' AND entidade = ?';    params.push(entidade); }
   if (entidade_id) { sql += ' AND entidade_id = ?'; params.push(Number(entidade_id)); }
-  sql += ' ORDER BY criado_em DESC LIMIT 200';
+  if (de)  { sql += ' AND date(criado_em) >= ?'; params.push(de); }
+  if (ate) { sql += ' AND date(criado_em) <= ?'; params.push(ate); }
+  sql += ' ORDER BY criado_em DESC LIMIT 500';
   const rows = db.prepare(sql).all(...params);
   res.json(rows);
 });
