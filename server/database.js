@@ -127,6 +127,17 @@ db.exec(`
 `);
 
 // ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// MIGRATIONS — adicionar colunas sem recriar tabelas
+// ══════════════════════════════════════════════════
+const migrations = [
+  "ALTER TABLE obras ADD COLUMN cliente  TEXT DEFAULT ''",
+  "ALTER TABLE obras ADD COLUMN contrato TEXT DEFAULT ''",
+];
+migrations.forEach(sql => {
+  try { db.exec(sql); } catch(e) { /* coluna já existe — ignorar */ }
+});
+
 // SEED — usuário admin padrão
 // ══════════════════════════════════════════════════
 const adminEmail = 'guilherme@engelinhas.com.br';

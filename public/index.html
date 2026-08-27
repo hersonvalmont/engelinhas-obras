@@ -8264,6 +8264,14 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
         <input type="text" class="form-input" id="obra-nome" placeholder="Ex: SE Uberlândia 500kV">
       </div>
       <div class="form-group">
+        <label class="form-label">Cliente</label>
+        <input type="text" class="form-input" id="obra-cliente" placeholder="Ex: ONS, CEMIG GT, Neo Energia...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contrato</label>
+        <input type="text" class="form-input" id="obra-contrato" placeholder="Ex: CT-2024-035">
+      </div>
+      <div class="form-group">
         <label class="form-label">UF *</label>
         <select class="form-select" id="obra-uf">
           <option value="">Selecione...</option>
@@ -8407,6 +8415,14 @@ let obrasAtualId = null;
 async function obrasCarregar(){
   try{
     OBRAS_LISTA = await apiObras.listar();
+    // Sincronizar RDO_OBRAS com dados reais da API (nome + cliente + contrato)
+    OBRAS_LISTA.forEach(o=>{
+      RDO_OBRAS[o.id] = {
+        nome:     o.nome     || '',
+        cliente:  o.cliente  || RDO_OBRAS[o.id]?.cliente  || '',
+        contrato: o.contrato || RDO_OBRAS[o.id]?.contrato || '',
+      };
+    });
     obrasRender();
   }catch(e){ console.warn('Erro ao carregar obras:', e); }
 }
@@ -8537,6 +8553,8 @@ function obrasOpenModal(id){
   document.getElementById('obra-prazo').value='';
   document.getElementById('obra-progresso').value='0';
   document.getElementById('obra-status').value='Em execução';
+  document.getElementById('obra-cliente').value='';
+  document.getElementById('obra-contrato').value='';
   document.getElementById('obra-descricao').value='';
   openModal('modal-nova-obra');
   setTimeout(()=>lucide.createIcons(),50);
@@ -8555,6 +8573,8 @@ function obrasOpenModalEditar(id){
   document.getElementById('obra-prazo').value=o.prazo||'';
   document.getElementById('obra-progresso').value=o.progresso||0;
   document.getElementById('obra-status').value=o.status;
+  document.getElementById('obra-cliente').value=o.cliente||'';
+  document.getElementById('obra-contrato').value=o.contrato||'';
   document.getElementById('obra-descricao').value=o.descricao||'';
   openModal('modal-nova-obra');
   setTimeout(()=>lucide.createIcons(),50);
@@ -8569,17 +8589,19 @@ function obrasSalvar(){
   const prazo=document.getElementById('obra-prazo').value;
   const progresso=parseInt(document.getElementById('obra-progresso').value)||0;
   const status=document.getElementById('obra-status').value;
+  const cliente=document.getElementById('obra-cliente').value.trim();
+  const contrato=document.getElementById('obra-contrato').value.trim();
   const descricao=document.getElementById('obra-descricao').value.trim();
   const editId=document.getElementById('obra-edit-id').value;
 
   if(!nome){ alert('Informe o nome da obra.'); return; }
   if(!uf){ alert('Selecione a UF.'); return; }
 
-  const dados = { nome, uf, fase, criticidade, fiscal, prazo, progresso, status, descricao };
+  const dados = { nome, uf, fase, criticidade, fiscal, prazo, progresso, status, cliente, contrato, descricao };
   const op = editId ? apiObras.editar(editId, dados) : apiObras.criar(dados);
   op.then((salva)=>{
     const obraId2 = editId || (salva&&salva.id);
-    auditLog('obras', obraId2, editId?'EDITADA':'CRIADA', `Obra "${nome}" | UF: ${uf} | Fase: ${fase} | Status: ${status} | Criticidade: ${criticidade}`);
+    auditLog('obras', obraId2, editId?'EDITADA':'CRIADA', `Obra "${nome}" | UF: ${uf} | Fase: ${fase} | Status: ${status} | Cliente: ${cliente||'—'} | Contrato: ${contrato||'—'}`);
     closeModal('modal-nova-obra');
     showToast(editId?'Obra atualizada com sucesso!':'Obra "'+nome+'" cadastrada com sucesso!','success');
     obrasCarregar();
