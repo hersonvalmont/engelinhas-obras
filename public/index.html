@@ -1854,7 +1854,17 @@ tbody tr:hover td{background:var(--bg3)}
           <div class="card" style="margin-bottom:16px">
             <div class="card-header">
               <div class="card-title"><i data-lucide="wrench" style="width:14px;height:14px;margin-right:6px"></i> Serviços Executados</div>
-              <button class="btn btn-sm btn-primary" onclick="rdoAddServico()"><i data-lucide="plus"></i> Adicionar serviço</button>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                <button class="btn btn-sm" onclick="rdoAbrirPredefinicoes()" title="Carregar lista de serviços por frente de trabalho">
+                  <i data-lucide="layout-list" style="width:13px;height:13px"></i> Predefinições
+                </button>
+                <button class="btn btn-sm" onclick="rdoLimparServicos()" style="color:var(--red)" title="Excluir todos os serviços da lista">
+                  <i data-lucide="trash-2" style="width:13px;height:13px"></i> Excluir tudo
+                </button>
+                <button class="btn btn-sm btn-primary" onclick="rdoAddServico()">
+                  <i data-lucide="plus" style="width:13px;height:13px"></i> Adicionar serviço
+                </button>
+              </div>
             </div>
             <div style="overflow-x:auto">
               <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:900px">
@@ -5179,6 +5189,174 @@ const RDO_SERVICOS_PADRAO = [
   '15) Instalação de Acessórios',
   '16) Comissionamento',
 ];
+
+// ─── Frentes de Serviço por tipo de obra (dados do Excel Engelinhas) ────────
+const RDO_FRENTES = {
+  lt: [
+    'Estudo de traçado da linha',
+    'Levantamento topográfico da faixa',
+    'Estudo de impacto ambiental (EIA/RIMA, quando exigível)',
+    'Licenciamento ambiental (LP, LI, LO)',
+    'Levantamento fundiário e cadastro de proprietários atingidos',
+    'Elaboração de laudo técnico de indenização por propriedade',
+    'Negociação e obtenção de servidão administrativa',
+    'Escritura pública da faixa de servidão',
+    'Definição da classe de tensão e geometria da torre',
+    'Escolha do tipo de condutor e limite térmico',
+    'Abertura de estradas de acesso',
+    'Adequação/manutenção de estradas vicinais existentes',
+    'Limpeza de faixa de servidão (supressão vegetal)',
+    'Terraplenagem de acessos e praças de montagem',
+    'Sondagem e classificação de solo (SUCS)',
+    'Locação de estruturas / piquetamento',
+    'Escavação de cavas',
+    'Execução de fundação em grelha metálica',
+    'Execução de fundação em tubulão (com montagem de stub)',
+    'Execução de fundação em rocha (bloco/sapata/grelha ancorada)',
+    'Execução de fundação estaqueada',
+    'Reaterro e compactação',
+    'Nivelamento e conferência de fundação',
+    'Pré-montagem de seções da torre em solo',
+    'Montagem de estrutura autoportante',
+    'Montagem de estrutura estaiada (mastro provisório e estais)',
+    'Içamento de estrutura (manual ou mecanizado)',
+    'Tensionamento de estais e nivelamento de torre',
+    'Instalação de sistema de aterramento (contrapeso)',
+    'Medição de resistividade do solo',
+    'Aterramento de cercas na faixa',
+    'Montagem de cadeias de isoladores',
+    'Lançamento de cabos condutores',
+    'Lançamento de cabos para-raios (incluindo OPGW, se aplicável)',
+    'Regulagem (flecha) dos cabos',
+    'Grampeação de cabos condutores e para-raios',
+    'Sinalização e numeração de torres',
+    'Revisão final da faixa e estruturas',
+  ],
+  se: [
+    'Estudo de viabilidade / análise de demanda',
+    'Levantamento topográfico do terreno',
+    'Projeto conceitual (layout, especificação de equipamentos)',
+    'Projeto básico',
+    'Projeto executivo (elétrico, civil, proteção e controle)',
+    'Licenciamento ambiental',
+    'Aprovação de projeto junto à concessionária / órgãos reguladores',
+    'Terraplenagem',
+    'Sistema de drenagem',
+    'Execução de malha de aterramento',
+    'Fundações e bases de concreto para equipamentos',
+    'Dutos e canaletas para cabeamento',
+    'Edificação de casa de comando / controle',
+    'Cercamento e portão de acesso',
+    'Montagem de pórticos e suportes de equipamentos',
+    'Instalação de transformador de força',
+    'Instalação de disjuntores',
+    'Instalação de seccionadoras',
+    'Instalação de transformadores de potencial (TP) e de corrente (TC)',
+    'Instalação de para-raios',
+    'Instalação de banco de capacitores (shunt/série)',
+    'Instalação de reatores',
+    'Montagem de barramentos',
+    'Montagem de isoladores de suporte',
+    'Interligação de cabos de média tensão',
+    'Interligação de cabos de baixa tensão',
+    'Instalação de painéis de proteção e controle',
+    'Instalação e parametrização de relés',
+    'Cabeamento de sinalização e supervisão (SCADA, quando aplicável)',
+    'Testes de aceitação de equipamentos',
+    'Comissionamento (a frio e a quente)',
+    'Urbanização e paisagismo (embritamento, ajardinamento)',
+    'Limpeza geral e entrega da obra',
+  ],
+  eletr: [
+    'Análise de projeto (plantas e diagramas técnicos)',
+    'Elaboração de cronograma e alocação de recursos',
+    'Planejamento logístico (transporte e armazenamento de componentes)',
+    'Revisão de normas aplicáveis e obtenção de autorizações',
+    'Limpeza e nivelamento da área',
+    'Execução de fundações e bases metálicas/concreto',
+    'Instalação de suportes (eletrocalhas, bandejas, racks)',
+    'Montagem de tubulações e sistemas mecânicos',
+    'Instalação e interligação de sistemas elétricos',
+    'Montagem de quadros e painéis elétricos',
+    'Testes funcionais de equipamentos',
+    'Comissionamento (frio e a quente)',
+    'Entrega técnica e documentação as built',
+  ],
+  civil: [
+    'Instalações provisórias de obra (elétrica, água, esgoto)',
+    'Mobilização, desmobilização e transporte de materiais',
+    'Montagem de canteiro / container de obra',
+    'Sinalização e isolamento de área',
+    'Terraplenagem',
+    'Fundações',
+    'Estrutura (concreto armado, metálica ou mista)',
+    'Alvenaria e vedações',
+    'Cobertura',
+    'Instalações elétricas prediais',
+    'Instalações hidrossanitárias',
+    'Instalações de combate a incêndio (quando aplicável)',
+    'Limpeza geral da obra',
+    'Verificação final de instalações e acabamentos',
+    'Entrega técnica à fiscalização',
+  ],
+  comiss: [
+    'Planejamento do comissionamento (plano e cronograma)',
+    'Complementação mecânica',
+    'Pré-comissionamento (definição de sistemas/subsistemas, testes de equipamentos isolados)',
+    'Comissionamento a frio (sem carga)',
+    'Comissionamento a quente (com carga)',
+    'Testes de sequenciamento e intertravamento',
+    'Teste de desempenho',
+    'Verificação de distâncias de segurança e posicionamento de isoladores',
+    'Aceitação técnica',
+    'Operação assistida (pós-entrega)',
+  ],
+};
+
+// Limpar todos os serviços da tabela com confirmação
+function rdoLimparServicos(){
+  if(!confirm('Excluir todos os serviços da lista?\n\nEsta ação não pode ser desfeita.')) return;
+  rdoRenderServicos([]);
+}
+
+// Abrir modal de predefinições por frente de trabalho
+function rdoAbrirPredefinicoes(){
+  // Resetar seleção
+  const radios = document.querySelectorAll('input[name="rdo-frente-radio"]');
+  radios.forEach(r => r.checked = false);
+  // Limpar preview
+  const prev = document.getElementById('rdo-pred-preview');
+  if(prev) prev.innerHTML = '<p style="color:var(--text3);font-size:12px;text-align:center;padding:20px 0">Selecione uma frente para visualizar os serviços.</p>';
+  document.getElementById('modal-rdo-predefinicoes').style.display = 'flex';
+}
+
+function rdoPredVisualizarFrente(chave){
+  const nomes = {
+    lt: 'LT — Linha de Transmissão',
+    se: 'SE — Subestação',
+    eletr: 'Montagem Eletromecânica',
+    civil: 'Obras Civis / Infraestrutura',
+    comiss: 'Comissionamento',
+  };
+  const itens = RDO_FRENTES[chave] || [];
+  const prev = document.getElementById('rdo-pred-preview');
+  if(!prev) return;
+  prev.innerHTML = `
+    <p style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:600">${nomes[chave]} — ${itens.length} serviços</p>
+    <ol style="margin:0;padding-left:18px;font-size:12px;color:var(--text);line-height:1.8">
+      ${itens.map(s=>`<li>${s}</li>`).join('')}
+    </ol>`;
+}
+
+function rdoCarregarPredefinicao(){
+  const radio = document.querySelector('input[name="rdo-frente-radio"]:checked');
+  if(!radio){ alert('Selecione uma frente de trabalho.'); return; }
+  const chave = radio.value;
+  const itens = RDO_FRENTES[chave] || [];
+  const lista = itens.map(nome => ({ nome, previsto:'', execDia:'', acumulado:'' }));
+  rdoRenderServicos(lista);
+  document.getElementById('modal-rdo-predefinicoes').style.display = 'none';
+}
 
 // MO padrão conforme XLSX
 const RDO_MO_PADRAO = {
@@ -10866,6 +11044,112 @@ function dashboardRender(){
     </div>
   </div>
 </div>
+
+<!-- MODAL: Predefinições por Frente de Trabalho (RDO Serviços) -->
+<div class="modal-overlay" id="modal-rdo-predefinicoes" style="display:none;align-items:flex-start;padding-top:60px">
+  <div class="modal" style="max-width:700px;width:95%;max-height:80vh;display:flex;flex-direction:column">
+    <div class="modal-header" style="flex-shrink:0">
+      <div class="modal-title"><i data-lucide="layout-list" style="width:16px;height:16px;margin-right:8px;vertical-align:middle"></i> Predefinições — Frente de Trabalho</div>
+      <button class="modal-close" onclick="document.getElementById('modal-rdo-predefinicoes').style.display='none'">✕</button>
+    </div>
+    <div class="modal-body" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px">
+      <p style="font-size:13px;color:var(--text2);margin:0">
+        Selecione a frente de trabalho deste RDO. A lista de serviços será carregada automaticamente na tabela, substituindo os itens atuais.
+      </p>
+
+      <!-- Cards de seleção de frente -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px">
+
+        <label style="cursor:pointer" onclick="rdoPredVisualizarFrente('lt')">
+          <input type="radio" name="rdo-frente-radio" value="lt" style="display:none">
+          <div class="rdo-frente-card" data-frente="lt" style="border:2px solid var(--border);border-radius:8px;padding:14px 12px;transition:all 0.15s;user-select:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:20px">⚡</span>
+              <span style="font-weight:700;font-size:13px;color:var(--text)">Linha de Transmissão</span>
+            </div>
+            <span style="font-size:11px;color:var(--text3)">LT — 38 serviços</span>
+          </div>
+        </label>
+
+        <label style="cursor:pointer" onclick="rdoPredVisualizarFrente('se')">
+          <input type="radio" name="rdo-frente-radio" value="se" style="display:none">
+          <div class="rdo-frente-card" data-frente="se" style="border:2px solid var(--border);border-radius:8px;padding:14px 12px;transition:all 0.15s;user-select:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:20px">🏭</span>
+              <span style="font-weight:700;font-size:13px;color:var(--text)">Subestação</span>
+            </div>
+            <span style="font-size:11px;color:var(--text3)">SE — 33 serviços</span>
+          </div>
+        </label>
+
+        <label style="cursor:pointer" onclick="rdoPredVisualizarFrente('eletr')">
+          <input type="radio" name="rdo-frente-radio" value="eletr" style="display:none">
+          <div class="rdo-frente-card" data-frente="eletr" style="border:2px solid var(--border);border-radius:8px;padding:14px 12px;transition:all 0.15s;user-select:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:20px">🔧</span>
+              <span style="font-weight:700;font-size:13px;color:var(--text)">Montagem Eletromecânica</span>
+            </div>
+            <span style="font-size:11px;color:var(--text3)">13 serviços</span>
+          </div>
+        </label>
+
+        <label style="cursor:pointer" onclick="rdoPredVisualizarFrente('civil')">
+          <input type="radio" name="rdo-frente-radio" value="civil" style="display:none">
+          <div class="rdo-frente-card" data-frente="civil" style="border:2px solid var(--border);border-radius:8px;padding:14px 12px;transition:all 0.15s;user-select:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:20px">🏗️</span>
+              <span style="font-weight:700;font-size:13px;color:var(--text)">Obras Civis / Infraestrutura</span>
+            </div>
+            <span style="font-size:11px;color:var(--text3)">15 serviços</span>
+          </div>
+        </label>
+
+        <label style="cursor:pointer" onclick="rdoPredVisualizarFrente('comiss')">
+          <input type="radio" name="rdo-frente-radio" value="comiss" style="display:none">
+          <div class="rdo-frente-card" data-frente="comiss" style="border:2px solid var(--border);border-radius:8px;padding:14px 12px;transition:all 0.15s;user-select:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:20px">✅</span>
+              <span style="font-weight:700;font-size:13px;color:var(--text)">Comissionamento</span>
+            </div>
+            <span style="font-size:11px;color:var(--text3)">10 serviços</span>
+          </div>
+        </label>
+
+      </div>
+
+      <!-- Preview dos serviços da frente selecionada -->
+      <div style="border:1px solid var(--border);border-radius:8px;padding:14px;background:var(--bg2);max-height:260px;overflow-y:auto">
+        <div id="rdo-pred-preview">
+          <p style="color:var(--text3);font-size:12px;text-align:center;padding:20px 0">Selecione uma frente para visualizar os serviços.</p>
+        </div>
+      </div>
+
+      <!-- Aviso -->
+      <p style="font-size:11px;color:var(--amber);margin:0;display:flex;align-items:center;gap:6px">
+        <i data-lucide="alert-triangle" style="width:13px;height:13px;flex-shrink:0"></i>
+        Os serviços atuais da tabela serão <strong>substituídos</strong> pelos da frente selecionada. Você pode editar individualmente após carregar.
+      </p>
+    </div>
+    <div class="modal-footer" style="flex-shrink:0">
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-rdo-predefinicoes').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary" onclick="rdoCarregarPredefinicao()">
+        <i data-lucide="check" style="width:14px;height:14px"></i> Carregar Predefinição
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Highlight do card de frente selecionado */
+input[name="rdo-frente-radio"]:checked + .rdo-frente-card {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+.rdo-frente-card:hover {
+  border-color: var(--primary);
+  opacity: 0.9;
+}
+</style>
 
 </body>
 </html>
