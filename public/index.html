@@ -3446,22 +3446,26 @@ tbody tr:hover td{background:var(--bg3)}
           <div>
             <div class="page-breadcrumb"><i data-lucide="users-round"></i> Recursos Humanos <i data-lucide="chevron-right"></i> <span>Mobilização</span></div>
             <div class="page-title">Mobilização e Desmobilização</div>
-            <div class="page-sub">Controle de entrada e saída de efetivo por obra e frente de serviço</div>
+            <div class="page-sub">Funcionários com documentação completa — aptos para mobilização</div>
           </div>
-          <button class="btn btn-primary"><i data-lucide="plus"></i> Nova mobilização</button>
         </div>
-        <div class="kpi-grid kpi-grid-4">
-          <div class="kpi blue"><div class="kpi-label">Mobilizações ativas</div><div class="kpi-value">0</div></div>
-          <div class="kpi green"><div class="kpi-label">Funcionários mobilizados</div><div class="kpi-value">0</div></div>
-          <div class="kpi amber"><div class="kpi-label">Previstas (30 dias)</div><div class="kpi-value">0</div></div>
-          <div class="kpi"><div class="kpi-label">Desmobilizações (mês)</div><div class="kpi-value">0</div></div>
+        <div class="kpi-grid kpi-grid-3">
+          <div class="kpi blue"><div class="kpi-label">Aptos para mobilização</div><div class="kpi-value" id="mob-kpi-aptos">0</div></div>
+          <div class="kpi green"><div class="kpi-label">Documentação completa</div><div class="kpi-value" id="mob-kpi-completo">0</div></div>
+          <div class="kpi amber"><div class="kpi-label">Documentação pendente</div><div class="kpi-value" id="mob-kpi-pendente">0</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><div class="card-title">Registro de mobilizações</div></div>
+          <div class="card-header">
+            <div class="card-title">Funcionários aptos para mobilização</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="text" class="form-input" id="mob-busca" placeholder="Buscar funcionário..." style="width:200px;font-size:12px" oninput="mobilizacaoRender()">
+              <select class="form-select" id="mob-filtro-obra" style="width:200px;font-size:12px" onchange="mobilizacaoRender()"><option value="">Todas as obras</option></select>
+            </div>
+          </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Funcionário</th><th>Função</th><th>Obra destino</th><th>Data mobilização</th><th>Previsão desmob.</th><th>Transporte</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3);font-size:13px">Nenhuma mobilização registrada.</td></tr>
+            <thead><tr><th>Matrícula</th><th>Funcionário</th><th>Função</th><th>Obra</th><th>Regime</th><th>Admissão</th><th>Docs</th></tr></thead>
+            <tbody id="mob-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3);font-size:13px">Carregando...</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -4541,6 +4545,83 @@ async function abrirHistorico(entidade, entidade_id, titulo){
     document.getElementById('hist-corpo').innerHTML =
       `<div style="padding:24px;color:var(--red);text-align:center">Erro ao carregar histórico.</div>`;
   }
+}
+
+// ══════════════════════════════════════════════════════
+// MOBILIZAÇÃO — lista automática por docs=Completo
+// ══════════════════════════════════════════════════════
+function mobilizacaoRender(){
+  const tbody = document.getElementById('mob-tbody');
+  if(!tbody) return;
+
+  const ativos = (FUNCIONARIOS||[]).filter(f => f.ativo !== false);
+  const completos = ativos.filter(f => f.docs === 'Completo');
+  const pendentes = ativos.filter(f => f.docs !== 'Completo');
+
+  // KPIs
+  const kpiAptos   = document.getElementById('mob-kpi-aptos');
+  const kpiComp    = document.getElementById('mob-kpi-completo');
+  const kpiPend    = document.getElementById('mob-kpi-pendente');
+  if(kpiAptos)   kpiAptos.textContent   = completos.length;
+  if(kpiComp)    kpiComp.textContent    = completos.length;
+  if(kpiPend)    kpiPend.textContent    = pendentes.length;
+
+  // Popular filtro de obras
+  const selObra = document.getElementById('mob-filtro-obra');
+  if(selObra && selObra.options.length <= 1){
+    const obras = [...new Set(completos.map(f => {
+      return (RDO_OBRAS&&RDO_OBRAS[f.obraId]?.nome) ||
+             (OBRAS_LISTA&&OBRAS_LISTA.find(o=>o.id===f.obraId)?.nome) ||
+             f.obraId || '';
+    }).filter(Boolean))];
+    obras.sort().forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o; opt.textContent = o;
+      selObra.appendChild(opt);
+    });
+  }
+
+  // Filtros
+  const busca     = ((document.getElementById('mob-busca')||{}).value||'').toLowerCase();
+  const obraFilt  = ((document.getElementById('mob-filtro-obra')||{}).value||'');
+
+  const filtrados = completos.filter(f => {
+    const obraNome = (RDO_OBRAS&&RDO_OBRAS[f.obraId]?.nome) ||
+                     (OBRAS_LISTA&&OBRAS_LISTA.find(o=>o.id===f.obraId)?.nome) ||
+                     f.obraId || '';
+    const matchBusca = !busca || (f.nome||'').toLowerCase().includes(busca) ||
+                       (f.matricula||'').toLowerCase().includes(busca) ||
+                       (f.funcao||'').toLowerCase().includes(busca);
+    const matchObra  = !obraFilt || obraNome === obraFilt;
+    return matchBusca && matchObra;
+  });
+
+  if(!filtrados.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3);font-size:13px">
+      <i data-lucide="shield-check" style="width:28px;height:28px;opacity:.3;display:block;margin:0 auto 8px"></i>
+      ${ completos.length === 0
+        ? 'Nenhum funcionário com documentação completa. Complete a documentação na aba <strong>Documentação</strong>.'
+        : 'Nenhum resultado para os filtros aplicados.' }
+    </td></tr>`;
+    setTimeout(()=>lucide.createIcons(),50);
+    return;
+  }
+
+  tbody.innerHTML = filtrados.map(f => {
+    const obraNome = (RDO_OBRAS&&RDO_OBRAS[f.obraId]?.nome) ||
+                     (OBRAS_LISTA&&OBRAS_LISTA.find(o=>o.id===f.obraId)?.nome) ||
+                     f.obraId || '—';
+    return `<tr>
+      <td style="font-size:11px;color:var(--text3)">${f.matricula||'—'}</td>
+      <td style="font-weight:500">${f.nome||'—'}</td>
+      <td>${f.funcao||'—'}</td>
+      <td style="font-size:12px">${obraNome}</td>
+      <td><span class="badge badge-gray">${f.regime||'—'}</span></td>
+      <td style="font-size:12px">${f.admissao||'—'}</td>
+      <td><span class="badge badge-green">✓ Completo</span></td>
+    </tr>`;
+  }).join('');
+  setTimeout(()=>lucide.createIcons(),50);
 }
 
 // Helper: registrar evento de auditoria sem bloquear UI
@@ -6420,6 +6501,7 @@ async function rhCarregarFuncionarios(){
     rhRenderFuncionarios();
     if(typeof rhRenderTreinamentos==='function') rhRenderTreinamentos();
     if(typeof rhRenderPainelGeral==='function') setTimeout(rhRenderPainelGeral, 50);
+    if(typeof mobilizacaoRender==='function') setTimeout(mobilizacaoRender, 60);
   }catch(e){ console.warn('Erro ao carregar funcionários:', e); }
 }
 
@@ -8140,6 +8222,9 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     if(pageId === 'usuarios'){
       usuariosCarregar();
+    }
+    if(pageId === 'rh-mobilizacao'){
+      mobilizacaoRender();
     }
     if(pageId === 'auditoria'){
       auditoriaRender();
