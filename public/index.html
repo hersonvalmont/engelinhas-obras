@@ -4859,7 +4859,8 @@ function _aplicarLogin(user){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
   document.getElementById('user-name').textContent=(user.nome||'').split(' ')[0];
-  usuarioLogadoEmail = user.email;
+  usuarioLogadoNome   = user.nome  || '';
+  usuarioLogadoEmail  = user.email;
   usuarioLogadoPerfil = user.perfil || 'Fiscal';
   // Sincronizar USUARIOS_LISTA com dados do usuário logado
   if(typeof USUARIOS_LISTA !== 'undefined'){
@@ -5273,9 +5274,9 @@ function rdoNovoForm(){
   const hoje = new Date().toISOString().split('T')[0];
   document.getElementById('rdo-data').value = hoje;
   rdoDataChange();
-  // Responsável = usuário logado
-  document.getElementById('rdo-responsavel').value = document.getElementById('user-name')?.textContent || '';
-  document.getElementById('rdo-elab-engelinhas').value = document.getElementById('user-name')?.textContent || '';
+  // Responsável = nome completo do usuário logado (editável)
+  document.getElementById('rdo-responsavel').value = usuarioLogadoNome || document.getElementById('user-name')?.textContent || '';
+  document.getElementById('rdo-elab-engelinhas').value = usuarioLogadoNome || document.getElementById('user-name')?.textContent || '';
   // Obra ativa do topbar — mapear nome para id
   const obraNomeAtiva = document.getElementById('obra-ativa-label')?.textContent?.trim() || '';
   const obraIdAtiva = Object.entries(RDO_OBRAS).find(([_,o])=>o.nome===obraNomeAtiva || obraNomeAtiva.includes(o.nome.split(' ')[0]))?.[0] || '';
@@ -9860,7 +9861,8 @@ function showToast(msg, tipo='info'){
 // ═══════════════════════════════════════════════════════
 // PERFIL DE USUÁRIO LOGADO
 // ═══════════════════════════════════════════════════════
-let usuarioLogadoEmail = '';
+let usuarioLogadoNome   = '';
+let usuarioLogadoEmail  = '';
 let usuarioLogadoPerfil = 'Fiscal';
 
 function abrirPerfil(){
@@ -9913,7 +9915,8 @@ function salvarPerfil(){
   USUARIOS_LISTA[idx].nome=nome;
   USUARIOS_LISTA[idx].empresa=document.getElementById('perfil-empresa').value.trim()||user.empresa;
   usuariosSalvarStorage(USUARIOS_LISTA);
-  // Atualizar nome exibido no topbar
+  // Atualizar nome exibido no topbar e variável global
+  usuarioLogadoNome = nome;
   document.getElementById('user-name').textContent=nome.split(' ')[0];
   // Feedback visual no modal
   const msgEl=document.getElementById('perfil-msg');
