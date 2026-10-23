@@ -3437,9 +3437,9 @@ tbody tr:hover td{background:var(--bg3)}
             </div>
           </div>
           <div class="table-wrap"><table>
-            <thead><tr><th>Funcionário</th><th>Tipo</th><th>Médico</th><th>Emissão</th><th>Validade</th><th>Resultado</th><th>Situação</th><th></th></tr></thead>
+            <thead><tr><th>Funcionário</th><th>Tipo</th><th>Emissão</th><th>Validade</th><th>Resultado</th><th>Situação</th><th></th></tr></thead>
             <tbody id="aso-tbody">
-              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum ASO registrado. Clique em "+ Registrar ASO" para adicionar.</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum ASO registrado. Clique em "+ Registrar ASO" para adicionar.</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -6630,7 +6630,7 @@ const FUNC_FUNCOES = [
 // técnicos de segurança e funções de coordenação de campo.
 const FUNC_NRS = {
   'Engenheiro de Produção': ['NR-6','NR-10','NR-18','NR-23','NR-35','Primeiros Socorros'],
-  'Engenheiro Eletricista': ['NR-6','NR-10','NR-35'],
+  'Engenheiro Eletricista': ['NR-6','NR-10','NR-10 SEP','NR-35'],
   'Engenheiro Civil': ['NR-6','NR-18','NR-33','NR-35'],
   'Engenheiro Residente': ['NR-6','NR-10','NR-18','NR-23','NR-35','Primeiros Socorros'],
   'Engenheiro de Segurança do Trabalho': ['NR-6','NR-10','NR-11','NR-12','NR-18','NR-23','NR-33','NR-35','Primeiros Socorros'],
@@ -6642,12 +6642,12 @@ const FUNC_NRS = {
   'Encarregado de Topografia': ['NR-6','NR-18','NR-35'],
   'Encarregado de Acesso': ['NR-6','NR-18'],
   'Encarregado Civil': ['NR-6','NR-18','NR-23','NR-33','Primeiros Socorros'],
-  'Encarregado Elétrico': ['NR-6','NR-10','NR-23','NR-35','Primeiros Socorros'],
+  'Encarregado Elétrico': ['NR-6','NR-10','NR-10 SEP','NR-23','NR-35','Primeiros Socorros'],
   'Encarregado de Lançamento de Cabos': ['NR-6','NR-10','NR-11','NR-12','NR-23','NR-35','Primeiros Socorros'],
   'Mestre de Obras': ['NR-6','NR-18','NR-23','NR-35','Primeiros Socorros'],
 
   'Técnico de Segurança do Trabalho': ['NR-6','NR-10','NR-11','NR-12','NR-18','NR-23','NR-33','NR-35','Primeiros Socorros'],
-  'Técnico em Eletrotécnica': ['NR-6','NR-10','NR-35'],
+  'Técnico em Eletrotécnica': ['NR-6','NR-10','NR-10 SEP','NR-35'],
   'Técnico em Edificações': ['NR-6','NR-18'],
   'Técnico de Fiscalização': ['NR-6','NR-10','NR-18','NR-35'],
   'Técnico Ambiental': ['NR-6','NR-18'],
@@ -6665,18 +6665,18 @@ const FUNC_NRS = {
 
   'Montador de Linha': ['NR-6','NR-10','NR-11','NR-12','NR-35'],
   'Montador de Estruturas Metálicas': ['NR-6','NR-11','NR-12','NR-18','NR-35'],
-  'Montador de Subestação': ['NR-6','NR-10','NR-11','NR-12','NR-35'],
+  'Montador de Subestação': ['NR-6','NR-10','NR-10 SEP','NR-11','NR-12','NR-35'],
   'Preparador de Estruturas Metálicas': ['NR-6','NR-11','NR-12','NR-18'],
   'Rigger / Sinaleiro': ['NR-6','NR-11','NR-12','NR-18','NR-35'],
 
   'Cabista — Lançamento de Cabos': ['NR-6','NR-10','NR-11','NR-12','NR-35'],
   'Regulador de Cabos': ['NR-6','NR-10','NR-11','NR-12','NR-35'],
-  'Instalador de Linhas de Alta Tensão': ['NR-6','NR-10','NR-35'],
+  'Instalador de Linhas de Alta Tensão': ['NR-6','NR-10','NR-10 SEP','NR-35'],
 
-  'Eletricista de Linha': ['NR-6','NR-10','NR-35'],
-  'Eletricista Industrial': ['NR-6','NR-10'],
-  'Eletricista Instalador de Alta e Baixa Tensão': ['NR-6','NR-10','NR-35'],
-  'Operador de Manutenção de Transmissão': ['NR-6','NR-10','NR-12','NR-35'],
+  'Eletricista de Linha': ['NR-6','NR-10','NR-10 SEP','NR-35'],
+  'Eletricista Industrial': ['NR-6','NR-10','NR-10 SEP'],
+  'Eletricista Instalador de Alta e Baixa Tensão': ['NR-6','NR-10','NR-10 SEP','NR-35'],
+  'Operador de Manutenção de Transmissão': ['NR-6','NR-10','NR-10 SEP','NR-12','NR-35'],
 
   'Soldador': ['NR-6','NR-12','NR-18'],
   'Armador': ['NR-6','NR-18'],
@@ -6826,13 +6826,14 @@ function rhRenderFuncionarios(){
         <td>${statusBadge}</td>
         <td>
           <div style="display:flex;gap:4px">
+            <button class="btn btn-sm" onclick="funcVerDetalhes('${f.matricula}')" title="Ver detalhes" style="color:var(--blue)">Ver</button>
             <button class="btn btn-sm" onclick="funcEditar('${f.matricula}')" title="Editar"><i data-lucide="pencil" style="width:12px;height:12px"></i></button>
             ${f.id ? `<button class="btn btn-sm" onclick="arquivosAbrir('funcionarios','${f.id}','Documentos — ${(f.nome||'').replace(/'/g,"\\'")}')" title="Ver documentos" style="color:var(--blue)"><i data-lucide="paperclip" style="width:12px;height:12px"></i></button>` : ''}
             <button class="btn btn-sm ${ativo?'':'btn-primary'}" onclick="funcToggleAtivo('${f.matricula}')" title="${ativo?'Desativar':'Ativar'}">
               ${ativo?'<i data-lucide="user-x" style="width:12px;height:12px"></i>':'<i data-lucide="user-check" style="width:12px;height:12px"></i>'}
             </button>
             ${f.id ? `<button class="btn btn-sm" onclick="funcExcluirFuncionario(${f.id},'${(f.nome||'').replace(/'/g,"\\'")}')" title="Excluir funcionário" style="color:#ef4444"><i data-lucide="trash-2" style="width:12px;height:12px"></i></button>` : ''}
-            ${f.id ? `<button class="btn btn-sm" onclick="abrirHistorico('funcionarios',${f.id},'${(f.nome||'').replace(/'/g,"\\'")}')" title="Histórico" style="color:var(--text3)"><i data-lucide="history" style="width:12px;height:12px"></i></button>` : ''}
+            ${f.id ? `<button class="btn btn-sm" onclick="funcAbrirTimeline('${f.matricula}')" title="Histórico do funcionário" style="color:var(--text3)"><i data-lucide="history" style="width:12px;height:12px"></i></button>` : ''}
           </div>
         </td>
       </tr>`;
@@ -6915,6 +6916,107 @@ function funcVerDetalhes(matricula){
   document.getElementById('func-ver-conteudo').innerHTML = conteudo;
   openModal('modal-ver-funcionario');
   setTimeout(()=>{ if(window.lucide) lucide.createIcons(); },50);
+}
+
+// ── Linha do tempo completa do funcionário ────────────
+async function funcAbrirTimeline(matricula){
+  const f = FUNCIONARIOS.find(x=>x.matricula===matricula);
+  if(!f){ showToast('Funcionário não encontrado.','error'); return; }
+
+  document.getElementById('hist-subtitulo').textContent = f.nome + ' · ' + f.matricula;
+  document.getElementById('hist-corpo').innerHTML =
+    `<div style="text-align:center;padding:32px;color:var(--text3)">
+       <i data-lucide="loader" style="width:24px;height:24px;margin-bottom:8px;opacity:.5"></i>
+       <div style="font-size:13px">Carregando linha do tempo...</div>
+     </div>`;
+  openModal('modal-historico');
+  setTimeout(()=>lucide.createIcons(),50);
+
+  try {
+    // 1. Auditoria da entidade funcionários (cadastro, edições, ativações)
+    let auditFuncs = [];
+    if(f.id){
+      try{ auditFuncs = await apiAudit.listar('funcionarios', f.id); } catch(e){ auditFuncs=[]; }
+    }
+
+    // 2. Treinamentos registrados (de nrsDetalhes)
+    const nrsDetalhes = f.nrsDetalhes || {};
+    const treinamentosEvts = Object.entries(nrsDetalhes).map(([nr, det])=>({
+      tipo: 'treinamento',
+      data: det.dataRealizacao || '',
+      descricao: `Treinamento registrado: ${nr} (${det.tipo||'—'}) · Validade: ${det.dataVencimento||'—'} · Certificadora: ${det.instituicao||'—'}`
+    }));
+
+    // 3. ASOs do funcionário
+    const asoFuncs = (typeof ASO_LISTA !== 'undefined' ? ASO_LISTA : [])
+      .filter(a => a.matricula === matricula);
+    const asoEvts = asoFuncs.map(a=>({
+      tipo: 'aso',
+      data: a.dataEmissao || a.criadoEm || '',
+      descricao: `ASO registrado: ${a.tipo||'—'} · Resultado: ${a.resultado||'—'} · Validade: ${a.validade||'—'}`
+    }));
+
+    const corpo = document.getElementById('hist-corpo');
+
+    if(!auditFuncs.length && !treinamentosEvts.length && !asoEvts.length){
+      corpo.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text3)">
+        <i data-lucide="clock" style="width:32px;height:32px;margin-bottom:10px;opacity:.3"></i>
+        <div style="font-size:13px">Nenhuma movimentação registrada ainda.</div>
+      </div>`;
+      setTimeout(()=>lucide.createIcons(),50);
+      return;
+    }
+
+    const acaoIcone = (acao) => {
+      if(acao==='CRIADO'||acao==='REGISTRADO') return {cls:'create', icon:'plus'};
+      if(acao==='EDITADO'||acao==='ATUALIZADO') return {cls:'update', icon:'pencil'};
+      if(acao==='EXCLUIDO'||acao==='REMOVIDO'||acao==='DESATIVADO') return {cls:'delete', icon:'trash-2'};
+      if(acao==='ATIVADO') return {cls:'create', icon:'user-check'};
+      if(acao==='TREINAMENTO') return {cls:'update', icon:'book-open'};
+      if(acao==='ASO') return {cls:'update', icon:'file-heart'};
+      return {cls:'view', icon:'activity'};
+    };
+
+    // Montar itens auditoria
+    const itensAudit = auditFuncs.map(h=>{
+      const {cls, icon} = acaoIcone(h.acao);
+      return `<div class="hist-item">
+        <div class="hist-icon ${cls}"><i data-lucide="${icon}" style="width:14px;height:14px"></i></div>
+        <div class="hist-body">
+          <div class="hist-acao">${h.acao}</div>
+          ${h.detalhe ? `<div class="hist-detalhe">${h.detalhe}</div>` : ''}
+          <div class="hist-meta"><strong>${h.usuario_nome||'Sistema'}</strong>${h.usuario_email?' · '+h.usuario_email:''} · ${h.criado_em||''}</div>
+        </div>
+      </div>`;
+    });
+
+    // Montar itens treinamentos
+    const itensTr = treinamentosEvts.map(ev=>`<div class="hist-item">
+      <div class="hist-icon update"><i data-lucide="book-open" style="width:14px;height:14px"></i></div>
+      <div class="hist-body">
+        <div class="hist-acao">TREINAMENTO</div>
+        <div class="hist-detalhe">${ev.descricao}</div>
+        <div class="hist-meta">${ev.data||'Data não informada'}</div>
+      </div>
+    </div>`);
+
+    // Montar itens ASO
+    const itensAso = asoEvts.map(ev=>`<div class="hist-item">
+      <div class="hist-icon create"><i data-lucide="heart-pulse" style="width:14px;height:14px"></i></div>
+      <div class="hist-body">
+        <div class="hist-acao">ASO</div>
+        <div class="hist-detalhe">${ev.descricao}</div>
+        <div class="hist-meta">${ev.data||'Data não informada'}</div>
+      </div>
+    </div>`);
+
+    corpo.innerHTML = [...itensAudit, ...itensTr, ...itensAso].join('') ||
+      `<div style="text-align:center;padding:40px;color:var(--text3)">Nenhum evento encontrado.</div>`;
+    setTimeout(()=>lucide.createIcons(),50);
+  } catch(e){
+    document.getElementById('hist-corpo').innerHTML =
+      `<div style="padding:24px;color:var(--red);text-align:center">Erro ao carregar linha do tempo.</div>`;
+  }
 }
 
 // ── Registro de treinamento/NR individual ─────────────
@@ -7081,6 +7183,12 @@ async function trSalvar(){
 
   rhSalvarFuncionarios();
 
+  // Registrar evento na linha do tempo do funcionário
+  if(f.id){
+    auditLog('funcionarios', f.id, 'TREINAMENTO REGISTRADO',
+      `${nrNome} (${tipo}) · Realização: ${dataRealizacao} · Vencimento: ${dataVencimento} · Certificadora: ${instituicao}`);
+  }
+
   // Sincronizar com API
   const fAtualizado = FUNCIONARIOS.find(x=>x.matricula===matricula);
   if(fAtualizado && fAtualizado.id){
@@ -7232,7 +7340,7 @@ function funcRenderNRs(funcao){
   const lista = document.getElementById('func-nrs-lista');
   if(!wrapper || !lista) return;
   const nrsSugeridas = FUNC_NRS[funcao] || [];
-  const TODAS_NRS = ['NR-6','NR-10','NR-12','NR-18','NR-33','NR-35','Trabalho em Altura','Primeiros Socorros'];
+  const TODAS_NRS = ['NR-6','NR-10','NR-10 SEP','NR-11','NR-12','NR-18','NR-23','NR-33','NR-35','Trabalho em Altura','Direção Defensiva','Primeiros Socorros'];
   if(!funcao){
     wrapper.style.display='none';
     lista.innerHTML='';
@@ -9426,6 +9534,11 @@ function asoSalvar(){
     showToast(asoEditandoId?'ASO atualizado com sucesso.':'ASO registrado com sucesso.','success');
     const detalhe = `Tipo: ${dados.tipo} | Resultado: ${dados.resultado} | Emissão: ${dados.dataEmissao} | Validade: ${dados.validade}`;
     auditLog('asos', asoId, asoEditandoId?'EDITADO':'REGISTRADO', detalhe);
+    // Registrar também na linha do tempo do funcionário
+    if(func && func.id){
+      auditLog('funcionarios', func.id, asoEditandoId ? 'ASO ATUALIZADO' : 'ASO REGISTRADO',
+        `${dados.tipo} · Resultado: ${dados.resultado} · Emissão: ${dados.dataEmissao} · Validade: ${dados.validade}`);
+    }
     closeModal('modal-aso');
     asoCarregar().then(()=>asoRender());
   }).catch(e=>showToast(e.message,'error'));
@@ -9455,7 +9568,7 @@ function asoRender(){
   lista = lista.slice().sort((a,b)=> (b.criadoEm||'').localeCompare(a.criadoEm||''));
 
   if(!lista.length){
-    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:32px">Nenhum ASO encontrado.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px">Nenhum ASO encontrado.</td></tr>';
     asoRenderKpis();
     return;
   }
@@ -9468,7 +9581,6 @@ function asoRender(){
     return `<tr>
       <td><span style="font-weight:500">${a.nomeFuncionario}</span><br><span style="font-size:11px;color:var(--text3)">${a.matricula||''}</span></td>
       <td><span class="badge">${a.tipo||'—'}</span></td>
-      <td style="font-size:12px">${a.medico||'—'}${a.crm?' <span style="color:var(--text3)">'+a.crm+'</span>':''}</td>
       <td style="font-size:13px">${emissaoFmt}</td>
       <td style="font-size:13px">${validadeFmt}</td>
       <td><span class="badge ${a.resultado==='Apto'?'badge-green':a.resultado==='Inapto'?'badge-red':'badge-amber'}">${a.resultado||'—'}</span></td>
@@ -10013,8 +10125,8 @@ function exportarCSV(tipo){
   } else if(tipo==='asos'){
     asoCarregar();
     nome='asos_engelinhas';
-    linhas.push(['ID','Funcionário','Matrícula','Tipo','Resultado','Médico','CRM','Data Emissão','Validade','Observações','Qtd Arquivos']);
-    ASO_LISTA.forEach(a=>linhas.push([a.id,a.nomeFuncionario||'',a.matricula||'',a.tipo||'',a.resultado||'',a.medico||'',a.crm||'',a.dataEmissao||'',a.validade||'',a.obs||'',(a.arquivos||[]).length]));
+    linhas.push(['ID','Funcionário','Matrícula','Tipo','Resultado','Data Emissão','Validade','Observações','Qtd Arquivos']);
+    ASO_LISTA.forEach(a=>linhas.push([a.id,a.nomeFuncionario||'',a.matricula||'',a.tipo||'',a.resultado||'',a.dataEmissao||'',a.validade||'',a.obs||'',(a.arquivos||[]).length]));
   } else if(tipo==='rh-epi'){
     const lista=repoCarregar('rh-epi');
     nome='epi_engelinhas';
