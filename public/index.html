@@ -696,13 +696,21 @@ tbody tr:hover td{background:var(--bg3)}
         </div>
       </div>
 
-      <!-- 4. PROJETOS -->
+      <!-- 4. DOCUMENTAÇÃO TÉCNICA -->
       <div class="nav-item has-children" id="nav-projetos" onclick="toggleNav('projetos')">
         <span class="nav-icon"><i data-lucide="drafting-compass"></i></span>
-        <span class="nav-label">Projetos</span>
+        <span class="nav-label">Documentação Técnica</span>
         <span class="nav-chevron"><i data-lucide="chevron-down"></i></span>
       </div>
       <div class="nav-sub" id="sub-projetos">
+        <div class="nav-sub-item" data-page="doc-procedimentos" onclick="navTo('doc-procedimentos')">
+          <span class="sub-icon"><i data-lucide="clipboard-check"></i></span>
+          <span class="sub-label">Procedimentos</span>
+        </div>
+        <div class="nav-sub-item" data-page="doc-normas" onclick="navTo('doc-normas')">
+          <span class="sub-icon"><i data-lucide="book-open"></i></span>
+          <span class="sub-label">Normas</span>
+        </div>
         <div class="nav-sub-item has-children" id="nav-sub-basicos" onclick="toggleSubNav('basicos')">
           <span class="sub-icon"><i data-lucide="folder"></i></span>
           <span class="sub-label">Proj. Básicos</span>
@@ -753,10 +761,6 @@ tbody tr:hover td{background:var(--bg3)}
         <div class="nav-sub-item" data-page="acomp-rdpp" onclick="navTo('acomp-rdpp')">
           <span class="sub-icon"><i data-lucide="bar-chart-2"></i></span>
           <span class="sub-label">Diário de Produção</span>
-        </div>
-        <div class="nav-sub-item" data-page="acomp-planilhas" onclick="navTo('acomp-planilhas')">
-          <span class="sub-icon"><i data-lucide="table-2"></i></span>
-          <span class="sub-label">Planilhas Técnicas</span>
         </div>
         <div class="nav-sub-item has-children" id="nav-sub-acomp-relatorios" onclick="toggleSubNav('acomp-relatorios')">
           <span class="sub-icon"><i data-lucide="folder-open"></i></span>
@@ -809,7 +813,7 @@ tbody tr:hover td{background:var(--bg3)}
         </div>
         <div class="nav-sub-item has-children" id="nav-sub-plan-geotecnica" onclick="toggleSubNav('plan-geotecnica')">
           <span class="sub-icon"><i data-lucide="cable"></i></span>
-          <span class="sub-label">Geotécnica</span>
+          <span class="sub-label">Eletromecânico</span>
           <span class="sub-chev"><i data-lucide="chevron-down"></i></span>
         </div>
         <div class="nav-sub-sub" id="subsub-plan-geotecnica">
@@ -888,6 +892,9 @@ tbody tr:hover td{background:var(--bg3)}
       <div class="nav-item" data-page="auditoria" onclick="navTo('auditoria')">
         <span class="nav-icon"><i data-lucide="shield-check"></i></span>
         <span class="nav-label">Auditoria</span>
+      </div>
+      <div style="padding:8px 16px 12px">
+        <button onclick="limparCacheApp()" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--text3);opacity:0.4;padding:2px 0;transition:opacity .2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.4'">limpar cache</button>
       </div>
     </nav>
 
@@ -1323,11 +1330,43 @@ tbody tr:hover td{background:var(--bg3)}
         </div>
       </div>
 
+      <!-- ═══ DOC PROCEDIMENTOS ═══ -->
+      <div class="page" id="page-doc-procedimentos">
+        <div class="page-header">
+          <div>
+            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Documentação Técnica <i data-lucide="chevron-right"></i> <span>Procedimentos</span></div>
+            <div class="page-title">Procedimentos</div>
+            <div class="page-sub">Procedimentos técnicos e operacionais da obra</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:24px;padding:48px;text-align:center">
+          <i data-lucide="construction" style="width:48px;height:48px;color:var(--text3);margin-bottom:16px"></i>
+          <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px">Módulo em implantação</div>
+          <div style="font-size:13px;color:var(--text3)">Este módulo estará disponível em breve.</div>
+        </div>
+      </div>
+
+      <!-- ═══ DOC NORMAS ═══ -->
+      <div class="page" id="page-doc-normas">
+        <div class="page-header">
+          <div>
+            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Documentação Técnica <i data-lucide="chevron-right"></i> <span>Normas</span></div>
+            <div class="page-title">Normas</div>
+            <div class="page-sub">Normas técnicas aplicáveis ao contrato</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:24px;padding:48px;text-align:center">
+          <i data-lucide="construction" style="width:48px;height:48px;color:var(--text3);margin-bottom:16px"></i>
+          <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px">Módulo em implantação</div>
+          <div style="font-size:13px;color:var(--text3)">Este módulo estará disponível em breve.</div>
+        </div>
+      </div>
+
       <!-- ═══ PROJ BÁSICO CIVIS ═══ -->
       <div class="page" id="page-proj-basico-civis">
         <div class="page-header">
           <div>
-            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Projetos <i data-lucide="chevron-right"></i> Proj. Básicos <i data-lucide="chevron-right"></i> <span>Civis</span></div>
+            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Documentação Técnica <i data-lucide="chevron-right"></i> Proj. Básicos <i data-lucide="chevron-right"></i> <span>Civis</span></div>
             <div class="page-title">Projetos Básicos — Civis</div>
             <div class="page-sub">Implantação, fundações, drenagem e obras civis</div>
           </div>
@@ -1367,7 +1406,7 @@ tbody tr:hover td{background:var(--bg3)}
       <div class="page" id="page-proj-basico-em">
         <div class="page-header">
           <div>
-            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Projetos <i data-lucide="chevron-right"></i> Proj. Básicos <i data-lucide="chevron-right"></i> <span>Eletromecânicos</span></div>
+            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Documentação Técnica <i data-lucide="chevron-right"></i> Proj. Básicos <i data-lucide="chevron-right"></i> <span>Eletromecânicos</span></div>
             <div class="page-title">Projetos Básicos — Eletromecânicos</div>
             <div class="page-sub">Sistemas elétricos, proteção, controle e mecânicos</div>
           </div>
@@ -1406,7 +1445,7 @@ tbody tr:hover td{background:var(--bg3)}
       <div class="page" id="page-proj-exec-civis">
         <div class="page-header">
           <div>
-            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Projetos <i data-lucide="chevron-right"></i> Proj. Executivos <i data-lucide="chevron-right"></i> <span>Civis</span></div>
+            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Documentação Técnica <i data-lucide="chevron-right"></i> Proj. Executivos <i data-lucide="chevron-right"></i> <span>Civis</span></div>
             <div class="page-title">Projetos Executivos — Civis</div>
             <div class="page-sub">Armaduras, formas, cofragens e especificações detalhadas</div>
           </div>
@@ -1445,7 +1484,7 @@ tbody tr:hover td{background:var(--bg3)}
       <div class="page" id="page-proj-exec-em">
         <div class="page-header">
           <div>
-            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Projetos <i data-lucide="chevron-right"></i> Proj. Executivos <i data-lucide="chevron-right"></i> <span>Eletromecânicos</span></div>
+            <div class="page-breadcrumb"><i data-lucide="drafting-compass"></i> Documentação Técnica <i data-lucide="chevron-right"></i> Proj. Executivos <i data-lucide="chevron-right"></i> <span>Eletromecânicos</span></div>
             <div class="page-title">Projetos Executivos — Eletromecânicos</div>
             <div class="page-sub">Submittals, listas técnicas, diagramas e testes de aceitação</div>
           </div>
@@ -3697,7 +3736,7 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <div class="page" id="page-plan-geo-lancamento">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Plano de Lançamento</span></div><div class="page-title">Plano de Lançamento</div><div class="page-sub">Planilhas de lançamento de cabos, vãos e sequência de montagem</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-geo-lancamento','Novo Plano de Lançamento')"><i data-lucide="plus"></i> Nova Planilha</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Eletromecânico</span><i data-lucide="chevron-right"></i><span>Plano de Lançamento</span></div><div class="page-title">Plano de Lançamento</div><div class="page-sub">Planilhas de lançamento de cabos, vãos e sequência de montagem</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-geo-lancamento','Novo Plano de Lançamento')"><i data-lucide="plus"></i> Nova Planilha</button></div>
         
       <div class="kpi-grid kpi-grid-3" style="margin-top:8px">
         <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-plan-geo-lancamento-total">0</div></div>
@@ -3719,7 +3758,7 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
 
       <div class="page" id="page-plan-geo-esticamento">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Geotécnica</span><i data-lucide="chevron-right"></i><span>Tabela de Esticamento</span></div><div class="page-title">Tabela de Esticamento</div><div class="page-sub">Tabelas de flechas, tensões e parâmetros de esticamento de cabos</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-geo-esticamento','Nova Tabela de Esticamento')"><i data-lucide="plus"></i> Nova Planilha</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Planilhas Técnicas</span><i data-lucide="chevron-right"></i><span>Eletromecânico</span><i data-lucide="chevron-right"></i><span>Tabela de Esticamento</span></div><div class="page-title">Tabela de Esticamento</div><div class="page-sub">Tabelas de flechas, tensões e parâmetros de esticamento de cabos</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('plan-geo-esticamento','Nova Tabela de Esticamento')"><i data-lucide="plus"></i> Nova Planilha</button></div>
         
       <div class="kpi-grid kpi-grid-3" style="margin-top:8px">
         <div class="kpi blue"><div class="kpi-label">Total</div><div class="kpi-value" id="kpi-plan-geo-esticamento-total">0</div></div>
@@ -3903,9 +3942,9 @@ tbody tr:hover td{background:var(--bg3)}
         </div>
       </div>
 
-      <!-- PROJETOS — Materiais -->
+      <!-- DOCUMENTAÇÃO TÉCNICA — Materiais -->
       <div class="page" id="page-proj-materiais">
-        <div class="page-header"><div><div class="page-breadcrumb"><span>Projetos</span><i data-lucide="chevron-right"></i><span>Materiais</span></div><div class="page-title">Materiais</div><div class="page-sub">Especificações técnicas, listas de materiais e controle de aprovações</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('proj-materiais','Novo Material')"><i data-lucide="plus"></i> Novo material</button></div>
+        <div class="page-header"><div><div class="page-breadcrumb"><span>Documentação Técnica</span><i data-lucide="chevron-right"></i><span>Materiais</span></div><div class="page-title">Materiais</div><div class="page-sub">Especificações técnicas, listas de materiais e controle de aprovações</div></div><button class="btn btn-primary" onclick="abrirModalRegistro('proj-materiais','Novo Material')"><i data-lucide="plus"></i> Novo material</button></div>
         <div class="kpi-grid kpi-grid-3">
           <div class="kpi blue"><div class="kpi-label">Itens cadastrados</div><div class="kpi-value" id="kpi-proj-materiais-total">0</div></div>
           <div class="kpi green"><div class="kpi-label">Aprovados</div><div class="kpi-value" id="kpi-proj-materiais-ok">0</div></div>
@@ -4795,6 +4834,27 @@ function auditoriaExportarCSV(){
   a.href = URL.createObjectURL(blob);
   a.download = 'auditoria_' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
+}
+
+// Limpar cache API e service workers sem apagar localStorage
+async function limparCacheApp(){
+  try {
+    // Cache API
+    if('caches' in window){
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+    // Service Workers
+    if('serviceWorker' in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+    // Recarregar com ?v=timestamp para forçar novos recursos
+    const sep = location.search ? '&' : '?';
+    location.href = location.pathname + location.search + sep + 'v=' + Date.now();
+  } catch(e){
+    location.reload(true);
+  }
 }
 
 function toggleDebug(){
@@ -8388,6 +8448,9 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     if(pageId === 'auditoria'){
       auditoriaRender();
+    }
+    if(pageId === 'doc-procedimentos' || pageId === 'doc-normas'){
+      // páginas estáticas — nada a carregar
     }
     // Atualizar KPIs globais de RH sempre que navegar para qualquer sub-página RH
     if(pageId && pageId.startsWith('rh-') && typeof rhAtualizarKpis==='function'){
